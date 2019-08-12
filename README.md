@@ -7,4 +7,4 @@ Microsequencer-based processors:
 
     MCL86 - Intel 8086/8088
 
-Lockstep Quad Modular Redundant Processor 
+Lockstep Quad Modular Redundant Processor ..
