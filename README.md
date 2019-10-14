@@ -1,4 +1,4 @@
-# MicroCore Labs 
+# Ted Fried's MicroCore Labs Projects
 Microsequencer-based processors:
 
     MCL65 - MOS 6502 
@@ -7,4 +7,3 @@ Microsequencer-based processors:
 
     MCL86 - Intel 8086/8088
 
-Lockstep Quad Modular Redundant Processor ..

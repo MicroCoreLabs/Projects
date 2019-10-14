@@ -1,0 +1,2747 @@
+//
+// Microcode for the MCL65
+//
+
+// -------------------------------------------------
+//
+// Main loop
+//
+// -------------------------------------------------
+
+
+// Fetch the next program opcode byte
+//
+@100 277F_0001  // PC = PC + 1
+@101 4A7F_0000  // ADDRESS_OUT = PC
+@102 4DFF_0003  // SYNC=1, RD_WR_n=1
+@103 1033_0000  // Wait for CLK to be high
+
+// While waiting for CLK to go low, check for NMI, INT, or Overflow inputs active
+//
+@104 3FCF_0038  // Dummy <= System_Status AND 0x0038 	-- Isolate the IRQ, SO, and NMI active
+@105 1002_0113  // Jump zero to Fetch_Opcode
+
+@106 3FCF_0010  // Dummy <= System_Status AND 0x0010 	-- Test for SO
+@107 1002_010C  // Jump zero to next check
+@108 499F_0040  // Set the V Flag
+@109 4DDF_0010  // Assert so_debounce
+@10A 3DDF_FFEF  // De-assert so_debounce
+@10B 1002_0113  // Jump to Fetch_Opcode
+
+@10C 3FCF_0008  // Dummy <= System_Status AND 0x0008 	-- Test for NMI
+@10D 1002_0111  // Jump zero to next check
+@10E 4DDF_0008  // Assert nmi_debounce
+@10F 3DDF_FFF7  // De-assert nmi_debounce
+@110 1000_05A2  // Jump to NMI_n Interrupt Processing
+
+@111 3FCF_0020  // Dummy <= System_Status AND 0x0020 	-- Test for IRQ
+@112 1001_0573  // Jump nonzero to INTR_n Interrupt Processing
+
+
+@113 1034_0000  // Wait for CLK to be low
+@114 4DFF_0001  // SYNC=0, RD_WR_n=1
+@115 1010_0000  // Jump to opcode vector table
+
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+//
+//                 Procedures
+//
+// -------------------------------------------------
+// -------------------------------------------------
+
+// -------------------------------------------------
+//
+// Procedure - Calc_Flags
+//
+// Input: r2 = register to examine for Z and N flags
+//
+// -------------------------------------------------
+@122 30CF_0040  // r0 <= system_signals AND 0040 -- Set Flag OVERFLOW_CARRY_NEGATIVE_ZERO
+@123 399F_FFBF  // Flags <= Flags AND 0xFFBF
+@124 4990_0000  // Flags <= Flags OR r0 
+
+@125 30CF_0001  // r0 <= system_signals AND 0001 -- Set Flag CARRY_NEGATIVE_ZERO
+@126 399F_FFFE  // Flags <= Flags AND 0xFFFE
+@127 4990_0000  // Flags <= Flags OR r0 
+
+@128 399F_FF7F  // Flags <= Flags AND 0xFF7F     -- Set Flag NEGATIVE_ZERO
+@129 3F2F_0080  // Dummy <= r2 AND 0080			 
+@12A 1002_012C  // Jump Zero to set flag Z
+@12B 499F_0080  // Flags <= Flags OR 0080
+    
+@12C 399F_FFFD  // Flags <= Flags AND 0xFFFD     -- Set Flag ZERO
+@12D 3F2F_00FF  // Dummy <= r2 AND 00FF			 
+@12E 1001_0130  // Jump NonZero to return
+@12F 499F_0002  // Flags <= Flags OR 0002
+
+@130 1020_0000  // Return
+
+
+// -------------------------------------------------
+//
+// Procedure - Fetch_Immediate
+//
+//  r2 = Fetched data
+//
+//  1) Fetch the next byte and store it in r2.
+//  2) Begin the process of fetching the next instruction.
+//
+// -------------------------------------------------
+@134 277F_0001  // PC = PC + 1
+@135 4A7F_0000  // ADDRESS_OUT = PC
+@136 4DFF_0001  // SYNC=0, RD_WR_n=1
+@137 1033_0000  // Wait for CLK to be high
+@138 1034_0000  // Wait for CLK to be low
+@139 32BF_00FF  // r2 <= data_in AND 0x00FF
+
+@13A 277F_0001  // PC = PC + 1
+@13B 4A7F_0000  // ADDRESS_OUT = PC
+@13C 4DFF_0003  // SYNC=1, RD_WR_n=1
+@13D 1020_0000  // Return
+
+
+// -------------------------------------------------
+//
+// Procedure - Fetch_Zero_Page
+//
+//  r2 = Fetched data
+//
+//  1) Fetch the next byte, ADL, and store it in ADDR_OUT.
+//  2) Fetch next byte from address 0x00,ADL and store it in r2.
+//  3) Begin the process of fetching the next instruction.
+//
+// -------------------------------------------------
+@142 277F_0001  // PC = PC + 1
+@143 4A7F_0000  // ADDRESS_OUT = PC
+@144 4DFF_0001  // SYNC=0, RD_WR_n=1
+@145 1033_0000  // Wait for CLK to be high
+@146 1034_0000  // Wait for CLK to be low
+@147 3ABF_00FF  // ADDRESS_OUT <= data_in AND 0x00FF
+
+@148 4DFF_0001  // SYNC=0, RD_WR_n=1
+@149 1033_0000  // Wait for CLK to be high
+@14A 1034_0000  // Wait for CLK to be low
+@14B 32BF_00FF  // r2 <= data_in AND 0x00FF
+
+@14C 277F_0001  // PC = PC + 1
+@14D 4A7F_0000  // ADDRESS_OUT = PC
+@14E 4DFF_0003  // SYNC=1, RD_WR_n=1
+@14F 1020_0000  // Return
+
+
+// -------------------------------------------------
+//
+// Procedure - Fetch_Zero_Page_X  Jump to 0x155
+//           - Fetch_Zero_Page_Y  Jump to 0x153
+//
+//  r2 = Fetched data
+//
+//  1) Fetch the next byte, BAL, and store it in ADDR_OUT.
+//  2) Fetch next byte from address 0x00,BAL but ignore it.
+//  3) Add register X to the address 0x00,BAL and store returned data in r2.
+//  4) Begin the process of fetching the next instruction.
+//
+// -------------------------------------------------
+
+@153 436F_0000  // r3 <= Y OR 0x0000
+@154 1000_0156  // Jump over next instruction
+
+@155 435F_0000  // r3 <= X OR 0x0000
+@156 277F_0001  // PC = PC + 1
+@157 4A7F_0000  // ADDRESS_OUT = PC
+@158 4DFF_0001  // SYNC=0, RD_WR_n=1
+@159 1033_0000  // Wait for CLK to be high
+@15A 1034_0000  // Wait for CLK to be low
+@15B 3ABF_00FF  // ADDRESS_OUT <= data_in AND 0x00FF
+
+@15C 1033_0000  // Wait for CLK to be high
+@15D 1034_0000  // Wait for CLK to be low
+@15E 223A_0000  // r2 <= r3 + ADDRESS_OUT
+@15F 3A2F_00FF  // ADDRESS_OUT <= r2 AND 0x00FF
+
+@160 1033_0000  // Wait for CLK to be high
+@161 1034_0000  // Wait for CLK to be low
+@162 32BF_00FF  // r2 <= data_in AND 0x00FF
+
+@163 277F_0001  // PC = PC + 1
+@164 4A7F_0000  // ADDRESS_OUT = PC
+@165 4DFF_0003  // SYNC=1, RD_WR_n=1
+@166 1020_0000  // Return
+
+
+// -------------------------------------------------
+//
+// Procedure - Fetch_Absolute
+//
+//  r2 = Fetched data
+//
+//  1) Fetch the next byte, ADL, and store it in lower byte r2.
+//  2) Fetch the next byte, ADH, and store it in upper byte r3.
+//  3) Fetch the addressed byte from the combination of r3 and r2.
+//  4) Begin the process of fetching the next instruction.
+//
+// -------------------------------------------------
+@16A 277F_0001  // PC = PC + 1
+@16B 4A7F_0000  // ADDRESS_OUT = PC
+@16C 4DFF_0001  // SYNC=0, RD_WR_n=1
+@16D 1033_0000  // Wait for CLK to be high
+@16E 1034_0000  // Wait for CLK to be low
+@16F 32BF_00FF  // r2 <= data_in AND 0x00FF
+@170 277F_0001  // PC = PC + 1
+@171 4A7F_0000  // ADDRESS_OUT = PC
+
+@172 1033_0000  // Wait for CLK to be high
+@173 1034_0000  // Wait for CLK to be low
+@174 33BF_FF00  // r3 <= data_in AND 0xFF00
+@175 4A23_0000  // ADDRESS_OUT <= r2 OR r3
+
+@176 1033_0000  // Wait for CLK to be high
+@177 1034_0000  // Wait for CLK to be low
+@178 32BF_00FF  // r2 <= data_in AND 0x00FF
+
+@179 277F_0001  // PC = PC + 1
+@17A 4A7F_0000  // ADDRESS_OUT = PC
+@17B 4DFF_0003  // SYNC=1, RD_WR_n=1
+@17C 1020_0000  // Return
+
+
+// -------------------------------------------------
+//
+// Procedure - Fetch_Absolute_X 
+//
+//  r2 = Fetched data
+//
+//  1) Fetch the next byte, ADL, and store it in lower byte r2.
+//  2) Fetch the next byte, ADH, and store it in upper byte r3.
+//  3) Add X to the addressed byte from the combination of r3 and r2 and fetch byte.
+// 3a) If addition carried over into ADH, then increment ADH and fetch data again.
+//  4) Begin the process of fetching the next instruction.
+//
+// -------------------------------------------------
+@180 415F_0000  // r1 <= X OR 0x0000
+@181 277F_0001  // PC = PC + 1
+@182 4A7F_0000  // ADDRESS_OUT = PC
+@183 4DFF_0001  // SYNC=0, RD_WR_n=1
+@184 1033_0000  // Wait for CLK to be high
+@185 1034_0000  // Wait for CLK to be low
+@186 32BF_00FF  // r2 <= data_in AND 0x00FF
+@187 277F_0001  // PC = PC + 1
+@188 4A7F_0000  // ADDRESS_OUT = PC
+
+@189 1033_0000  // Wait for CLK to be high
+@18A 1034_0000  // Wait for CLK to be low
+@18B 33BF_FF00  // r3 <= data_in AND 0xFF00
+@18C 4323_0000  // r3 <= r2 OR r3           		-- r3 =  ADH,ADL
+@18D 2031_0000  // r0 <= r3 + r1			   		-- r0 = (ADH_ADL + X/Y) Possible Carry  r1
+@18E 3FCF_0001  // Dummy <= System_Status AND 0001 	-- Isolate the carry bit
+@18F 1002_019A  // Jump Zero to No_Page_Wrap code
+
+
+@190 310F_00FF  // r1 <= r0 AND 0x00FF				-- Yes_Page_Wrap
+@191 323F_FF00  // r2 <= r3 AND 0xFF00
+@192 4A12_0000  // ADDRESS_OUT = r1 OR r2				
+@193 1033_0000  // Wait for CLK to be high
+@194 1034_0000  // Wait for CLK to be low
+
+@195 2AAF_0100  // ADDRESS_OUT = ADDRESS_OUT + 0x0100		
+@196 1033_0000  // Wait for CLK to be high
+@197 1034_0000  // Wait for CLK to be low
+@198 32BF_00FF  // r2 <= data_in AND 0x00FF
+@199 1000_019E  // Jump over No_Page_Wrap code
+
+
+@19A 4AF0_0000  // ADDRESS_OUT = r0					-- No_Page_Wrap		
+@19B 1033_0000  // Wait for CLK to be high
+@19C 1034_0000  // Wait for CLK to be low
+@19D 32BF_00FF  // r2 <= data_in AND 0x00FF
+
+@19E 277F_0001  // PC = PC + 1
+@19F 4A7F_0000  // ADDRESS_OUT = PC
+@1A0 4DFF_0003  // SYNC=1, RD_WR_n=1
+@1A1 1020_0000  // Return
+
+
+// -------------------------------------------------
+//
+// Procedure - Fetch_Absolute_Y
+//
+@1A4 416F_0000  // r1 <= Y OR 0x0000
+@1A5 1000_0181  // Jump to common code
+
+// -------------------------------------------------
+//
+// Procedure - Indexed_Indirect_X
+//
+//  r2 = Fetched data
+//
+//  1) Fetch the next byte, BAL, and store it in ADDR_OUT.
+//  2) Fetch next byte from address 0x00,BAL but ignore it.
+//  3) Fetch ADL from address BAL.
+//  4) Fetch ADH from address BAL+1.
+//  5) Fetch data from ADH,ADL.
+//  6) Begin the process of fetching the next instruction.
+//
+// -------------------------------------------------
+@1A7 277F_0001  // PC = PC + 1
+@1A8 4A7F_0000  // ADDRESS_OUT = PC
+@1A9 4DFF_0001  // SYNC=0, RD_WR_n=1
+@1AA 1033_0000  // Wait for CLK to be high
+@1AB 1034_0000  // Wait for CLK to be low
+@1AC 3ABF_00FF  // ADDRESS_OUT <= data_in AND 0x00FF	-- BAL
+
+@1AD 1033_0000  // Wait for CLK to be high
+@1AE 1034_0000  // Wait for CLK to be low
+@1AF 225A_0000  // r2 <= X + ADDRESS_OUT
+@1B0 3A2F_00FF  // ADDRESS_OUT <= r2 AND 0x00FF  		-- BAL + X
+
+@1B1 1033_0000  // Wait for CLK to be high
+@1B2 1034_0000  // Wait for CLK to be low
+@1B3 30BF_00FF  // r0 <= data_in AND 0x00FF
+@1B4 22AF_0001  // r2 <= ADDRESS_OUT + 1
+@1B5 3A2F_00FF  // ADDRESS_OUT <= r2 AND 0x00FF  		-- ADL Data
+
+@1B6 1033_0000  // Wait for CLK to be high
+@1B7 1034_0000  // Wait for CLK to be low
+@1B8 31BF_FF00  // r1 <= data_in AND 0xFF00
+@1B9 4A01_0000  // ADDRESS_OUT <= r0 OR r1				-- ADH Data
+
+@1BA 1033_0000  // Wait for CLK to be high
+@1BB 1034_0000  // Wait for CLK to be low
+@1BC 32BF_00FF  // r2 <= data_in AND 0x00FF
+
+@1BD 277F_0001  // PC = PC + 1
+@1BE 4A7F_0000  // ADDRESS_OUT = PC
+@1BF 4DFF_0003  // SYNC=1, RD_WR_n=1
+@1C0 1020_0000  // Return
+
+
+// -------------------------------------------------
+//
+// Procedure - Indirect_Indexed_Y
+//
+//  r2 = Fetched data
+//
+//  1) Fetch the next byte whish is the IAL
+//  2) Fetch BAL at address IAL
+//  3) Fetch BAH at address IAL+1
+//  4) Fetch Data at BAH/BAH and add to Y
+//  5) If page boundary crosses, re-fetch Data at BAH/BAL + Y + C
+//  6) Begin the process of fetching the next instruction.
+//
+// -------------------------------------------------
+@1C4 277F_0001  // PC = PC + 1
+@1C5 4A7F_0000  // ADDRESS_OUT = PC
+@1C6 4DFF_0001  // SYNC=0, RD_WR_n=1
+@1C7 1033_0000  // Wait for CLK to be high
+@1C8 1034_0000  // Wait for CLK to be low
+@1C9 3ABF_00FF  // ADDRESS_OUT <= data_in AND 0x00FF	-- IAL
+
+@1CA 1033_0000  // Wait for CLK to be high
+@1CB 1034_0000  // Wait for CLK to be low
+@1CC 32BF_00FF  // r2 <= data_in AND 0x00FF
+@1CD 23AF_0001  // r3 <= ADDRESS_OUT + 1
+@1CE 3A3F_00FF  // ADDRESS_OUT <= r3 AND 0x00FF			-- IAL+1
+
+@1CF 416F_0000  // r1 <= Y OR 0x0000
+@1D0 1000_0189  // Jump to common code at Fetch_Absolute_X
+
+
+
+// -------------------------------------------------
+//
+// Procedure - Request_Next_Opcode
+//
+// -------------------------------------------------
+@1E0 277F_0001  // PC = PC + 1
+@1E1 4A7F_0000  // ADDRESS_OUT = PC
+@1E2 4DFF_0001  // SYNC=0, RD_WR_n=1
+@1E3 1033_0000  // Wait for CLK to be high
+@1E4 1034_0000  // Wait for CLK to be low
+@1E5 4DFF_0003  // SYNC=1, RD_WR_n=1
+@1E6 1020_0000  // Return
+
+
+
+// -------------------------------------------------
+//
+// Procedure - Write_Zero_Page
+//
+//  Data_Out = Data to Write
+//
+//  1) Fetch the next byte, ADL, and store it in ADDR_OUT.
+//  2) Write the data_out byte to address 0x00,ADL
+//  3) Begin the process of fetching the next instruction.
+//
+// -------------------------------------------------
+@600 277F_0001  // PC = PC + 1
+@601 4A7F_0000  // ADDRESS_OUT = PC
+@602 4DFF_0001  // SYNC=0, RD_WR_n=1
+@603 1033_0000  // Wait for CLK to be high
+@604 1034_0000  // Wait for CLK to be low
+@605 3ABF_00FF  // ADDRESS_OUT <= data_in AND 0x00FF
+@606 4DFF_0000  // SYNC=0, RD_WR_n=0
+
+@607 1033_0000  // Wait for CLK to be high
+@608 4DFF_0004  // Dataout_Enable=1, SYNC=0, RD_WR_n=0
+
+@609 1034_0000  // Wait for CLK to be low
+@60A 4DFF_0000  // Dataout_Enable=0, SYNC=0, RD_WR_n=0
+
+@60B 277F_0001  // PC = PC + 1
+@60C 4A7F_0000  // ADDRESS_OUT = PC
+@60D 4DFF_0003  // SYNC=1, RD_WR_n=1
+@60E 1020_0000  // Return
+
+
+// -------------------------------------------------
+//
+// Procedure - Write_Zero_Page_X  Jump to 0x615
+//           - Write_Zero_Page_Y  Jump to 0x613
+//
+//  Data_Out = Data to Write
+//
+//  1) Fetch the next byte, BAL, and store it in ADDR_OUT.
+//  2) Fetch next byte from address 0x00,BAL but ignore it.
+//  3) Write the data_out byte to (X/Y + 0x00,BAL)
+//  4) Begin the process of fetching the next instruction.
+//
+// -------------------------------------------------
+
+@613 436F_0000  // r3 <= Y OR 0x0000
+@614 1000_0616  // Jump over next instruction
+
+@615 435F_0000  // r3 <= X OR 0x0000
+@616 277F_0001  // PC = PC + 1
+@617 4A7F_0000  // ADDRESS_OUT = PC
+@618 4DFF_0001  // SYNC=0, RD_WR_n=1
+@619 1033_0000  // Wait for CLK to be high
+@61A 1034_0000  // Wait for CLK to be low
+@61B 3ABF_00FF  // ADDRESS_OUT <= data_in AND 0x00FF
+
+@61C 1033_0000  // Wait for CLK to be high
+@61D 1034_0000  // Wait for CLK to be low
+@61E 223A_0000  // r2 <= r3 + ADDRESS_OUT
+@61F 3A2F_00FF  // ADDRESS_OUT <= r2 AND 0x00FF
+@620 1000_0606  // Jump to common  code
+
+
+// -------------------------------------------------
+//
+// Procedure - Write_Absolute
+//
+//  Data_Out = Data to Write
+//
+//  1) Fetch the next byte, ADL, and store it in lower byte r2.
+//  2) Fetch the next byte, ADH, and store it in upper byte r3.
+//  3) Write the data_out byte to the combination of r3 and r2.
+//  4) Begin the process of fetching the next instruction.
+//
+// -------------------------------------------------
+@625 277F_0001  // PC = PC + 1
+@626 4A7F_0000  // ADDRESS_OUT = PC
+@627 4DFF_0001  // SYNC=0, RD_WR_n=1
+@628 1033_0000  // Wait for CLK to be high
+@629 1034_0000  // Wait for CLK to be low
+@62A 32BF_00FF  // r2 <= data_in AND 0x00FF
+@62B 277F_0001  // PC = PC + 1
+@62C 4A7F_0000  // ADDRESS_OUT = PC
+
+@62D 1033_0000  // Wait for CLK to be high
+@62E 1034_0000  // Wait for CLK to be low
+@62F 33BF_FF00  // r3 <= data_in AND 0xFF00
+@630 4A23_0000  // ADDRESS_OUT <= r2 OR r3
+@631 1000_0606  // Jump to common  code
+
+
+
+
+// -------------------------------------------------
+//
+// Procedure - Write_Absolute_X 
+//
+//  Data_Out = Data to Write
+//
+//  1) Fetch the next byte, ADL, and store it in lower byte r2.
+//  2) Fetch the next byte, ADH, and store it in upper byte r3.
+//  3) Add X to the addressed byte from the combination of r3 and r2 and fetch byte but ignore it.
+//  4) Write byte to this address
+//  5) Begin the process of fetching the next instruction.
+//
+// -------------------------------------------------
+@636 415F_0000  // r1 <= X OR 0x0000
+@637 277F_0001  // PC = PC + 1
+@638 4A7F_0000  // ADDRESS_OUT = PC
+@639 4DFF_0001  // SYNC=0, RD_WR_n=1
+@63A 1033_0000  // Wait for CLK to be high
+@63B 1034_0000  // Wait for CLK to be low
+@63C 32BF_00FF  // r2 <= data_in AND 0x00FF
+@63D 277F_0001  // PC = PC + 1
+@63E 4A7F_0000  // ADDRESS_OUT = PC
+
+@63F 1033_0000  // Wait for CLK to be high
+@640 1034_0000  // Wait for CLK to be low
+@641 33BF_FF00  // r3 <= data_in AND 0xFF00
+@642 4323_0000  // r3 <= r2 OR r3           		-- r3 =  ADH,ADL
+@643 2A31_0000  // ADDRESS_OUT <= r3 + r1			-- r0 = (ADH_ADL + X/Y)
+			
+@644 1033_0000  // Wait for CLK to be high
+@645 1034_0000  // Wait for CLK to be low
+@646 1000_0606  // Jump to common  code
+
+// -------------------------------------------------
+//
+// Procedure - Write_Absolute_Y
+//
+@647 416F_0000  // r1 <= Y OR 0x0000
+@648 1000_0637  // Jump to common code
+
+
+// -------------------------------------------------
+//
+// Procedure - Write_Indexed_Indirect_X
+//
+//  Data_Out = Data to Write
+//
+//  1) Fetch the next byte, BAL, and store it in ADDR_OUT.
+//  2) Fetch next byte from address 0x00,BAL but ignore it.
+//  3) Fetch ADL from address BAL.
+//  4) Fetch ADH from address BAL+1.
+//  5) Write the data_out byte to ADH,ADL.
+//  6) Begin the process of fetching the next instruction.
+//
+// -------------------------------------------------
+@64D 277F_0001  // PC = PC + 1
+@64E 4A7F_0000  // ADDRESS_OUT = PC
+@64F 4DFF_0001  // SYNC=0, RD_WR_n=1
+@650 1033_0000  // Wait for CLK to be high
+@651 1034_0000  // Wait for CLK to be low
+@652 3ABF_00FF  // ADDRESS_OUT <= data_in AND 0x00FF	-- BAL
+
+@653 1033_0000  // Wait for CLK to be high
+@654 1034_0000  // Wait for CLK to be low
+@655 225A_0000  // r2 <= X + ADDRESS_OUT
+@656 3A2F_00FF  // ADDRESS_OUT <= r2 AND 0x00FF  		-- BAL + X
+
+@657 1033_0000  // Wait for CLK to be high
+@658 1034_0000  // Wait for CLK to be low
+@659 30BF_00FF  // r0 <= data_in AND 0x00FF
+@65A 22AF_0001  // r2 <= ADDRESS_OUT + 1
+@65B 3A2F_00FF  // ADDRESS_OUT <= r2 AND 0x00FF  		-- ADL Data
+
+@65C 1033_0000  // Wait for CLK to be high
+@65D 1034_0000  // Wait for CLK to be low
+@65E 31BF_FF00  // r1 <= data_in AND 0xFF00
+@65F 4A01_0000  // ADDRESS_OUT <= r0 OR r1				-- ADH Data
+@660 1000_0606  // Jump to common  code
+
+
+// -------------------------------------------------
+//
+// Procedure - Write_Indirect_Indexed_Y
+//
+//  Data_Out = Data to Write
+//
+//  1) Fetch the next byte whish is the IAL
+//  2) Fetch BAL at address IAL
+//  3) Fetch BAH at address IAL+1
+//  4) Fetch Data at BAH/BAH + Y
+//  5) Write the data_out byte to ADH,ADL.
+//  6) Begin the process of fetching the next instruction.
+//
+// -------------------------------------------------
+@665 277F_0001  // PC = PC + 1
+@666 4A7F_0000  // ADDRESS_OUT = PC
+@667 4DFF_0001  // SYNC=0, RD_WR_n=1
+@668 1033_0000  // Wait for CLK to be high
+@669 1034_0000  // Wait for CLK to be low
+@66A 3ABF_00FF  // ADDRESS_OUT <= data_in AND 0x00FF	-- IAL
+
+@66B 1033_0000  // Wait for CLK to be high
+@66C 1034_0000  // Wait for CLK to be low
+@66D 32BF_00FF  // r2 <= data_in AND 0x00FF
+@66E 23AF_0001  // r3 <= ADDRESS_OUT + 1
+@66F 3A3F_00FF  // ADDRESS_OUT <= r3 AND 0x00FF			-- IAL+1
+
+@670 416F_0000  // r1 <= Y OR 0x0000
+@671 1000_063F  // Jump to common code
+
+
+
+// -------------------------------------------------
+//
+// Procedure - Fetch_Zero_Page_NoInc_PC
+//
+//  r2 = Fetched data
+//
+//  1) Fetch the next byte, ADL, and store it in ADDR_OUT.
+//  2) Fetch next byte from address 0x00,ADL and store it in r2.
+//  3) Assert the Write line on the falling edge, but dont bother asserting data.
+//
+// -------------------------------------------------
+
+@680 277F_0001  // PC = PC + 1
+@681 4A7F_0000  // ADDRESS_OUT = PC
+@682 4DFF_0001  // SYNC=0, RD_WR_n=1
+@683 1033_0000  // Wait for CLK to be high
+@684 1034_0000  // Wait for CLK to be low
+@685 3ABF_00FF  // ADDRESS_OUT <= data_in AND 0x00FF
+
+@686 1033_0000  // Wait for CLK to be high
+@687 1034_0000  // Wait for CLK to be low
+@688 32BF_00FF  // r2 <= data_in AND 0x00FF
+@689 4DFF_0000  // SYNC=0, RD_WR_n=0
+@68A 1020_0000  // Return
+
+
+// -------------------------------------------------
+//
+// Procedure - Fetch_Zero_Page_X_NoInc_PC
+//
+//  r2 = Fetched data
+//
+//  1) Fetch the next byte, BAL, and store it in ADDR_OUT.
+//  2) Fetch next byte from address 0x00,BAL but ignore it.
+//  3) Add register X to the address 0x00,BAL and store returned data in r2.
+//
+// -------------------------------------------------
+
+@690 435F_0000  // r3 <= X OR 0x0000
+@691 277F_0001  // PC = PC + 1
+@692 4A7F_0000  // ADDRESS_OUT = PC
+@693 4DFF_0001  // SYNC=0, RD_WR_n=1
+@694 1033_0000  // Wait for CLK to be high
+@695 1034_0000  // Wait for CLK to be low
+@696 3ABF_00FF  // ADDRESS_OUT <= data_in AND 0x00FF
+
+@697 1033_0000  // Wait for CLK to be high
+@698 1034_0000  // Wait for CLK to be low
+@699 223A_0000  // r2 <= X + ADDRESS_OUT
+@69A 3A2F_00FF  // ADDRESS_OUT <= r2 AND 0x00FF
+
+@69B 1000_0686  // Jump to common code
+
+
+
+// -------------------------------------------------
+//
+// Procedure - Fetch_Absolute_NoInc_PC
+//
+//  r2 = Fetched data
+//
+//  1) Fetch the next byte, ADL, and store it in lower byte r2.
+//  2) Fetch the next byte, ADH, and store it in upper byte r3.
+//  3) Fetch the addressed byte from the combination of r3 and r2.
+//
+// -------------------------------------------------
+@6A0 277F_0001  // PC = PC + 1
+@6A1 4A7F_0000  // ADDRESS_OUT = PC
+@6A2 4DFF_0001  // SYNC=0, RD_WR_n=1
+@6A3 1033_0000  // Wait for CLK to be high
+@6A4 1034_0000  // Wait for CLK to be low
+@6A5 32BF_00FF  // r2 <= data_in AND 0x00FF
+@6A6 277F_0001  // PC = PC + 1
+@6A7 4A7F_0000  // ADDRESS_OUT = PC
+
+@6A8 1033_0000  // Wait for CLK to be high
+@6A9 1034_0000  // Wait for CLK to be low
+@6AA 33BF_FF00  // r3 <= data_in AND 0xFF00
+@6AB 4A23_0000  // ADDRESS_OUT <= r2 OR r3
+
+@6AC 1000_0686  // Jump to common code
+
+
+
+// -------------------------------------------------
+//
+// Procedure - Fetch_Absolute_X_NoInc_PC
+//
+//  r2 = Fetched data
+//
+//  1) Fetch the next byte, ADL, and store it in lower byte r2.
+//  2) Fetch the next byte, ADH, and store it in upper byte r3.
+//  3) Add X to the addressed byte from the combination of r3 and r2 and fetch byte.
+// 3a) If addition carried over into ADH, then increment ADH and fetch data again.
+//
+// -------------------------------------------------
+@6B0 415F_0000  // r1 <= X OR 0x0000
+@6B1 277F_0001  // PC = PC + 1
+@6B2 4A7F_0000  // ADDRESS_OUT = PC
+@6B3 4DFF_0001  // SYNC=0, RD_WR_n=1
+@6B4 1033_0000  // Wait for CLK to be high
+@6B5 1034_0000  // Wait for CLK to be low
+@6B6 32BF_00FF  // r2 <= data_in AND 0x00FF
+@6B7 277F_0001  // PC = PC + 1
+@6B8 4A7F_0000  // ADDRESS_OUT = PC
+
+@6B9 1033_0000  // Wait for CLK to be high
+@6BA 1034_0000  // Wait for CLK to be low
+@6BB 33BF_FF00  // r3 <= data_in AND 0xFF00
+@6BC 4323_0000  // r3 <= r2 OR r3           		-- r3 =  ADH,ADL
+@6BD 2A31_0000  // ADDRESS_OUT <= r3 + r1			-- r0 = (ADH_ADL + X/Y)
+
+
+@6BE 1033_0000  // Wait for CLK to be high
+@6BF 1034_0000  // Wait for CLK to be low
+
+@6C0 1000_0686  // Jump to common code
+
+
+// -------------------------------------------------
+//
+// Common Code - Double_WriteBack
+//
+//  r2 = New data for second write
+//  r3 = New data for second write
+//
+// -------------------------------------------------
+@6D0 1033_0000  // Wait for CLK to be high
+@6D1 1034_0000  // Wait for CLK to be low
+@6D2 4DFF_0000  // SYNC=0, RD_WR_n=0
+
+@6D3 1033_0000  // Wait for CLK to be high
+@6D4 4DFF_0004  // Dataout_Enable=1, SYNC=0, RD_WR_n=0
+
+@6D5 1034_0000  // Wait for CLK to be low
+@6D6 277F_0001  // PC = PC + 1
+@6D7 4A7F_0000  // ADDRESS_OUT = PC
+@6D8 4DFF_0003  // SYNC=1, RD_WR_n=1
+@6D9 1000_0101  // Jump back to main loop
+
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+//
+//               6502 Opcodes
+//
+// -------------------------------------------------
+// -------------------------------------------------
+
+
+
+// -------------------------------------------------
+// 0x18 - CLC - Clear Carry Flag
+// -------------------------------------------------
+@200 1100_01E0  // Call Request_Next_Opcode
+@201 399F_FFFE  // Clear the C Flag
+@202 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0x38 - SEC - Set Carry Flag
+// -------------------------------------------------
+@206 1100_01E0  // Call Request_Next_Opcode
+@207 499F_0001  // Set the C Flag
+@208 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0xEA - NOP 
+// -------------------------------------------------
+@20C 1100_01E0  // Call Request_Next_Opcode
+@20D 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0xAA - TAX - Transfer Accumulator to X 
+// -------------------------------------------------
+@212 1100_01E0  // Call Request_Next_Opcode
+@213 45F4_0000  // X <= 0000 OR A
+@214 325F_00FF  // r2 <= X AND 00FF
+@215 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@216 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0xA8 - TAY - Transfer Accumulator to Y
+// -------------------------------------------------
+@21A 1100_01E0  // Call Request_Next_Opcode
+@21B 46F4_0000  // Y <= 0000 OR A
+@21C 326F_00FF  // r2 <= Y AND 00FF
+@21D 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@21E 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0x58 - CLI - Clear Interrupt Flag
+// -------------------------------------------------
+@221 1100_01E0  // Call Request_Next_Opcode
+@222 399F_FFFB  // Clear the I Flag
+@223 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0xD8 - CLD - Clear Decimal Mode 
+// -------------------------------------------------
+@227 1100_01E0  // Call Request_Next_Opcode
+@228 399F_FFF7  // Clear the D Flag
+@229 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0xB8 - CLV - Clear Overflow Flag
+// -------------------------------------------------
+@22D 1100_01E0  // Call Request_Next_Opcode
+@22E 399F_FFBF  // Clear the V Flag
+@22F 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0xF8 - SED - Set Decimal Mode 
+// -------------------------------------------------
+@233 1100_01E0  // Call Request_Next_Opcode
+@234 499F_0008  // Set the D Flag
+@235 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0x78 - SEI - Set Interrupt Flag 
+// -------------------------------------------------
+@239 1100_01E0  // Call Request_Next_Opcode
+@23A 499F_0004  // Set the I Flag
+@23B 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0xBA - TSX - Transfer Stack Pointer to X 
+// -------------------------------------------------
+@23F 1100_01E0  // Call Request_Next_Opcode
+@240 45F8_0000  // X <= 0000 OR SP
+@241 325F_00FF  // r2 <= X AND 00FF
+@242 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@243 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0x8A - TXA - Transfer X to Accumulator
+// -------------------------------------------------
+@246 1100_01E0  // Call Request_Next_Opcode
+@247 44F5_0000  // A <= 0000 OR X
+@248 324F_00FF  // r2 <= A AND 00FF
+@249 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@24A 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0x9A - TXS - Transfer X to Stack Pointer
+// -------------------------------------------------
+@24D 1100_01E0  // Call Request_Next_Opcode
+@24E 48F5_0000  // SP <= 0000 OR X
+@24F 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0x98 - TYA - Transfer Y to Accumulator
+// -------------------------------------------------
+@253 1100_01E0  // Call Request_Next_Opcode
+@254 44F6_0000  // A <= 0000 OR Y
+@255 324F_00FF  // r2 <= A AND 00FF
+@256 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@257 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0x0A - ASL A - Arithmetic Shift Left - Accumulator
+// -------------------------------------------------
+@25A 1100_01E0  // Call Request_Next_Opcode
+@25B 2444_0000  // A <= A + A
+@25C 324F_00FF  // r2 <= A AND 00FF
+@25D 1100_0125  // Call Calc_Flags CARRY_NEGATIVE_ZERO
+@25E 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0x2A - ROL A - Rotate Left - Accumulator
+// -------------------------------------------------
+@262 1100_01E0  // Call Request_Next_Opcode
+@263 309F_0001  // r0 <= Flags AND 0001 - Isolate current Carry bit
+@264 2444_0000  // A <= A + A
+@265 4440_0000  // A <= A OR r0
+@266 324F_00FF  // r2 <= A AND 00FF
+@267 1100_0125  // Call Calc_Flags CARRY_NEGATIVE_ZERO
+@268 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0x4A - LSR A - Logical Shift Right - Accumulator
+// -------------------------------------------------
+@26C 1100_01E0  // Call Request_Next_Opcode
+@26D 304F_0001  // r0 <= A AND 0001 - Isolate bit 0 of the accumulator
+@26E 6444_0000  // SHR A
+@26F 399F_FFFE  // Flags <= Flags AND 0xFFFE
+@270 4990_0000  // Flags <= Flags OR r0
+@271 324F_00FF  // r2 <= A AND 00FF
+@272 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@273 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0x6A - ROR A - Rotate Right - Accumulator
+// -------------------------------------------------
+@276 1100_01E0  // Call Request_Next_Opcode
+@277 319F_0001  // r1 <= Flags AND 0001 - Isolate current Carry Flag bit
+@278 304F_0001  // r0 <= A AND 0001 - Isolate bit 0 of the accumulator
+@279 6444_0000  // SHR A
+@27A 399F_FFFE  // Flags <= Flags AND 0xFFFE
+@27B 4990_0000  // Flags <= Flags OR r0
+@27C 324F_00FF  // r2 <= A AND 00FF
+@27D 4F1F_0000  // Dummy <= r1 OR 0000
+@27E 1002_0280  // Jump Zero over next instruction
+@27F 444F_0080  // A <= A OR 0080
+@280 324F_00FF  // r2 <= A AND 00FF
+@281 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@282 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0xE8 - INX - Increment X
+// -------------------------------------------------
+@286 1100_01E0  // Call Request_Next_Opcode
+@287 255F_0001  // X <= X + 1
+@288 325F_00FF  // r2 <= X AND 00FF
+@289 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@28A 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0xC8 - INY - Increment Y
+// -------------------------------------------------
+@28E 1100_01E0  // Call Request_Next_Opcode
+@28F 266F_0001  // Y <= Y + 1
+@290 326F_00FF  // r2 <= Y AND 00FF
+@291 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@292 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0xCA - DEX - Decrement X
+// -------------------------------------------------
+@296 1100_01E0  // Call Request_Next_Opcode
+@297 255F_FFFF  // X <= X + FFFF
+@298 325F_00FF  // r2 <= X AND 00FF
+@299 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@29A 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0x88 - DEY - Decrement Y
+// -------------------------------------------------
+@29E 1100_01E0  // Call Request_Next_Opcode
+@29F 266F_FFFF  // Y <= Y + FFFF
+@2A0 326F_00FF  // r2 <= Y AND 00FF
+@2A1 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@2A2 1000_0101  // Jump back to main loop
+
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0x29 - AND - Immediate
+// -------------------------------------------------
+@2A7 1100_0134  // Call Fetch_Immediate
+@2A8 3442_0000  // A <= A AND r2
+@2A9 324F_00FF  // r2 <= A AND 00FF
+@2AA 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@2AB 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0x25 - AND - ZeroPage
+// -------------------------------------------------
+@2AE 1100_0142  // Call Fetch_Zero_Page
+@2AF 1000_02A8  // Jump to AND code
+
+// -------------------------------------------------
+// 0x35 - AND - ZeroPage , X
+// -------------------------------------------------
+@2B0 1100_0155  // Call Fetch_Zero_Page_X
+@2B1 1000_02A8  // Jump to AND code
+
+// -------------------------------------------------
+// 0x2D - AND - Absolute
+// -------------------------------------------------
+@2B2 1100_016A  // Call Fetch_Absolute
+@2B3 1000_02A8  // Jump to AND code
+
+// -------------------------------------------------
+// 0x3D - AND - Absolute , X
+// -------------------------------------------------
+@2B4 1100_0180  // Call Fetch_Absolute_X
+@2B5 1000_02A8  // Jump to AND code
+
+// -------------------------------------------------
+// 0x39 - AND - Absolute , Y
+// -------------------------------------------------
+@2B6 1100_01A4  // Call Fetch_Absolute_Y
+@2B7 1000_02A8  // Jump to AND code
+
+// -------------------------------------------------
+// 0x21 - AND - Indexed Indirect X
+// -------------------------------------------------
+@2B8 1100_01A7  // Call Indexed_Indirect_X
+@2B9 1000_02A8  // Jump to AND code
+
+// -------------------------------------------------
+// 0x31 - AND - Indirect Indexed  Y
+// -------------------------------------------------
+@2BA 1100_01C4  // Call Indirect_Indexed_Y
+@2BB 1000_02A8  // Jump to AND code
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0x09 - OR - Immediate
+// -------------------------------------------------
+@2C0 1100_0134  // Call Fetch_Immediate
+@2C1 4442_0000  // A <= A OR r2
+@2C3 324F_00FF  // r2 <= A AND 00FF
+@2C4 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@2C5 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0x05 - OR - ZeroPage
+// -------------------------------------------------
+@2C6 1100_0142  // Call Fetch_Zero_Page
+@2C7 1000_02C1  // Jump to OR code
+
+// -------------------------------------------------
+// 0x15 - OR - ZeroPage , X
+// -------------------------------------------------
+@2C8 1100_0155  // Call Fetch_Zero_Page_X
+@2C9 1000_02C1  // Jump to OR code
+
+// -------------------------------------------------
+// 0x0D - OR - Absolute
+// -------------------------------------------------
+@2CA 1100_016A  // Call Fetch_Absolute
+@2CB 1000_02C1  // Jump to OR code
+
+// -------------------------------------------------
+// 0x1D - OR - Absolute , X
+// -------------------------------------------------
+@2CC 1100_0180  // Call Fetch_Absolute_X
+@2CD 1000_02C1  // Jump to OR code
+
+// -------------------------------------------------
+// 0x19 - OR - Absolute , Y
+// -------------------------------------------------
+@2CE 1100_01A4  // Call Fetch_Absolute_Y
+@2CF 1000_02C1  // Jump to OR code
+
+// -------------------------------------------------
+// 0x01 - OR - Indexed Indirect X
+// -------------------------------------------------
+@2D0 1100_01A7  // Call Indexed_Indirect_X
+@2D1 1000_02C1  // Jump to OR code
+
+// -------------------------------------------------
+// 0x11 - OR - Indirect Indexed  Y
+// ------------------------------------------------
+@2D2 1100_01C4  // Call Indirect_Indexed_Y
+@2D3 1000_02C1  // Jump to OR code
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0x49 - EOR - Immediate
+// -------------------------------------------------
+@2D8 1100_0134  // Call Fetch_Immediate
+@2D9 5442_0000  // A <= A XOR r2
+@2DA 324F_00FF  // r2 <= A AND 00FF
+@2DB 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@2DC 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0x45 - EOR - ZeroPage
+// -------------------------------------------------
+@2DD 1100_0142  // Call Fetch_Zero_Page
+@2DE 1000_02D9  // Jump to EOR code
+
+// -------------------------------------------------
+// 0x55 - EOR - ZeroPage , X
+// -------------------------------------------------
+@2DF 1100_0155  // Call Fetch_Zero_Page_X
+@2E0 1000_02D9  // Jump to EOR code
+
+// -------------------------------------------------
+// 0x4D - EOR - Absolute
+// -------------------------------------------------
+@2E1 1100_016A  // Call Fetch_Absolute
+@2E2 1000_02D9  // Jump to EOR code
+
+// -------------------------------------------------
+// 0x5D - EOR - Absolute , X
+// -------------------------------------------------
+@2E3 1100_0180  // Call Fetch_Absolute_X
+@2E4 1000_02D9  // Jump to EOR code
+
+// -------------------------------------------------
+// 0x59 - EOR - Absolute , Y
+// -------------------------------------------------
+@2E5 1100_01A4  // Call Fetch_Absolute_Y
+@2E6 1000_02D9  // Jump to EOR code
+
+// -------------------------------------------------
+// 0x41 - EOR - Indexed Indirect X
+// -------------------------------------------------
+@2E7 1100_01A7  // Call Indexed_Indirect_X
+@2E8 1000_02D9  // Jump to EOR code
+
+// -------------------------------------------------
+// 0x51 - EOR - Indirect Indexed  Y
+// ------------------------------------------------
+@2E9 1100_01C4  // Call Indirect_Indexed_Y
+@2EA 1000_02D9  // Jump to EOR code
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0xA9 - LDA - Immediate
+// -------------------------------------------------
+@2F0 1100_0134  // Call Fetch_Immediate
+@2F1 44F2_0000  // A <= 0x0000 OR r2
+@2F2 324F_00FF  // r2 <= A AND 00FF
+@2F3 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@2F4 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0xA5 - LDA - ZeroPage
+// -------------------------------------------------
+@2F5 1100_0142  // Call Fetch_Zero_Page
+@2F6 1000_02F1 // Jump to LDA code
+
+// -------------------------------------------------
+// 0xB5 - LDA - ZeroPage , X
+// -------------------------------------------------
+@2F7 1100_0155  // Call Fetch_Zero_Page_X
+@2F8 1000_02F1  // Jump to LDA code
+
+// -------------------------------------------------
+// 0xAD - LDA - Absolute
+// -------------------------------------------------
+@2F9 1100_016A  // Call Fetch_Absolute
+@2FA 1000_02F1  // Jump to LDA code
+
+// -------------------------------------------------
+// 0xBD - LDA - Absolute , X
+// -------------------------------------------------
+@2FB 1100_0180  // Call Fetch_Absolute_X
+@2FC 1000_02F1  // Jump to LDA code
+
+// -------------------------------------------------
+// 0xB9 - LDA - Absolute , Y
+// -------------------------------------------------
+@2FD 1100_01A4  // Call Fetch_Absolute_Y
+@2FE 1000_02F1  // Jump to LDA code
+
+// -------------------------------------------------
+// 0xA1 - LDA - Indexed Indirect X
+// -------------------------------------------------
+@2FF 1100_01A7  // Call Indexed_Indirect_X
+@300 1000_02F1  // Jump to LDA code
+
+// -------------------------------------------------
+// 0xB1 - LDA - Indirect Indexed  Y
+// ------------------------------------------------
+@301 1100_01C4  // Call Indirect_Indexed_Y
+@302 1000_02F1  // Jump to LDA code
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0xA2 - LDX - Immediate
+// -------------------------------------------------
+@307 1100_0134  // Call Fetch_Immediate
+@308 45F2_0000  // X <= 0x0000 OR r2
+@309 325F_00FF  // r2 <= X AND 00FF
+@30A 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@30B 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0xA6 - LDX - ZeroPage
+// -------------------------------------------------
+@30C 1100_0142  // Call Fetch_Zero_Page
+@30D 1000_0308 // Jump to LDX code
+
+// -------------------------------------------------
+// 0xB6 - LDX - ZeroPage , Y
+// -------------------------------------------------
+@30E 1100_0153  // Call Fetch_Zero_Page_Y
+@30F 1000_0308  // Jump to LDX code
+
+// -------------------------------------------------
+// 0xAE - LDX - Absolute
+// -------------------------------------------------
+@310 1100_016A  // Call Fetch_Absolute
+@311 1000_0308  // Jump to LDX code
+
+// -------------------------------------------------
+// 0xBE - LDX - Absolute , Y
+// -------------------------------------------------
+@312 1100_01A4  // Call Fetch_Absolute_Y
+@313 1000_0308  // Jump to LDX code
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0xA0 - LDY - Immediate
+// -------------------------------------------------
+@318 1100_0134  // Call Fetch_Immediate
+@319 46F2_0000  // Y <= 0x0000 OR r2
+@31A 326F_00FF  // r2 <= Y AND 00FF
+@31B 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@31C 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0xA4 - LDY - ZeroPage
+// -------------------------------------------------
+@31D 1100_0142  // Call Fetch_Zero_Page
+@31E 1000_0319  // Jump to LDY code
+
+// -------------------------------------------------
+// 0xB4 - LDY - ZeroPage , X
+// -------------------------------------------------
+@31F 1100_0155  // Call Fetch_Zero_Page_X
+@320 1000_0319  // Jump to LDY code
+
+// -------------------------------------------------
+// 0xAC - LDY - Absolute
+// -------------------------------------------------
+@321 1100_016A  // Call Fetch_Absolute
+@322 1000_0319  // Jump to LDY code
+
+// -------------------------------------------------
+// 0xBC - LDY - Absolute , X
+// -------------------------------------------------
+@323 1100_0180  // Call Fetch_Absolute_X
+@324 1000_0319  // Jump to LDY code
+
+
+
+// -------------------------------------------------
+// 0x24 - BIT - ZeroPage
+// -------------------------------------------------
+@327 1100_0142  // Call Fetch_Zero_Page
+@328 399F_FF3F  // Flags <= Flags AND 0xFF3F
+@329 312F_00C0  // r1 <= r2 AND 0x00C0
+@32A 4991_0000  // Flags <= Flags OR r1
+@32B 3242_0000  // r2 <= A AND r2
+@32C 1100_012C  // Call Calc_Flags ZERO
+@32D 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0x2C - BIT - Absolute
+// -------------------------------------------------
+@32E 1100_016A  // Call Fetch_Absolute
+@32F 1000_0328  // Jump to BIT code
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0xC9 - CMP - Immediate
+// -------------------------------------------------
+@336 1100_0134  // Call Fetch_Immediate
+@337 522F_FFFF  // r2 <= r2 XOR 0xFFFF -- 2's compliment r2
+@338 222F_0001  // r2 <= r2 + 1
+@339 2242_0000  // r2 <= A + r2
+@33A 1100_0760  // Call Flags_SUB_NEGATIVE_ZERO
+@33B 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0xC5 - CMP - ZeroPage
+// -------------------------------------------------
+@33C 1100_0142  // Call Fetch_Zero_Page
+@33D 1000_0337  // Jump to CMP code
+
+// -------------------------------------------------
+// 0xD5 - CMP - ZeroPage , X
+// -------------------------------------------------
+@33E 1100_0155  // Call Fetch_Zero_Page_X
+@33F 1000_0337  // Jump to CMP code
+
+// -------------------------------------------------
+// 0xCD - CMP - Absolute
+// -------------------------------------------------
+@340 1100_016A  // Call Fetch_Absolute
+@341 1000_0337  // Jump to CMP code
+
+// -------------------------------------------------
+// 0xDD - CMP - Absolute , X
+// -------------------------------------------------
+@342 1100_0180  // Call Fetch_Absolute_X
+@343 1000_0337  // Jump to CMP code
+
+// -------------------------------------------------
+// 0xD9 - CMP - Absolute , Y
+// -------------------------------------------------
+@344 1100_01A4  // Call Fetch_Absolute_Y
+@345 1000_0337  // Jump to CMP code
+
+// -------------------------------------------------
+// 0xC1 - CMP - Indexed Indirect X
+// -------------------------------------------------
+@346 1100_01A7  // Call Indexed_Indirect_X
+@347 1000_0337  // Jump to CMP code
+
+// -------------------------------------------------
+// 0xD1 - CMP - Indirect Indexed  Y
+// ------------------------------------------------
+@348 1100_01C4  // Call Indirect_Indexed_Y
+@349 1000_0337  // Jump to CMP code
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0xE0 - CPX - Immediate
+// -------------------------------------------------
+@34E 1100_0134  // Call Fetch_Immediate
+@34F 522F_FFFF  // r2 <= r2 XOR 0xFFFF -- 2's compliment r2
+@350 222F_0001  // r2 <= r2 + 1
+@351 2252_0000  // r2 <= X + r2
+@352 1100_0760  // Call Flags_SUB_NEGATIVE_ZERO
+@353 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0xE4 - CPX - ZeroPage
+// -------------------------------------------------
+@354 1100_0142  // Call Fetch_Zero_Page
+@355 1000_034F  // Jump to CPX code
+
+// -------------------------------------------------
+// 0xEC - CPX - Absolute
+// -------------------------------------------------
+@356 1100_016A  // Call Fetch_Absolute
+@357 1000_034F  // Jump to CPX code
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0xC0 - CPY - Immediate
+// -------------------------------------------------
+@35C 1100_0134  // Call Fetch_Immediate
+@35D 522F_FFFF  // r2 <= r2 XOR 0xFFFF -- 2's compliment r2
+@35E 222F_0001  // r2 <= r2 + 1
+@35F 2262_0000  // r2 <= Y + r2
+@360 1100_0760  // Call Flags_SUB_NEGATIVE_ZERO
+@361 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0xC4 - CPY - ZeroPage
+// -------------------------------------------------
+@362 1100_0142  // Call Fetch_Zero_Page
+@363 1000_035D  // Jump to CPY code
+
+// -------------------------------------------------
+// 0xCC - CPY - Absolute
+// -------------------------------------------------
+@364 1100_016A  // Call Fetch_Absolute
+@365 1000_035D  // Jump to CPY code
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0x85 - STA - ZeroPage
+// -------------------------------------------------
+@36A 4B4F_0000  // Data_out <= A OR 0x0000
+@36B 1100_0600  // Call Write_Zero_Page
+@36C 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0x95 - STA - ZeroPage , X
+// -------------------------------------------------
+@36D 4B4F_0000  // Data_out <= A OR 0x0000
+@36E 1100_0615  // Call Write_Zero_Page_X
+@36F 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0x8D - STA - Absolute
+// -------------------------------------------------
+@370 4B4F_0000  // Data_out <= A OR 0x0000
+@371 1100_0625  // Call Write_Absolute
+@372 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0x9D - STA - Absolute , X
+// -------------------------------------------------
+@373 4B4F_0000  // Data_out <= A OR 0x0000
+@374 1100_0636  // Call Write_Absolute_X
+@375 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0x99 - STA - Absolute , Y
+// -------------------------------------------------
+@376 4B4F_0000  // Data_out <= A OR 0x0000
+@377 1100_0647  // Call Write_Absolute_Y
+@378 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0x81 - STA - Indexed Indirect X
+// -------------------------------------------------
+@379 4B4F_0000  // Data_out <= A OR 0x0000
+@37A 1100_064D  // Call Write_Indexed_Indirect_X
+@37B 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0x91 - STA - Indirect Indexed  Y
+// -------------------------------------------------
+@37C 4B4F_0000  // Data_out <= A OR 0x0000
+@37D 1100_0665  // Call Write_Indirect_Indexed_Y
+@37E 1000_0101  // Jump back to main loop
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0x86 - STX - ZeroPage
+// -------------------------------------------------
+@383 4B5F_0000  // Data_out <= X OR 0x0000
+@384 1100_0600  // Call Write_Zero_Page
+@385 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0x96 - STX - ZeroPage , Y
+// -------------------------------------------------
+@386 4B5F_0000  // Data_out <= X OR 0x0000
+@387 1100_0613  // Call Write_Zero_Page_Y
+@388 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0x8E - STX - Absolute
+// -------------------------------------------------
+@389 4B5F_0000  // Data_out <= X OR 0x0000
+@38A 1100_0625  // Call Write_Absolute
+@38B 1000_0101  // Jump back to main loop
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0x84 - STY - ZeroPage
+// -------------------------------------------------
+@390 4B6F_0000  // Data_out <= Y OR 0x0000
+@391 1100_0600  // Call Write_Zero_Page
+@392 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0x94 - STY - ZeroPage , X
+// -------------------------------------------------
+@393 4B6F_0000  // Data_out <= Y OR 0x0000
+@394 1100_0615  // Call Write_Zero_Page_X
+@395 1000_0101  // Jump back to main loop
+
+// -------------------------------------------------
+// 0x8C - STY - Absolute
+// -------------------------------------------------
+@396 4B6F_0000  // Data_out <= Y OR 0x0000
+@397 1100_0625  // Call Write_Absolute
+@398 1000_0101  // Jump back to main loop
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0x06 - ASL  - Arithmetic Shift Left - ZeroPage
+// -------------------------------------------------
+@3A0 1100_0680  // Call Fetch_Zero_Page_NoInc_PC
+@3A1 2022_0000  // r0 <= r2 + r2
+@3A2 4B0F_0000  // Data_out <= r0 OR 0x0000
+@3A3 320F_00FF  // r2 <= r0 AND 00FF
+@3A4 1100_0125  // Call Calc_Flags CARRY_NEGATIVE_ZERO
+@3A5 1000_06D0  // Jump to Double_WriteBack
+
+// -------------------------------------------------
+// 0x16 - ASL  - Arithmetic Shift Left - ZeroPage , X
+// -------------------------------------------------
+@3A6 1100_0690  // Call Fetch_Zero_Page_X_NoInc_PC
+@3A7 1000_03A1  // Jump to common code
+
+// -------------------------------------------------
+// 0x0E - ASL  - Arithmetic Shift Left - Absolute
+// -------------------------------------------------
+@3A8 1100_06A0  // Call Fetch_Absolute_NoInc_PC
+@3A9 1000_03A1  // Jump to common code
+
+// -------------------------------------------------
+// 0x1E - ASL  - Arithmetic Shift Left - Absolute , X
+// -------------------------------------------------
+@3AA 1100_06B0  // Call Fetch_Absolute_X_NoInc_PC
+@3AB 1000_03A1  // Jump to common code
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0xE6 - INC - ZeroPage
+// -------------------------------------------------
+@3B0 1100_0680  // Call Fetch_Zero_Page_NoInc_PC
+@3B1 202F_0001  // r0 <= r2 + 1
+@3B2 4B0F_0000  // Data_out <= r0 OR 0x0000
+@3B3 320F_00FF  // r2 <= r0 AND 00FF
+@3B4 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@3B5 1000_06D0  // Jump to Double_WriteBack
+
+// -------------------------------------------------
+// 0xF6 - INC - ZeroPage , X
+// -------------------------------------------------
+@3B6 1100_0690  // Call Fetch_Zero_Page_X_NoInc_PC
+@3B7 1000_03B1  // Jump to common code
+
+// -------------------------------------------------
+// 0xEE - INC - Absolute
+// -------------------------------------------------
+@3B8 1100_06A0  // Call Fetch_Absolute_NoInc_PC
+@3B9 1000_03B1  // Jump to common code
+
+// -------------------------------------------------
+// 0xFE - INC - Absolute , X
+// -------------------------------------------------
+@3BA 1100_06B0  // Call Fetch_Absolute_X_NoInc_PC
+@3BB 1000_03B1  // Jump to common code
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0xC6 - DEC - ZeroPage
+// -------------------------------------------------
+@3C0 1100_0680  // Call Fetch_Zero_Page_NoInc_PC
+@3C1 202F_FFFF  // r0 <= r2 - 1
+@3C2 4B0F_0000  // Data_out <= r0 OR 0x0000
+@3C3 320F_00FF  // r2 <= r0 AND 00FF
+@3C4 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@3C5 1000_06D0  // Jump to Double_WriteBack
+
+// -------------------------------------------------
+// 0xD6 - DEC - ZeroPage , X
+// -------------------------------------------------
+@3C6 1100_0690  // Call Fetch_Zero_Page_X_NoInc_PC
+@3C7 1000_03C1  // Jump to common code
+
+// -------------------------------------------------
+// 0xCE - DEC - Absolute
+// -------------------------------------------------
+@3C8 1100_06A0  // Call Fetch_Absolute_NoInc_PC
+@3C9 1000_03C1  // Jump to common code
+
+// -------------------------------------------------
+// 0xDE - DEC - Absolute , X
+// -------------------------------------------------
+@3CA 1100_06B0  // Call Fetch_Absolute_X_NoInc_PC
+@3CB 1000_03C1  // Jump to common code
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0x46 - LSR - Logical Shift Right - ZeroPage
+// -------------------------------------------------
+@3D0 1100_0680  // Call Fetch_Zero_Page_NoInc_PC
+@3D1 302F_0001  // r0 <= r2 AND 0001 - Isolate bit 0 of the fetched data
+@3D2 6222_0000  // r2 <= SHR r2
+@3D3 4B2F_0000  // Data_Out <= r2 OR 0x0000
+@3D4 399F_FFFE  // Flags <= Flags AND 0xFFFE
+@3D5 4990_0000  // Flags <= Flags OR r0 
+@3D6 322F_00FF  // r2 <= r2 AND 00FF
+@3D7 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@3D8 1000_06D0  // Jump to Double_WriteBack
+
+// -------------------------------------------------
+// 0x56 - LSR - Logical Shift Right - ZeroPage , X
+// -------------------------------------------------
+@3D9 1100_0690  // Call Fetch_Zero_Page_X_NoInc_PC
+@3DA 1000_03D1  // Jump to common code
+
+// -------------------------------------------------
+// 0x4E - LSR - Logical Shift Right - Absolute
+// -------------------------------------------------
+@3DB 1100_06A0  // Call Fetch_Absolute_NoInc_PC
+@3DC 1000_03D1  // Jump to common code
+
+// -------------------------------------------------
+// 0x5E - LSR - Logical Shift Right - Absolute , X
+// -------------------------------------------------
+@3DD 1100_06B0  // Call Fetch_Absolute_X_NoInc_PC
+@3DE 1000_03D1  // Jump to common code
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0x26 - ROL - Rotate Left - ZeroPage
+// -------------------------------------------------
+@3E0 1100_0680  // Call Fetch_Zero_Page_NoInc_PC
+@3E1 309F_0001  // r0 <= Flags AND 0001 - Isolate current Carry bit
+@3E2 2222_0000  // r2 <= r2 + r2
+@3E3 4B20_0000  // Data_Out <= r2 OR r0
+@3E4 4220_00FF  // r2 <= r2 or r0
+@3E5 1100_0125  // Call Calc_Flags CARRY_NEGATIVE_ZERO
+@3E6 1000_06D0  // Jump to Double_WriteBack
+
+// -------------------------------------------------
+// 0x36 - ROL - Rotate Left - ZeroPage , X
+// -------------------------------------------------
+@3E7 1100_0690  // Call Fetch_Zero_Page_X_NoInc_PC
+@3E8 1000_03E1  // Jump to common code
+
+// -------------------------------------------------
+// 0x2E - ROL - Rotate Left - Absolute
+// -------------------------------------------------
+@3E9 1100_06A0  // Call Fetch_Absolute_NoInc_PC
+@3EA 1000_03E1  // Jump to common code
+
+// -------------------------------------------------
+// 0x3E - ROL - Rotate Left - Absolute , X
+// -------------------------------------------------
+@3EB 1100_06B0  // Call Fetch_Absolute_X_NoInc_PC
+@3EC 1000_03E1  // Jump to common code
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0x66 - ROR - Rotate Right - ZeroPage
+// -------------------------------------------------
+@3F0 1100_0680  // Call Fetch_Zero_Page_NoInc_PC
+@3F1 319F_0001  // r1 <= Flags AND 0001 - Isolate current Carry Flag bit
+@3F2 302F_0001  // r0 <= r2 AND 0001 - Isolate bit 0 of the data
+@3F3 6322_0000  // r3 <= SHR r2
+@3F4 399F_FFFE  // Flags <= Flags AND 0xFFFE
+@3F5 4990_0000  // Flags <= Flags OR r0
+@3F6 324F_00FF  // r2 <= r3 AND 00FF
+@3F7 4F1F_0000  // Dummy <= r1 OR 0000
+@3F8 1002_03FA  // Jump Zero over next instruction
+@3F9 433F_0080  // r3 <= r3 OR 0080
+@3FA 4B3F_0000  // Data_Out <= r3 OR 0x0000
+@3FB 323F_00FF  // r2 <= r3 AND 00FF
+@3FC 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@3FD 1000_06D0  // Jump to Double_WriteBack
+
+// -------------------------------------------------
+// 0x76 - ROR - Rotate Right - ZeroPage , X
+// -------------------------------------------------
+@3FE 1100_0690  // Call Fetch_Zero_Page_X_NoInc_PC
+@3FF 1000_03F1  // Jump to common code
+
+// -------------------------------------------------
+// 0x6E - ROR - Rotate Right - Absolute
+// -------------------------------------------------
+@400 1100_06A0  // Call Fetch_Absolute_NoInc_PC
+@401 1000_03F1  // Jump to common code
+
+// -------------------------------------------------
+// 0x7E - ROR - Rotate Right - Absolute , X
+// -------------------------------------------------
+@402 1100_06B0  // Call Fetch_Absolute_X_NoInc_PC
+@403 1000_03F1  // Jump to common code
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0x08 - PHP - Push processor status to the stack	Jump to 0x412
+// 0x48 - PHA - Push Accumulator to the stack 		Jump to 0x410
+// -------------------------------------------------
+@410 4B4F_0000  // Data_Out <= A OR 0x0000
+@411 1000_0413  // Jump over next instruction
+
+@412 4B9F_0000  // Data_Out <= Flags OR 0x0000
+@413 277F_0001  // PC = PC + 1
+@414 4A7F_0000  // ADDRESS_OUT = PC
+@415 4DFF_0001  // SYNC=0, RD_WR_n=1
+
+@416 1033_0000  // Wait for CLK to be high
+@417 1034_0000  // Wait for CLK to be low
+@418 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+@419 4DFF_0000  // SYNC=0, RD_WR_n=0
+@41A 288F_FFFF  // SP <= SP - 1
+
+@41B 1033_0000  // Wait for CLK to be high
+@41C 4DFF_0004  // Dataout_Enable=1, SYNC=0, RD_WR_n=0
+
+@41D 1034_0000  // Wait for CLK to be low
+@41E 4DFF_0007  // Dataout_Enable=1, SYNC=1, RD_WR_n=1 
+@41F 1000_0101  // Jump to main loop
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0x28 - PLP - Pop processor status from the stack
+// -------------------------------------------------
+@430 277F_0001  // PC = PC + 1
+@431 4A7F_0000  // ADDRESS_OUT = PC
+@432 4DFF_0001  // SYNC=0, RD_WR_n=1
+
+@433 1033_0000  // Wait for CLK to be high
+@434 1034_0000  // Wait for CLK to be low
+@435 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+@436 288F_0001  // SP <= SP + 1
+
+@437 1033_0000  // Wait for CLK to be high
+@438 1034_0000  // Wait for CLK to be low
+@439 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+
+@43A 1033_0000  // Wait for CLK to be high
+@43B 1034_0000  // Wait for CLK to be low
+@43C 39BF_00FF  // Flags <= data_in AND 0x00FF
+
+@43D 4A7F_0000  // ADDRESS_OUT = PC
+@43E 4DFF_0003  // SYNC=1, RD_WR_n=1
+@43F 1000_0101  // Jump to main loop
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0x68 - PLA - Pop Accumulator from the stack
+// -------------------------------------------------
+@448 277F_0001  // PC = PC + 1
+@449 4A7F_0000  // ADDRESS_OUT = PC
+@44A 4DFF_0001  // SYNC=0, RD_WR_n=1
+
+@44B 1033_0000  // Wait for CLK to be high
+@44C 1034_0000  // Wait for CLK to be low
+@44D 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+@44E 288F_0001  // SP <= SP + 1
+
+@44F 1033_0000  // Wait for CLK to be high
+@450 1034_0000  // Wait for CLK to be low
+@451 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+
+@452 1033_0000  // Wait for CLK to be high
+@453 1034_0000  // Wait for CLK to be low
+@454 34BF_00FF  // A <= data_in AND 0x00FF
+@455 324F_00FF  // r2 <= A AND 00FF
+@456 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@457 4A7F_0000  // ADDRESS_OUT = PC
+@458 4DFF_0003  // SYNC=1, RD_WR_n=1
+@459 1000_0101  // Jump to main loop
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0x20 - JSR - Jump to Subroutine
+// -------------------------------------------------
+@470 277F_0001  // PC = PC + 1
+@471 4A7F_0000  // ADDRESS_OUT = PC
+@472 4DFF_0001  // SYNC=0, RD_WR_n=1
+ 
+@473 1033_0000  // Wait for CLK to be high
+@474 1034_0000  // Wait for CLK to be low
+@475 32BF_00FF  // r2 <= data_in AND 0x00FF				-- Fetch ADL
+@476 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+@477 4DFF_0001  // SYNC=0, RD_WR_n=1
+ 
+@478 1033_0000  // Wait for CLK to be high
+@479 277F_0001  // PC = PC + 1
+@47A 1034_0000  // Wait for CLK to be low
+@47B 3FBF_00FF  // Dummy <= data_in AND 0x00FF			-- discard data
+@47C 4DFF_0000  // SYNC=0, RD_WR_n=0
+@47D 4BF7_0000  // Data_Out <= 0x0000 OR PC_Byte_Swapped
+@47E 288F_FFFF  // SP <= SP - 1
+ 
+@47F 1033_0000  // Wait for CLK to be high
+@480 4DFF_0004  // Dataout_Enable=1, SYNC=0, RD_WR_n=0
+@481 1034_0000  // Wait for CLK to be low
+@482 4DFF_0000  // Dataout_Enable=0, SYNC=0, RD_WR_n=1 	-- Push PCH
+@483 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+@484 4B7F_0000  // Data_Out <= 0x0000 OR PC
+ 
+@485 1033_0000  // Wait for CLK to be high
+@486 4DFF_0004  // Dataout_Enable=1, SYNC=0, RD_WR_n=0
+@487 1034_0000  // Wait for CLK to be low
+@488 4DFF_0000  // Dataout_Enable=0, SYNC=0, RD_WR_n=1	-- Push PCL
+@489 4A7F_0000  // ADDRESS_OUT = PC
+@48A 4DFF_0001  // SYNC=0, RD_WR_n=1
+ 
+@48B 1033_0000  // Wait for CLK to be high
+@48C 288F_FFFF  // SP <= SP - 1
+@48D 1034_0000  // Wait for CLK to be low
+@48E 31BF_FF00  // r1 <= data_in AND 0xFF00				-- Fetch ADH  
+@48F 4712_0000  // PC = r1 OR r2
+@490 4A7F_0000  // ADDRESS_OUT = PC
+@491 4DFF_0003  // SYNC=1, RD_WR_n=1
+@492 1000_0102  // Jump to main loop
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0x40 - RTI - Return from Interrupt
+// -------------------------------------------------
+@4A0 277F_0001  // PC = PC + 1
+@4A1 4A7F_0000  // ADDRESS_OUT = PC
+@4A2 4DFF_0001  // SYNC=0, RD_WR_n=1
+
+@4A3 1033_0000  // Wait for CLK to be high			-- Discard data
+@4A4 1034_0000  // Wait for CLK to be low
+@4A5 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+
+@4A6 1033_0000  // Wait for CLK to be high			-- Discard stack data
+@4A7 1034_0000  // Wait for CLK to be low
+@4A8 288F_0001  // SP <= SP + 1
+@4A9 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+
+@4AA 1033_0000  // Wait for CLK to be high			-- Pull P from stack
+@4AB 288F_0001  // SP <= SP + 1
+@4AC 1034_0000  // Wait for CLK to be low
+@4AD 39BF_00FF  // Flags <= data_in AND 0x00FF
+@4AE 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+
+@4AF 1033_0000  // Wait for CLK to be high			-- Pull PCL from stack
+@4B0 288F_0001  // SP <= SP + 1
+@4B1 1034_0000  // Wait for CLK to be low
+@4B2 32BF_00FF  // r2 <= data_in AND 0x00FF
+@4B3 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+
+@4B4 1033_0000  // Wait for CLK to be high			-- Pull PCH from stack
+@4B5 1034_0000  // Wait for CLK to be low
+@4B6 31BF_FF00  // r1 <= data_in AND 0xFF00
+@4B7 4712_0000  // PC = r1 OR r2
+@4B8 4A7F_0000  // ADDRESS_OUT = PC
+@4B9 4DFF_0003  // SYNC=1, RD_WR_n=1
+@4BA 1000_0101  // Jump to main loop
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0x4C - JMP - Jump Absolute
+// -------------------------------------------------
+@4C0 277F_0001  // PC = PC + 1
+@4C1 4A7F_0000  // ADDRESS_OUT = PC
+@4C2 4DFF_0001  // SYNC=0, RD_WR_n=1
+
+@4C3 1033_0000  // Wait for CLK to be high
+@4C4 1034_0000  // Wait for CLK to be low
+@4C5 32BF_00FF  // r2 <= data_in AND 0x00FF
+@4C6 277F_0001  // PC = PC + 1
+@4C7 4A7F_0000  // ADDRESS_OUT = PC
+
+@4C8 1033_0000  // Wait for CLK to be high
+@4C9 1034_0000  // Wait for CLK to be low
+@4CA 33BF_FF00  // r3 <= data_in AND 0xFF00
+@4CB 4723_0000  // PC = r2 OR r3
+@4CC 4A7F_0000  // ADDRESS_OUT = PC
+@4CD 4DFF_0003  // SYNC=1, RD_WR_n=1
+@4CE 1000_0101  // Jump to main loop
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0x6C - JMP - Jump Indirect					
+// -------------------------------------------------
+@4E0 277F_0001  // PC = PC + 1
+@4E1 4A7F_0000  // ADDRESS_OUT = PC
+@4E2 4DFF_0001  // SYNC=0, RD_WR_n=1
+
+@4E3 1033_0000  // Wait for CLK to be high				-- Fetch IAL
+@4E4 277F_0001  // PC = PC + 1
+@4E5 1034_0000  // Wait for CLK to be low
+@4E6 32BF_00FF  // r2 <= data_in AND 0x00FF
+@4E7 4A7F_0000  // ADDRESS_OUT = PC
+
+@4E8 1033_0000  // Wait for CLK to be high				-- Fetch IAH 
+@4E9 1034_0000  // Wait for CLK to be low
+@4EA 33BF_FF00  // r3 <= data_in AND 0xFF00
+@4EB 4A23_0000  // ADDRESS_OUT = r2 OR r3
+
+@4EC 1033_0000  // Wait for CLK to be high				-- Fetch ADL 
+@4ED 30AF_00FF  // r0 <= ADDRESS_OUT AND 0x00FF
+@4EE 200F_0001  // r0 <= r0 + 1
+@4EF 300F_00FF  // r0 <= r0 AND 0x00FF
+@4F0 32AF_FF00  // r2 <= ADDRESS_OUT AND 0xFF00
+@4F1 1034_0000  // Wait for CLK to be low
+@4F2 31BF_00FF  // r1 <= data_in AND 0x00FF
+@4F3 4A02_0000  // ADDRESS_OUT = r0 OR r2
+
+@4F4 1033_0000  // Wait for CLK to be high				-- Fetch ADH - 6502 page wrapping bug 
+@4F5 1034_0000  // Wait for CLK to be low
+@4F6 30BF_FF00  // r0 <= data_in AND 0xFF00
+@4F7 4701_0000  // PC = r0 OR r1
+@4F8 4A7F_0000  // ADDRESS_OUT = PC
+@4F9 4DFF_0003  // SYNC=1, RD_WR_n=1
+@4FA 1000_0102  // Jump to main loop 
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0x60 - RTS - Return from Subroutine
+// -------------------------------------------------
+@500 277F_0001  // PC = PC + 1
+@501 4A7F_0000  // ADDRESS_OUT = PC
+@502 4DFF_0001  // SYNC=0, RD_WR_n=1
+
+@503 1033_0000  // Wait for CLK to be high			-- Discard data
+@504 1034_0000  // Wait for CLK to be low
+@505 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+
+@507 1033_0000  // Wait for CLK to be high			-- Discard stack data
+@508 1034_0000  // Wait for CLK to be low
+@509 288F_0001  // SP <= SP + 1
+@50A 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+ 
+@50B 1033_0000  // Wait for CLK to be high			-- Pull PCL from stack
+@50C 288F_0001  // SP <= SP + 1
+@50D 1034_0000  // Wait for CLK to be low
+@50E 32BF_00FF  // r2 <= data_in AND 0x00FF
+@50F 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+ 
+@510 1033_0000  // Wait for CLK to be high			-- Pull PCH from stack
+@511 1034_0000  // Wait for CLK to be low
+@512 31BF_FF00  // r1 <= data_in AND 0xFF00
+@513 4712_0000  // PC = r1 OR r2
+@514 4A7F_0000  // ADDRESS_OUT = PC
+@515 4DFF_0001  // SYNC=0, RD_WR_n=1
+ 
+@516 1033_0000  // Wait for CLK to be high			-- Discard PCH,PCL
+@517 1034_0000  // Wait for CLK to be low
+@518 277F_0001  // PC = PC + 1
+@519 4A7F_0000  // ADDRESS_OUT = PC
+@51A 4DFF_0003  // SYNC=1, RD_WR_n=1
+@51B 1000_0101  // Jump to main loop
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0xB0 - BCS - Branch on Carry Set
+// -------------------------------------------------
+@520 3F9F_0001  // Dummy <= Flags AND 0x0001 - Isolate the Carry Flag bit
+@521 1001_0550  // Jump if non-zero to Branch_Taken
+@522 1000_0540  // Jump unconditional to Branch_Not_Taken
+
+// -------------------------------------------------
+// 0xF0 - BEQ - Branch on Zero Set
+// -------------------------------------------------
+@523 3F9F_0002  // Dummy <= Flags AND 0x0002 - Isolate the Zero Flag bit
+@524 1001_0550  // Jump if non-zero to Branch_Taken
+@525 1000_0540  // Jump unconditional to Branch_Not_Taken
+
+// -------------------------------------------------
+// 0x30 - BMI - Branch on Minus (N Flag Set)
+// -------------------------------------------------
+@526 3F9F_0080  // Dummy <= Flags AND 0x0080 - Isolate the N Flag bit
+@527 1001_0550  // Jump if non-zero to Branch_Taken
+@528 1000_0540  // Jump unconditional to Branch_Not_Taken
+
+// -------------------------------------------------
+// 0xD0 - BNE - Branch on Zero Clear
+// -------------------------------------------------
+@529 3F9F_0002  // Dummy <= Flags AND 0x0002 - Isolate the Zero Flag bit
+@52A 1002_0548  // Jump if zero to Branch_Taken
+@52B 1000_0540  // Jump unconditional to Branch_Not_Taken
+
+// -------------------------------------------------
+// 0x10 - BPL - Branch on Plus  (N Flag Clear)
+// -------------------------------------------------
+@52C 3F9F_0080  // Dummy <= Flags AND 0x0080 - Isolate the N Flag bit
+@52D 1002_0548  // Jump if zero to Branch_Taken
+@52E 1000_0540  // Jump unconditional to Branch_Not_Taken
+
+// -------------------------------------------------
+// 0x50 - BVC - Branch on Overflow Clear
+// -------------------------------------------------
+@52F 3F9F_0040  // Dummy <= Flags AND 0x0040 - Isolate the V Flag bit
+@530 1002_0548  // Jump if zero to Branch_Taken
+@531 1000_0540  // Jump unconditional to Branch_Not_Taken
+
+// -------------------------------------------------
+// 0x70 - BVS - Branch on Overflow Set
+// -------------------------------------------------
+@532 3F9F_0040  // Dummy <= Flags AND 0x0040 - Isolate the V Flag bit
+@533 1001_0550  // Jump if non-zero to Branch_Taken
+@534 1000_0540  // Jump unconditional to Branch_Not_Taken
+
+// -------------------------------------------------
+// 0x90 - BCC - Branch on Carry Clear
+// -------------------------------------------------
+@535 3F9F_0001  // Dummy <= Flags AND 0x0001 - Isolate the Carry Flag bit
+@536 1002_0548  // Jump if zero to Branch_Taken
+@537 1000_0540  // Jump unconditional to Branch_Not_Taken
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// Branch_Not_Taken
+// -------------------------------------------------
+@540 277F_0001  // PC = PC + 1
+@541 4A7F_0000  // ADDRESS_OUT = PC
+
+@542 1033_0000  // Wait for CLK to be high				-- Fetch next opcode
+@543 1034_0000  // Wait for CLK to be low
+@544 277F_0001  // PC = PC + 1
+@545 4A7F_0000  // ADDRESS_OUT = PC
+@546 4DFF_0003  // SYNC=1, RD_WR_n=1
+@547 1000_0103  // Jump to main loop 
+
+// -------------------------------------------------
+// -------------------------------------------------
+// Branch_Taken - Relative Addressing
+// -------------------------------------------------
+@550 277F_0001  // PC = PC + 1
+@551 4A7F_0000  // ADDRESS_OUT = PC
+@552 4DFF_0001  // SYNC=0, RD_WR_n=1			
+
+@553 1033_0000  // Wait for CLK to be high				-- Fetch the offset
+@554 1034_0000  // Wait for CLK to be low
+@555 30BF_00FF  // r0 <= data_in AND 0x00FF
+@556 277F_0001  // PC = PC + 1
+@557 4A7F_0000  // ADDRESS_OUT = PC
+
+@558 3F0F_0080  // Dummy <= r0 AND 0x0080  				- Isolate the sign bit
+@559 1002_055B  // Jump if zero over next instruction
+@55A 400F_FF00  // r0 <= r0 OR 0xFF00  					- Sign extend r0
+
+@55B 1033_0000  // Wait for CLK to be high				-- Discard next data
+@55C 1034_0000  // Wait for CLK to be low
+@55D 2070_0000  // r0 = PC + r0
+@55E 320F_FF00  // r2 <= r0 AND 0xFF00					-- Isolate new ADH
+@55F 33AF_FF00  // r3 <= ADDRESS_OUT AND 0xFF00			-- Isolate old ADH
+@560 5F23_0000  // Dummy <= r2 XOR r3 					-- Test of they are different
+@561 1001_0565  // Jump non-zero to Page_Crossed 
+@562 4A0F_0000  // ADDRESS_OUT = r0 OR 0x0000				
+@564 1000_056B  // Jump to code below
+ 
+@565 310F_00FF  // r1 <= r0 AND 0x00FF					-- Page_Crossed
+@566 327F_FF00  // r2 <= PC AND 0xFF00
+@567 4A12_0000  // ADDRESS_OUT = r1 OR r2				
+ 
+@568 1033_0000  // Wait for CLK to be high
+@569 1034_0000  // Wait for CLK to be low
+@56A 4A0F_0000  // ADDRESS_OUT = r0 OR 0x0000
+@56B 47AF_0000  // PC = ADDRESS_OUT
+@56C 4DFF_0003  // SYNC=1, RD_WR_n=1
+@56D 1000_0103  // Jump to main loop
+
+
+
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// BRK & INTR_n Interrupt Processing
+// -------------------------------------------------
+@570 409F_0010  // r0 <= Flags OR 0x0010 			- BRK: Set the B Flag
+@571 277F_0002  // PC = PC + 2
+@572 1000_0575  // Jump to main interrupt code
+@573 309F_FFEF  // r0 <= Flags AND 0xFFEF			- IRQ: Clear the B Flag
+//@574 277F_0002  // PC = PC + 1
+
+@575 1033_0000  // Wait for CLK to be high				-- Push PCH
+@576 1034_0000  // Wait for CLK to be low
+@577 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+@578 4DFF_0000  // SYNC=0, RD_WR_n=0
+@579 4BF7_0000  // Data_Out <= 0x0000 OR PC_Byte_Swapped
+@57A 288F_FFFF  // SP <= SP - 1
+@57B 1033_0000  // Wait for CLK to be high	
+@57C 4DFF_0004  // Dataout_Enable=1, SYNC=0, RD_WR_n=0
+ 
+@57D 1034_0000  // Wait for CLK to be low				-- Push PCL
+@57E 4DFF_0000  // Dataout_Enable=0, SYNC=0, RD_WR_n=1 
+@57F 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+@580 4B7F_0000  // Data_Out <= 0x0000 OR PC
+@581 288F_FFFF  // SP <= SP - 1
+@582 1033_0000  // Wait for CLK to be high
+@583 4DFF_0004  // Dataout_Enable=1, SYNC=0, RD_WR_n=0
+  
+@584 1034_0000  // Wait for CLK to be low				-- Push P
+@585 4DFF_0000  // Dataout_Enable=0, SYNC=0, RD_WR_n=1 
+@586 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+@587 4BF0_0000  // Data_Out <= 0x0000 OR r0
+@588 1033_0000  // Wait for CLK to be high
+@589 4DFF_0004  // Dataout_Enable=1, SYNC=0, RD_WR_n=0
+  
+@58A 1034_0000  // Wait for CLK to be low
+@58B 4DFF_0001  // Dataout_Enable=0, SYNC=0, RD_WR_n=1
+@58C 4AFF_FFFE  // ADDRESS_OUT = 0xFFFE					-- Fetch Vector PCL
+  
+@58D 1033_0000  // Wait for CLK to be high
+@58E 1034_0000  // Wait for CLK to be low
+@58F 33BF_00FF  // r3 <= data_in AND 0x00FF
+@590 4AFF_FFFF  // ADDRESS_OUT = 0xFFFF					-- Fetch Vector PCH
+@591 499F_0004  // Set the I Flag
+ 
+@592 1033_0000  // Wait for CLK to be high
+@593 288F_FFFF  // SP <= SP - 1
+@594 1034_0000  // Wait for CLK to be low
+@595 32BF_FF00  // r2 <= data_in AND 0xFF00
+@596 4723_0000  // PC = r2 OR r3
+@597 4A7F_0000  // ADDRESS_OUT = PC						-- Fetch first opcode at PCH,PCL
+@598 4DFF_0003  // SYNC=1, RD_WR_n=1
+@599 1000_0103  // Jump to main loop 
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// NMI_n Interrupt Processing
+// -------------------------------------------------
+@5A2 309F_FFEF  // r0 <= Flags AND FFEF                 -- Clear the B Flag
+@5A3 1033_0000  // Wait for CLK to be high				-- Push PCH
+@5A4 1034_0000  // Wait for CLK to be low
+@5A5 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+@5A6 4DFF_0000  // SYNC=0, RD_WR_n=0
+@5A7 4BF7_0000  // Data_Out <= 0x0000 OR PC_Byte_Swapped
+@5A8 288F_FFFF  // SP <= SP - 1
+@5A9 1033_0000  // Wait for CLK to be high	
+@5AA 4DFF_0004  // Dataout_Enable=1, SYNC=0, RD_WR_n=0
+ 
+@5AB 1034_0000  // Wait for CLK to be low				-- Push PCL
+@5AC 4DFF_0000  // Dataout_Enable=0, SYNC=0, RD_WR_n=1 
+@5AD 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+@5AE 4B7F_0000  // Data_Out <= 0x0000 OR PC
+@5AF 288F_FFFF  // SP <= SP - 1
+@5B0 1033_0000  // Wait for CLK to be high
+@5B1 4DFF_0004  // Dataout_Enable=1, SYNC=0, RD_WR_n=0
+  
+@5B2 1034_0000  // Wait for CLK to be low				-- Push P
+@5B3 4DFF_0000  // Dataout_Enable=0, SYNC=0, RD_WR_n=1 
+@5B4 4A8F_0000  // ADDRESS_OUT = SP OR 0x0000
+@5B5 4BF0_0000  // Data_Out <= 0x0000 OR r0
+@5B6 1033_0000  // Wait for CLK to be high
+@5B7 4DFF_0004  // Dataout_Enable=1, SYNC=0, RD_WR_n=0
+  
+@5B8 1034_0000  // Wait for CLK to be low
+@5B9 4DFF_0001  // Dataout_Enable=0, SYNC=0, RD_WR_n=1
+@5BA 4AFF_FFFA  // ADDRESS_OUT = 0xFFFA					-- Fetch Vector PCL
+  
+@5BB 1033_0000  // Wait for CLK to be high
+@5BC 499F_0004  // Set the I Flag
+@5BE 1034_0000  // Wait for CLK to be low
+@5BF 33BF_00FF  // r3 <= data_in AND 0x00FF
+@5C0 4AFF_FFFB  // ADDRESS_OUT = 0xFFFB					-- Fetch Vector PCH
+  
+@5C1 1033_0000  // Wait for CLK to be high
+@5C2 288F_FFFF  // SP <= SP - 1
+@5C3 1034_0000  // Wait for CLK to be low
+@5C4 32BF_FF00  // r2 <= data_in AND 0xFF00
+@5C5 4723_0000  // PC = r2 OR r3
+@5C6 4A7F_0000  // ADDRESS_OUT = PC						-- Fetch first opcode at PCH,PCL
+@5C7 4DFF_0003  // SYNC=1, RD_WR_n=1
+@5C8 1000_0103  // Jump to main loop 
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0x69 - ADC - Immediate - Binary
+// -------------------------------------------------
+@700 1100_0134  // Call Fetch_Immediate
+@701 3F9F_0008  // Dummy <= System_Status AND 0008 		-- Isolate the Decimal Flag bit
+@702 1001_0770  // Jump NonZero to ADC_Decimal code
+
+@703 2024_0000  // r0 <= r2 + A
+@704 31CF_0041  // r1 <= System_Status AND 0x0041  		-- Store the overflow,carry flags
+@705 329F_0001  // r2 <= Flags AND 0001 				-- Isolate the Carry Flag bit
+@706 2202_0000  // r2 <= r0 + r2
+@707 33C0_0041  // r3 <= System_Status AND 0x0041  		-- Store the overflow,carry flags
+@708 4313_0000  // r3 <= r1 OR r3					  	-- Combine old and new overflow,carry flags
+@709 399F_00BE  // Flags <= Flags AND 0x00BE		  	-- Clear the current overflow,carry flags
+@70A 4993_0000  // Flags <= Flags OR r3				  	-- Store old and new overflow,carry flags
+@70B 442F_0000  // A <= r2 OR 0c0000				  	-- Store addition results back to Accumulator
+@70C 1100_0128  // Call Calc_Flags NEGATIVE_ZERO
+@70D 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0x65 - ADC - ZeroPage
+// -------------------------------------------------
+@710 1100_0142  // Call Fetch_Zero_Page
+@711 1000_0701  // Jump to ADC code
+
+// -------------------------------------------------
+// 0x75 - ADC - ZeroPage , X
+// -------------------------------------------------
+@712 1100_0155  // Call Fetch_Zero_Page_X
+@713 1000_0701  // Jump to ADC code
+
+// -------------------------------------------------
+// 0x6D - ADC - Absolute
+// -------------------------------------------------
+@714 1100_016A  // Call Fetch_Absolute
+@715 1000_0701  // Jump to ADC code
+
+// -------------------------------------------------
+// 0x7D - ADC - Absolute , X
+// -------------------------------------------------
+@716 1100_0180  // Call Fetch_Absolute_X
+@717 1000_0701  // Jump to ADC code
+
+// -------------------------------------------------
+// 0x79 - ADC - Absolute , Y
+// -------------------------------------------------
+@718 1100_01A4  // Call Fetch_Absolute_Y
+@719 1000_0701  // Jump to ADC code
+
+// -------------------------------------------------
+// 0x61 - ADC - Indexed Indirect X
+// -------------------------------------------------
+@71A 1100_01A7  // Call Indexed_Indirect_X
+@71B 1000_0701  // Jump to ADC code
+
+// -------------------------------------------------
+// 0x71 - ADC - Indirect Indexed  Y
+// -------------------------------------------------
+@71C 1100_01C4  // Call Indirect_Indexed_Y
+@71D 1000_0701  // Jump to ADC code
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 0xE9 - SBC - Immediate
+// -------------------------------------------------
+@730 1100_0134  // Call Fetch_Immediate
+@731 3F9F_0008  // Dummy <= System_Status AND 0008 		-- Isolate the Decimal Flag bit
+@732 1001_0790  // Jump NonZero to SBC_Decimal code 
+
+@733 399F_00BF  // Flags <= Flags AND 0x00BF		  	-- Clear the current overflow flag
+
+@734 522F_FFFF  // r2 <= r2 XOR 0xFFFF 					
+@735 2224_0000  // r2 <= r2 + A
+@736 30CF_0040  // r0 <= System_Status AND 0x0040  		-- Store the overflow flag
+
+@737 3F9F_0001  // Dummy <= Flags AND 0001 				-- Isolate the Carry Flag bit
+@738 1002_073A  // Jump Zero over next instruction
+@739 222F_0001  // r2 <= r2 + 1			
+@73A 31CF_0040  // r1 <= System_Status AND 0x0040  		-- Store the overflow flag
+@73B 4001_0000  // r0 <= r0 OR r1					  	-- Combine old and new overflow flags
+@73C 4990_0000  // Flags <= Flags OR r0				  	-- Store old and new overflow flags
+
+@73D 442F_0000  // A <= r2 OR 0x0000				  	-- Store subtraction results back to Accumulator
+@73E 1100_0760  // Call Flags_SUB_NEGATIVE_ZERO 
+@73F 1000_0101  // Jump back to main loop
+
+
+// -------------------------------------------------
+// 0xE5 - SBC - ZeroPage
+// -------------------------------------------------
+@750 1100_0142  // Call Fetch_Zero_Page
+@751 1000_0731  // Jump to SBC code
+
+// -------------------------------------------------
+// 0xF5 - SBC - ZeroPage , X
+// -------------------------------------------------
+@752 1100_0155  // Call Fetch_Zero_Page_X
+@753 1000_0731  // Jump to SBC code
+
+// -------------------------------------------------
+// 0xED - SBC - Absolute
+// -------------------------------------------------
+@754 1100_016A  // Call Fetch_Absolute
+@755 1000_0731  // Jump to SBC code
+
+// -------------------------------------------------
+// 0xFD - SBC - Absolute , X
+// -------------------------------------------------
+@756 1100_0180  // Call Fetch_Absolute_X
+@757 1000_0731  // Jump to SBC code
+
+// -------------------------------------------------
+// 0xF9 - SBC - Absolute , Y
+// -------------------------------------------------
+@758 1100_01A4  // Call Fetch_Absolute_Y
+@759 1000_0731  // Jump to SBC code
+
+// -------------------------------------------------
+// 0xE1 - SBC - Indexed Indirect X
+// -------------------------------------------------
+@75A 1100_01A7  // Call Indexed_Indirect_X
+@75B 1000_0731  // Jump to SBC code
+
+// -------------------------------------------------
+// 0xF1 - SBC - Indirect Indexed  Y
+// -------------------------------------------------
+@75C 1100_01C4  // Call Indirect_Indexed_Y
+@75D 1000_0731  // Jump to SBC code
+
+
+
+// -------------------------------------------------
+// Flags_SUB_NEGATIVE_ZERO
+// -------------------------------------------------
+@760 399F_FFFE  // Flags <= Flags AND 0xFFFE     -- Clear the Carry Flag
+@761 302F_0100  // r0 <= r2 AND 0100			 -- Isolate bit[8] for carry
+@762 1001_0764  // Jump NonZero over next instruction
+@763 499F_0001  // Flags <= Flags OR 0001
+@764 1000_0128  // Jump to flags code
+   
+	
+
+// -------------------------------------------------
+// -------------------------------------------------
+// ADC - ADC_Decimal
+// -------------------------------------------------
+@770 309F_0001  // r0 <= Flags AND 0x0001 				-- Store the current Carry Flag bit
+@771 399F_FFFE  // Flags <= Flags AND 0xFFFE			-- Clear the current carry flag
+
+// Lower Nibble Processing
+@772 2440_0000  // A <= r0 + A							-- Add the Carry bit to the Accumulator
+@773 304F_000F  // r0 <= A AND 0x000F					-- Isolate the lower nibble of the accumulator
+@774 312F_000F  // r1 <= r2 AND 0x000F					-- Isolate the lower nibble of the fetched byte
+@775 2001_0000  // r0 <= r0 + r1						-- Add the two together
+@776 310F_001F  // r1 <= r0 AND 0x001F					-- Isolate the lower nibble and the carry
+@777 231F_0006  // r3 <= r1 + 0x0006					-- Test for value  >9
+@778 3F3F_00F0  // Dummy <= r3 AND 0x00F0				-- Test for carry out
+@779 1002_077C  // Jump Zero to Dont_Adjust_Lower_Nibble
+
+@77A 403F_0000  // r0 <= r3 OR 0x0000					-- Adjust_Lower_Nibble
+@77B 1000_077D  // Jump to upper nibble code
+
+@77C 401F_0000  // r0 <= r1 OR 0x0000  					-- Dont_Adjust_Lower_Nibble
+
+// Upper Nibble Processing
+@77D 344F_00F0  // A <= A AND 0x00F0					-- Isolate the upper nibble of the accumulator
+@77E 322F_00F0  // r2 <= r2 AND 0x00F0					-- Isolate the upper nibble of the fetched byte
+@77F 2142_0000  // r1 <= A + r2							-- Add the two nibbles
+@780 2110_0000  // r1 <= r1 + r0						-- Add the carry from the lower nibble addition
+@781 321F_01FF  // r2 <= r1 AND 0x01FF					-- Isolate the upper nibble and the carry
+
+@782 232F_0060  // r3 <= r2 + 0x0060					-- Test for upper nibble  >9
+@783 3F3F_0F00  // Dummy <= r3 AND 0x0F00				-- Test for carry out
+@784 1002_0787  // Jump Zero to Dont_Adjust_Lower_Nibble
+
+@785 403F_0000  // r0 <= r3 OR 0x0000					-- Adjust_Lower_Nibble
+@786 1000_0788  // Jump to Flag setting
+
+@787 401F_0000  // r0 <= r1 OR 0x0000  					-- Dont_Adjust_Lower_Nibble
+
+@788 440F_0000  // A <= r0 OR 0x0000  					-- Update the Accumulator
+@789 3F0F_0F00  // Dummy <= r0 AND 0x0F00				-- Isolate carry out
+@78A 1002_0101  // Jump_Zero back to main loop
+@78B 499F_0001  // Flags <= Flags OR 0x0001				-- Update the Carry Flag
+@78C 1000_0101  // Jump to main loop
+
+
+
+
+	
+
+// -------------------------------------------------
+// -------------------------------------------------
+// SBC - SBC_Decimal
+// -------------------------------------------------
+@790 309F_0001  // r0 <= Flags AND 0x0001 				-- Store the current Carry Flag bit
+@791 500F_0001  // r0 <= r0 XOR 0x0001					-- Invert the Carry bit
+@792 2220_0000  // r2 <= r2 + r0 		 				-- Add the current Carry flag bit to the fetched byte
+
+// Test for negative numbers to set the Carry Flag
+@793 399F_FFFE  // Flags <= Flags AND 0xFFFE    		-- Clear the current Carry Flag
+@794 502F_FFFF  // r0 <= r2 XOR 0xFFFF					-- 1's compliment the fetched byte
+@795 200F_0001  // r0 <= r0 + 0x0001					-- finish 2's compliment 
+@796 2004_0000  // r0 <= r0 + A 		 				-- Add the 9's complimented r2 to the accumulator
+@797 3F0F_0F00  // Dummy <= r0 AND 0x0F00  				-- Isolate the carry out for negative numbers
+@798 1001_079A  // Jump NonZero over next instruction
+@799 499F_0001  // Flags <= Flags OR 0x0001	    		-- Set the Carry Flag
+
+
+// 9's compliment the fetched byte lower nibble
+@79A 502F_FFFF  // r0 <= r2 XOR 0xFFFF					-- 1's compliment the fetched byte
+@79B 200F_000B  // r0 <= r0 + 0x000B					-- finish 2's compliment + add 0x9 for 9's compliment
+@79C 300F_000F  // r0 <= r0 AND 0x000F	 				-- Isolate the lower nibble
+@79D 314F_000F  // r1 <= A AND 0x000F	 				-- Isolate the Accumulator lower nibble
+@79E 2001_0000  // r0 <= r0 + r1 		 				-- Add the 9's complimented r2 to the accumulator
+
+// Adjust the lower nibble to BCD
+@79F 230F_0006  // r3 <= r0 + 0x0006	 				-- Test for value >9
+@7A0 3F3F_00F0  // Dummy <= r3 AND 0x00F0				-- Test for carry out			!!! problem is here
+@7A1 1002_07A5  // Jump Zero to Dont_Adjust_Lower_Nibble
+@7A2 303F_000F  // r0 <= r3 AND 0x000F  				-- Isolate lower nibble
+@7A3 43FF_00B0  // r3 <= 0x0000 OR 0x00B0	 			-- BCD carry over to upper nibble
+@7A4 1000_07A6  // Jump to next nibble
+@7A5 43FF_00A0  // r3 <= 0x0000 OR 0x00A0	 			-- BCD carry over to upper nibble
+
+// 9's compliment the fetched byte upper nibble
+@7A6 512F_FFF0  // r1 <= r2 XOR 0xFFF0					-- 1's compliment the fetched byte 
+@7A7 311F_00F0  // r1 <= r1 AND 0x00F0	 				-- Isolate the upper nibble
+@7A8 2313_0000  // r3 <= r1 + r3						-- finish 2's compliment + add 0x9 for 9's compliment
+@7A9 313F_00F0  // r1 <= r3 AND 0x00F0	 				-- Isolate the upper nibble
+@7AA 324F_00F0  // r2 <= A AND 0x00F0	 				-- Isolate the Accumulator upper nibble
+@7AB 2112_0000  // r1 <= r1 + r2		 				-- Add the 9's complimented r2 to the accumulator
+
+// Adjust the upper nibble to BCD
+@7AC 221F_0060  // r2 <= r1 + 0x0060	 				-- Add 0x6 to adjust to BCD
+@7AD 3F2F_0F00  // Dummy <= r2 AND 0x0F00				-- Test for carry out
+@7AE 1002_07B0  // Jump Zero to Dont_Adjust_Lower_Nibble
+@7AF 211F_0060  // r1 <= r1 + 0x0060	 				-- Add 0x6 to adjust to BCD
+
+@7B0 4401_0000  // A <= r0 OR r1				 		-- Combine two nibbles and store in accumulator
+
+@7B1 3F3F_0F00  // Dummy <= r3 AND 0x0F00  				-- Isolate the carry out
+@7B2 1002_07B4  // Jump Zero to processing negative number
+@7B3 1000_0101  // Jump to main loop
+
+
+// Negative number processing
+@7B4 4201_0000  // r2 <= r0 OR r1				 		-- Combine two nibbles and store in accumulator
+
+// 9's compliment the answer's  lower nibble
+@7B5 502F_FFFF  // r0 <= r2 XOR 0xFFFF					-- 1's compliment 
+@7B6 200F_000B  // r0 <= r0 + 0x000B					-- finish 2's compliment + add 0x9 for 9's compliment
+@7B7 300F_000F  // r0 <= r0 AND 0x000F	 				-- Isolate the lower nibble
+
+// Adjust the lower nibble to BCD
+@7B8 230F_0006  // r3 <= r0 + 0x0006	 				-- Test for value >9
+@7B9 3F3F_00F0  // Dummy <= r3 AND 0x00F0				-- Test for carry out
+@7BA 1002_07BE  // Jump Zero to Dont_Adjust_Lower_Nibble
+@7BB 303F_000F  // r0 <= r3 AND 0x000F  				-- Isolate lower nibble
+@7BC 43FF_00B0  // r3 <= 0x0000 OR 0x00B0	 			-- BCD carry over to upper nibble
+@7BD 1000_07BF  // Jump to next nibble
+@7BE 43FF_00A0  // r3 <= 0x0000 OR 0x00A0	 			-- BCD carry over to upper nibble
+
+// 9's compliment the answer's upper nibble
+@7BF 512F_FFFF  // r1 <= r2 XOR 0xFFFF					-- 1's compliment 
+@7C0 311F_00F0  // r1 <= r1 AND 0x00F0	 				-- Isolate the upper nibble
+@7C1 2113_0000  // r1 <= r1 + r3						-- finish 2's compliment + add 0x9 for 9's compliment
+@7C2 311F_00F0  // r1 <= r1 AND 0x00F0	 				-- Isolate the upper nibble
+
+
+// Adjust the upper nibble to BCD
+@7C3 221F_0060  // r2 <= r1 + 0x0060	 				-- Add 0x6 to adjust to BCD
+@7C4 3F2F_0F00  // Dummy <= r2 AND 0x0F00				-- Test for carry out
+@7C5 1002_07C7  // Jump Zero to Dont_Adjust_Lower_Nibble
+@7C6 211F_0060  // r1 <= r1 + 0x0060	 				-- Add 0x6 to adjust to BCD
+
+@7C7 4401_0000  // A <= r0 OR r1				 		-- Combine two nibbles and store in accumulator
+
+// ##################################
+
+@7C8 1000_0101  // Jump to main loop
+
+
+
+
+
+
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// 6502 Reset sequence
+// -------------------------------------------------
+@7D0 4DFF_0019  // Disable databus, Debounce SO and NMI, de-assert SYNC, Drive RD_WR_n to READ
+@7D1 1033_0000  // Wait for CLK to be high
+@7D2 1034_0000  // Wait for CLK to be low
+@7D3 4DFF_0003  // SYNC=1, RD_WR_n=1					-- Address ??
+
+@7D4 1033_0000  // Wait for CLK to be high
+@7D5 1034_0000  // Wait for CLK to be low
+@7D6 4DFF_0001  // SYNC=0, RD_WR_n=1
+@7D7 2AAF_0001  // ADDRESS_OUT = ADDRESS_OUT + 1		-- Address ?? + 1
+
+@7D8 1033_0000  // Wait for CLK to be high
+@7D9 1034_0000  // Wait for CLK to be low
+@7DA 4A8F_0000  // ADDRESS_OUT = SP						-- Address 0x0100 + SP
+ 
+@7DB 1033_0000  // Wait for CLK to be high
+@7DC 1034_0000  // Wait for CLK to be low
+@7DD 288F_FFFF  // SP = SP - 1
+@7DE 4A8F_0000  // ADDRESS_OUT = SP						-- Address 0x0100 + SP-1
+ 
+@7DF 1033_0000  // Wait for CLK to be high
+@7E0 1034_0000  // Wait for CLK to be low
+@7E1 288F_FFFF  // SP = SP - 1
+@7E2 4A8F_0000  // ADDRESS_OUT = SP						-- Address 0x0100 + SP-2
+ 
+@7E3 1033_0000  // Wait for CLK to be high
+@7E4 1034_0000  // Wait for CLK to be low
+@7E5 4AFF_FFFC  // ADDRESS_OUT = 0xFFFC					-- Fetch Start PCL
+ 
+@7E6 1033_0000  // Wait for CLK to be high
+@7E7 1034_0000  // Wait for CLK to be low
+@7E8 33BF_00FF  // r3 <= data_in AND 0x00FF
+@7E9 4AFF_FFFD  // ADDRESS_OUT = 0xFFFD					-- Fetch Start PCH
+@7EA 499F_0004  // Set the I Flag
+
+@7EB 1033_0000  // Wait for CLK to be high
+@7EC 1034_0000  // Wait for CLK to be low
+@7ED 32BF_FF00  // r2 <= data_in AND 0xFF00
+@7EE 4723_0000  // PC = r2 OR r3
+@7EF 4A7F_0000  // ADDRESS_OUT = PC						-- Fetch first opcode at PCH,PCL
+@7F0 4DFF_0003  // SYNC=1, RD_WR_n=1
+@7F1 1000_0101  // Jump to main loop
+
+
+
+
+// ----------------------------------------------------------------
+@7FE 1000_020C // undefined - NOP  // Jump to self - Bad opcode
+// ----------------------------------------------------------------
+
+
+
+//
+// Opcode Jump Table
+//
+@000 1000_0570 // BRK - Break
+@001 1000_02D0 // OR Indexed Indirect X
+@002 1000_020C // undefined - NOP
+@003 1000_020C // undefined - NOP
+@004 1000_020C // undefined - NOP
+@005 1000_02C6 // OR ZeroPage
+@006 1000_03A0 // ASL A - Arithmetic Shift Left - ZeroPage
+@007 1000_020C // undefined - NOP
+@008 1000_0412 // PHP - Push processor status to the stack
+@009 1000_02C0 // OR Immediate
+@00a 1000_025A // ASL A
+@00b 1000_020C // undefined - NOP
+@00c 1000_020C // undefined - NOP
+@00d 1000_02CA // OR Absolute
+@00e 1000_03A8 // ASL A - Arithmetic Shift Left - Absolute
+@00f 1000_020C // undefined - NOP
+@010 1000_052C //BNE - Branch on Zero Clear
+@011 1000_02D2 // OR Indirect Indexed  Y
+@012 1000_020C // undefined - NOP
+@013 1000_020C // undefined - NOP
+@014 1000_020C // undefined - NOP
+@015 1000_02C8 // OR ZeroPage,X
+@016 1000_03A6 // ASL A - Arithmetic Shift Left - ZeroPage , X
+@017 1000_020C // undefined - NOP
+@018 1000_0200 // CLC
+@019 1000_02CE // OR Absolute,Y
+@01a 1000_020C // undefined - NOP
+@01b 1000_020C // undefined - NOP
+@01c 1000_020C // undefined - NOP
+@01d 1000_02CC // OR Absolute,X
+@01e 1000_03AA // ASL A - Arithmetic Shift Left - Absolute , X
+@01f 1000_020C // undefined - NOP
+@020 1000_0470 // JSR - Jump to Subroutine
+@021 1000_02B8 // AND Indexed Indirect
+@022 1000_020C // undefined - NOP
+@023 1000_020C // undefined - NOP
+@024 1000_0327 // BIT - ZeroPage
+@025 1000_02AE // AND ZeroPage
+@026 1000_03E0 // ROL - Rotate Left - ZeroPage
+@027 1000_020C // undefined - NOP
+@028 1000_0430 // PLP - Pop processor status from the stack
+@029 1000_02A7 // AND Imm
+@02a 1000_0262 // ROL A
+@02b 1000_020C // undefined - NOP
+@02c 1000_032E // BIT - Absolute
+@02d 1000_02B2 // AND Absolute
+@02e 1000_03E9 // ROL - Rotate Left - Absolute
+@02f 1000_020C // undefined - NOP
+@030 1000_0526 //BMI - Branch on Minus (N Flag Set)
+@031 1000_02BA // AND Indirect Indexed
+@032 1000_020C // undefined - NOP
+@033 1000_020C // undefined - NOP
+@034 1000_020C // undefined - NOP
+@035 1000_02B0 // AND ZeroPage,X
+@036 1000_03E7 // ROL - Rotate Left - ZeroPage , X
+@037 1000_020C // undefined - NOP
+@038 1000_0206 // SEC
+@039 1000_02B6 // AND Absolute,Y
+@03a 1000_020C // undefined - NOP
+@03b 1000_020C // undefined - NOP
+@03c 1000_020C // undefined - NOP
+@03d 1000_02B4 // AND Absolute,X
+@03e 1000_03EB // ROL - Rotate Left - Absolute , X
+@03f 1000_020C // undefined - NOP
+@040 1000_04A0 // RTI - Return from Interrupt
+@041 1000_02E7 // EOR Indexed Indirect X
+@042 1000_020C // undefined - NOP
+@043 1000_020C // undefined - NOP
+@044 1000_020C // undefined - NOP
+@045 1000_02DD // EOR ZeroPage
+@046 1000_03D0 // LSR - Logical Shift Right - ZeroPage
+@047 1000_020C // undefined - NOP
+@048 1000_0410 // PHA - Push Accumulator to the stack
+@049 1000_02D8 // EOR Immediate
+@04a 1000_026C // LSR A
+@04b 1000_020C // undefined - NOP
+@04c 1000_04C0 // JMP - Jump Absolute
+@04d 1000_02E1 // EOR Absolute
+@04e 1000_03DB // LSR - Logical Shift Right - Absolute
+@04f 1000_020C // undefined - NOP
+@050 1000_052F //BVC - Branch on Overflow Clear
+@051 1000_02E9 // EOR Indirect Indexed  Y
+@052 1000_020C // undefined - NOP
+@053 1000_020C // undefined - NOP
+@054 1000_020C // undefined - NOP
+@055 1000_02DF // EOR ZeroPage,X
+@056 1000_03D9 // LSR - Logical Shift Right - ZeroPage , X
+@057 1000_020C // undefined - NOP
+@058 1000_0221 // CLI
+@059 1000_02E5 // EOR Absolute,Y
+@05a 1000_020C // undefined - NOP
+@05b 1000_020C // undefined - NOP
+@05c 1000_020C // undefined - NOP
+@05d 1000_02E3 // EOR Absolute,X
+@05e 1000_03DD // LSR - Logical Shift Right - Absolute , X
+@05f 1000_020C // undefined - NOP
+@060 1000_0500 // RTS - Return from Subroutine
+@061 1000_071A // ADC - Indexed Indirect X
+@062 1000_020C // undefined - NOP
+@063 1000_020C // undefined - NOP
+@064 1000_020C // undefined - NOP
+@065 1000_0710 // ADC - ZeroPage
+@066 1000_03F0 // ROR - Rotate Right - ZeroPage
+@067 1000_020C // undefined - NOP
+@068 1000_0448 // PLA - Pop Accumulator from the stack
+@069 1000_0700 // ADC - Immediate
+@06a 1000_0276 // ROR A
+@06b 1000_020C // undefined - NOP
+@06c 1000_04E0 // JMP - Jump Indirect
+@06d 1000_0714 // ADC - Absolute
+@06e 1000_0400 // ROR - Rotate Right - Absolute
+@06f 1000_020C // undefined - NOP
+@070 1000_0532 //BVS - Branch on Overflow Set
+@071 1000_071C // ADC - Indirect Indexed  Y
+@072 1000_020C // undefined - NOP
+@073 1000_020C // undefined - NOP
+@074 1000_020C // undefined - NOP
+@075 1000_0712 // ADC - ZeroPage , X
+@076 1000_03FE // ROR - Rotate Right - ZeroPage , X
+@077 1000_020C // undefined - NOP
+@078 1000_0239 // SEI
+@079 1000_0718 // ADC - Absolute , Y
+@07a 1000_020C // undefined - NOP
+@07b 1000_020C // undefined - NOP
+@07c 1000_020C // undefined - NOP
+@07d 1000_0716 // ADC - Absolute , X
+@07e 1000_0402 // ROR - Rotate Right - Absolute , X
+@07f 1000_020C // undefined - NOP
+@080 1000_020C // undefined - NOP
+@081 1000_0379 // STA - Indexed Indirect X
+@082 1000_020C // undefined - NOP
+@083 1000_020C // undefined - NOP
+@084 1000_0390 // STY - ZeroPage
+@085 1000_036A // STA - ZeroPage
+@086 1000_0383 // STX - ZeroPage
+@087 1000_020C // undefined - NOP
+@088 1000_029E // DEY
+@089 1000_020C // undefined - NOP
+@08a 1000_0246 // TXA
+@08b 1000_020C // undefined - NOP
+@08c 1000_0396 // STY - Absolute
+@08d 1000_0370 // STA - Absolute
+@08e 1000_0389 // STX - Absolute
+@08f 1000_020C // undefined - NOP
+@090 1000_0535 // BCC - Branch on Carry Clear
+@091 1000_037C // STA - Indirect Indexed  Y
+@092 1000_020C // undefined - NOP
+@093 1000_020C // undefined - NOP
+@094 1000_0393 // STY - ZeroPage , X
+@095 1000_036D // STA - ZeroPage , X
+@096 1000_0386 // STX - ZeroPage , Y
+@097 1000_020C // undefined - NOP
+@098 1000_0253 // TYA
+@099 1000_0376 // STA - Absolute , Y
+@09a 1000_024D // TXS
+@09b 1000_020C // undefined - NOP
+@09c 1000_020C // undefined - NOP
+@09d 1000_0373 // STA - Absolute , X
+@09e 1000_020C // undefined - NOP
+@09f 1000_020C // undefined - NOP
+@0a0 1000_0318 // LDY - Immediate
+@0a1 1000_02FF // LDA - Indexed Indirect X
+@0a2 1000_0307 // LDX - Immediate
+@0a3 1000_020C // undefined - NOP
+@0a4 1000_031D // LDY - ZeroPage
+@0a5 1000_02F5 // LDA - ZeroPage
+@0a6 1000_030C // LDX - ZeroPage
+@0a7 1000_020C // undefined - NOP
+@0a8 1000_021A // TAY
+@0a9 1000_02F0 // LDA Immediate
+@0aa 1000_0212 // TAX
+@0ab 1000_020C // undefined - NOP
+@0ac 1000_0321 // LDY - Absolute
+@0ad 1000_02F9 // LDA - Absolute
+@0ae 1000_0310 // LDX - Absolute
+@0af 1000_020C // undefined - NOP
+@0b0 1000_0520 // BCS - Branch on Carry Set
+@0b1 1000_0301 // LDA - Indirect Indexed  Y
+@0b2 1000_020C // undefined - NOP
+@0b3 1000_020C // undefined - NOP
+@0b4 1000_031F // LDY - ZeroPage , X
+@0b5 1000_02F7 // LDA - ZeroPage , X
+@0b6 1000_030E // LDX - ZeroPage , Y
+@0b7 1000_020C // undefined - NOP
+@0b8 1000_022D // CLV
+@0b9 1000_02FD // LDA - Absolute , Y
+@0ba 1000_023F // TSX
+@0bb 1000_020C // undefined - NOP
+@0bc 1000_0323 // LDY - Absolute , X
+@0bd 1000_02FB // LDA - Absolute , X
+@0be 1000_0312 // LDX - Absolute , Y
+@0bf 1000_020C // undefined - NOP
+@0c0 1000_035C // CPY - Immediate
+@0c1 1000_0346 // CMP - Indexed Indirect X
+@0c2 1000_020C // undefined - NOP
+@0c3 1000_020C // undefined - NOP
+@0c4 1000_0362 // CPY - ZeroPage
+@0c5 1000_033C // CMP - ZeroPage
+@0c6 1000_03C0 // DEC - ZeroPage
+@0c7 1000_020C // undefined - NOP
+@0c8 1000_028E // INY
+@0c9 1000_0336 // CMP - Immediate
+@0ca 1000_0296 // DEX
+@0cb 1000_020C // undefined - NOP
+@0cc 1000_0364 // CPY - Absolute
+@0cd 1000_0340 // CMP - Absolute
+@0ce 1000_03C8 // DEC - Absolute
+@0cf 1000_020C // undefined - NOP
+@0d0 1000_0529 // BNE - Branch on Zero Clear
+@0d1 1000_0348 // CMP - Indirect Indexed  Y
+@0d2 1000_020C // undefined - NOP
+@0d3 1000_020C // undefined - NOP
+@0d4 1000_020C // undefined - NOP
+@0d5 1000_033E // CMP - ZeroPage , X
+@0d6 1000_03C6 // DEC - ZeroPage , X
+@0d7 1000_020C // undefined - NOP
+@0d8 1000_0227 // CLD
+@0d9 1000_0344 // CMP - Absolute , Y
+@0da 1000_020C // undefined - NOP
+@0db 1000_020C // undefined - NOP
+@0dc 1000_020C // undefined - NOP
+@0dd 1000_0342 // CMP - Absolute , X
+@0de 1000_03CA // DEC - Absolute , X
+@0df 1000_020C // undefined - NOP
+@0e0 1000_034E // CPX - Immediate
+@0e1 1000_075A // SBC - Indexed Indirect X
+@0e2 1000_020C // undefined - NOP
+@0e3 1000_020C // undefined - NOP
+@0e4 1000_0354 // CPX - ZeroPage
+@0e5 1000_0750 // SBC - ZeroPage
+@0e6 1000_03B0 // INC - ZeroPage
+@0e7 1000_020C // undefined - NOP
+@0e8 1000_0286 // INX
+@0e9 1000_0730 // SBC - Immediate
+@0ea 1000_020C // NOP
+@0eb 1000_020C // undefined - NOP
+@0ec 1000_0356 // CPX - Absolute
+@0ed 1000_0754 // SBC - Absolute
+@0ee 1000_03B8 // INC - Absolute
+@0ef 1000_020C // undefined - NOP
+@0f0 1000_0523 // BEQ - Branch on Zero Set
+@0f1 1000_075C // SBC - Indirect Indexed  Y
+@0f2 1000_020C // undefined - NOP
+@0f3 1000_020C // undefined - NOP
+@0f4 1000_020C // undefined - NOP
+@0f5 1000_0752 // SBC - ZeroPage , X
+@0f6 1000_03B6 // INC - ZeroPage , X
+@0f7 1000_020C // undefined - NOP
+@0f8 1000_0233 // SED
+@0f9 1000_0758 // SBC - Absolute , Y
+@0fa 1000_020C // undefined - NOP
+@0fb 1000_020C // undefined - NOP
+@0fc 1000_020C // undefined - NOP
+@0fd 1000_0756 // SBC - Absolute , X
+@0fe 1000_03BA // INC - Absolute , X
+@0ff 1000_020C // undefined - NOP
+
