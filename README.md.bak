@@ -6,9 +6,6 @@ Microsequencer-based processors:
     MCL51 - Intel 8051
 
     MCL86 - Intel 8086/8088
-
-	
-Other processors:
 	
     MCLR5 - Quad-Issue Superscalar RISCV
 
