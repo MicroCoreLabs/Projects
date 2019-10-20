@@ -17,24 +17,24 @@
 # 
 # [15:8]=Internal Flags and system signals  [7:0]=Actual PSW register from the BIU
 #     ** Flags must be written to the PSW through the BIU - User could access PSW by address at any time
-# 	
-# assign eu_flags_r[15]     	=  eu_add_carry
-# assign eu_flags_r[14]     	=  eu_add_aux_carry
-# assign eu_flags_r[13]     	=  eu_add_carry16
-# assign eu_flags_r[12]		=  
-# assign eu_flags_r[11]		= 
-# assign eu_flags_r[10]     	=  eu_add_overflow
-# assign eu_flags_r[9]     	=  
-# assign eu_flags_r[8]     	=  BIU_INTERRUPT 
+#   
+# assign eu_flags_r[15]         =  eu_add_carry
+# assign eu_flags_r[14]         =  eu_add_aux_carry
+# assign eu_flags_r[13]         =  eu_add_carry16
+# assign eu_flags_r[12]     =  
+# assign eu_flags_r[11]     = 
+# assign eu_flags_r[10]         =  eu_add_overflow
+# assign eu_flags_r[9]      =  
+# assign eu_flags_r[8]      =  BIU_INTERRUPT 
 # 
-# assign eu_flags_r[7]		=  BIU_SFR_PSW[7]   // C
-# assign eu_flags_r[6]		=  BIU_SFR_PSW[6]   // AC
-# assign eu_flags_r[5]		=  BIU_SFR_PSW[5]   // F0
-# assign eu_flags_r[4]		=  BIU_SFR_PSW[4]   // RS1
-# assign eu_flags_r[3]		=  BIU_SFR_PSW[3]   // RS0
-# assign eu_flags_r[2]		=  BIU_SFR_PSW[2]   // Overflow
-# assign eu_flags_r[1]		=  BIU_INTR 		// Interrupt from the BIU
-# assign eu_flags_r[0]		=  BIU_SFR_PSW[0]   // Parity
+# assign eu_flags_r[7]      =  BIU_SFR_PSW[7]   // C
+# assign eu_flags_r[6]      =  BIU_SFR_PSW[6]   // AC
+# assign eu_flags_r[5]      =  BIU_SFR_PSW[5]   // F0
+# assign eu_flags_r[4]      =  BIU_SFR_PSW[4]   // RS1
+# assign eu_flags_r[3]      =  BIU_SFR_PSW[3]   // RS0
+# assign eu_flags_r[2]      =  BIU_SFR_PSW[2]   // Overflow
+# assign eu_flags_r[1]      =  BIU_INTR         // Interrupt from the BIU
+# assign eu_flags_r[0]      =  BIU_SFR_PSW[0]   // Parity
 # 
 # 
 # 
@@ -44,37 +44,34 @@
 # //  Only asserted for one clock cycle and cause BIU to take immediate action.
 # //  
 # 
-# eu_biu_address_code   = eu_biu_strobe[6:4];	
-# 							0=Program code space    
-# 							1=Direct Data space  
-# 							2=Indirect Data space  
-# 							3=SFR or Bit address?
+# eu_biu_address_code   = eu_biu_strobe[6:4];   
+#                           0=Program code space    
+#                           1=Direct Data space  
+#                           2=Indirect Data space  
+#                           3=SFR or Bit address?
 # 
 # eu_biu_strobe         = eu_biu_strobe[2:0];   
-# 							0=idle  
-# 							1=write BIU_DATAOUT to address in r3  
-# 							2=read address in r3 into BIU_RETURN_DATA
-# 							3=Global Interrupt Disable
-# 							4=Global Interrupt Enable
-# 														
+#                           0=idle  
+#                           1=write BIU_DATAOUT to address in r3  
+#                           2=read address in r3 into BIU_RETURN_DATA
+#                           3=Global Interrupt Disable
+#                           4=Global Interrupt Enable
+#                                                       
 # 
 # EU Registers
 # --------------
 # 
-# Destination					Operand0					Operand1
+# Destination                   Operand0                    Operand1
 # -----------------------------------------------------------------------------------------------
-# 0	r0                      0	r0                      0	r0
-# 1	r1                      1	r1                      1	r1
-# 2	r2                      2	r2                      2	r2
-# 3	r3                      3	r3                      3	r3
-# 4	BIU_Dataout             4	00,BIU_Return_Data      4	00,SP
-# 5	Dummy   	            5	{eu_flags_r}            5	
-# 6	BIU_Strobe		        6	00,ACC  	            6	DPTR
-# 7	IP			            7	IP		                7	Opcode Immediate[15:0]	
-# 							8+  16'h0000
-# hightea247
-# boat98247
-# feb 1 1971
+# 0 r0                      0   r0                      0   r0
+# 1 r1                      1   r1                      1   r1
+# 2 r2                      2   r2                      2   r2
+# 3 r3                      3   r3                      3   r3
+# 4 BIU_Dataout             4   00,BIU_Return_Data      4   00,SP
+# 5 Dummy                   5   {eu_flags_r}            5   
+# 6 BIU_Strobe              6   00,ACC                  6   DPTR
+# 7 IP                      7   IP                      7   Opcode Immediate[15:0]  
+#                           8+  16'h0000
 # 
 # 
 # EU Opcodes
@@ -83,18 +80,18 @@
 # ----------------
 # Bits[31:28] : 0x1
 # Bits[27:24] : CALL  1=Push next IP address to call stack
-# Bits[22:20] : Jump Source:     	
-# 				0x0=Immediate[12:0]	
-#                 0x1={4'h0 & code_byte}									-- For initial Jump
-#                 0x2={immediate[xx:0] & code_byte[3:0]}					-- Addressing modes	
-# 				0x3=Return to CALL stored IP address					-- CALL Return
-# 				0x4={ 7'h00 , BIU_RETURN_DATA[2:0] }					-- Bit Mask decoding table
+# Bits[22:20] : Jump Source:        
+#               0x0=Immediate[12:0] 
+#                 0x1={4'h0 & code_byte}                                    -- For initial Jump
+#                 0x2={immediate[xx:0] & code_byte[3:0]}                    -- Addressing modes 
+#               0x3=Return to CALL stored IP address                    -- CALL Return
+#               0x4={ 7'h00 , BIU_RETURN_DATA[2:0] }                    -- Bit Mask decoding table
 # 
 # 
-# Bits[19:16] : Jump Condition:	
-# 				0x0=Unconditional	
-# 				0x1=Last_ALU_Result!=0		
-# 				0x2=Last_ALU_Result==0
+# Bits[19:16] : Jump Condition: 
+#               0x0=Unconditional   
+#               0x1=Last_ALU_Result!=0      
+#               0x2=Last_ALU_Result==0
 # Bits[12:0]  : Immediate[12:0]
 # 
 # 
@@ -105,10 +102,10 @@
 # 0x6 - Byte swap eu_operand0
 # 0x7 - Shift Right based on type:  { immediate[0] , eu_operand0[7:0] }   
 #                                   Immedaite = 0 = Eight bit - shift in op0[0],  
-# 								              1 = Eight bit - shift in PSW_carry
-# 								              2 = Sixteen bit - shift in eu_add_carry16
+#                                             1 = Eight bit - shift in PSW_carry
+#                                             2 = Sixteen bit - shift in eu_add_carry16
 # 
-											  
+                                              
 # Reset the CPU
 p 00 00000 00001 0001
 p 01 00000 00001 0000
@@ -3029,7 +3026,7 @@ p 01 00000 00000 0252
 #             r2 = 
 #             r1 = Bit Mask
 #             r0 = Byte Data
-#	
+#   
 # -----------------------------------------------------
 #
 # PC = PC + 1   - Increment to the next opcode byte
