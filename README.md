@@ -1,4 +1,9 @@
 # Ted Fried's MicroCore Labs Projects
+
+New:
+
+    MCLWR1 - FPGA based Printer Option for the IBM Wheelwriter 5
+	
 Microsequencer-based processors:
 
     MCL65 - MOS 6502 
