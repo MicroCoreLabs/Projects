@@ -1,0 +1,40 @@
+
+MicroCore Labs - Arduino Leonards-based IBM Wheelwriter Printer Option
+---------------------------------------------------------------------------
+
+
+Description:
+------------
+ This is an Arduino Software project which allows RS232 access to an IBM Wheelwriter Typewriter. 
+ 
+ Using a terminal running at 300 baud  (300,n,8,1), the user can directly send characters to the typewriter. 
+ They can also cut and paste long documents into the terminal, which will be printed by the typewriter.
+ 
+ It has been tested on an IBM Wheelwriter 5, however other IBM typewriters such as the Wheelwriter 3 and 6 may also work.
+ The only connection needed to the typewriter is via two pins within the access panel at the top rear of the typewriter.
+ 
+ I am using an Arduino Leonardo board which uses the ATmega32u4 microcontroller which contains two UART controllers.
+ 
+ This design uses both UARTS. One is connected to the host at 300,N,8,1 and the second connects to the IBM Wheelwriter's IBM_BUS
+ interface which runs at 188k, N,9,1.  The UART is used in a non-standard 9 databits operation which is not directly supported 
+ by the Arduino software base. I needed to directly write a few registers to active this mode.
+ 
+ The IBM_BUS is bi-directional, so the Arduino's UART Transmitter must be deactivated and set to hi-Z so it will not conflict
+ with the drivers contained in the typewriter.  To save time I simply added a delay to give the typewriter time to ACK on the IBM_BUS
+ rather than sample it for the ACK response.  Faster printing action could be achieved if a separate bus transceiver was used
+ to switch on and off between the Arduino and the typewriter driving the bus.
+ 
+ There is very limited buffering in the Arduino's UART transmitter and reciever and I have also provided very shallow buffering,
+ so characters must be sent from the host at the pace typical of typing on the typewriter by hand.
+ 
+ 
+
+Pinout
+-------
+- The IBM Wheelwriter pins of interest are: 4=GND and 5=IBM_BUS.   Pin#1 is on the left when looking at the typewriter from the front.
+- On the Arduino, only the UART TX pin-1 and GND are needed.
+
+
+
+ 
+ 

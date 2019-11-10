@@ -2,7 +2,8 @@
 
 New:
 
-    MCLWR1 - FPGA based Printer Option for the IBM Wheelwriter 5
+    Wheelwriter  - FPGA based Printer Option for the IBM Wheelwriter 5
+    Wheelwriter2 - Arduino Leonardo based Printer Option for the IBM Wheelwriter 5
 	
 Microsequencer-based processors:
 
