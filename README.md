@@ -1,10 +1,6 @@
 # Ted Fried's MicroCore Labs Projects
 
-New:
 
-    Wheelwriter  - FPGA based Printer Option for the IBM Wheelwriter 5
-    Wheelwriter2 - Arduino Leonardo based Printer Option for the IBM Wheelwriter 5
-	
 Microsequencer-based processors:
 
     MCL65 - MOS 6502 
@@ -18,7 +14,14 @@ Other processors:
 	
     MCLR5 - Quad-Issue Superscalar RISCV
 	
-	Lockstep Quad Modular Redundant System
-
+	Lockstep Quad Modular Redundant System 
 	
+
+Misc:
+
+    Wheelwriter  - FPGA based Printer Option for the IBM Wheelwriter 5
+	
+    Wheelwriter2 - Arduino Leonardo based Printer Option for the IBM Wheelwriter 5
+	
+		
 For questions email me at www.MicroCoreLabs.com
