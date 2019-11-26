@@ -17,6 +17,8 @@ Microsequencer-based processors:
 Other processors:
 	
     MCLR5 - Quad-Issue Superscalar RISCV
+	
+	Lockstep Quad Modular Redundant System
 
 	
 For questions email me at www.MicroCoreLabs.com
