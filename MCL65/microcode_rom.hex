@@ -1,6 +1,98 @@
 //
 // Microcode for the MCL65
 //
+//------------------------------------------------------------------------
+// 
+// 	
+// System status register  
+// assign system_status[15:7] 	= 'h0;
+// assign system_status[6]  	= add_overflow8;	  
+// assign system_status[5]  	= irq_gated;	  
+// assign system_status[4]  	= so_asserted;	  
+// assign system_status[3]  	= nmi_asserted;	  
+// assign system_status[2]  	= 1'b0;	  
+// assign system_status[1]  	= 1'b0;		  
+// assign system_status[0]  	= add_carry8;		  
+// 
+// // Flags register
+// assign flag_n        		= register_flags[7];
+// assign flag_v        		= register_flags[6];
+// 
+// assign flag_b        		= register_flags[4];
+// 
+// assign flag_d				= register_flags[3];
+// assign flag_i      			= register_flags[2];
+// assign flag_z				= register_flags[1];
+// assign flag_c        		= register_flags[0];
+// 
+// // System Outputs register
+// assign so_debounce 	   		= system_output[4];
+// assign nmi_debounce 			= system_output[3];
+// assign dataout_enable 		= system_output[2];
+// assign sync_int				= system_output[1];
+// assign rdwr_n_int			= system_output[0];							
+// 
+// 
+// 
+// Microsequencer Registers
+// ------------------------
+// 
+// Destination					Operand0						 Operand1
+// -----------------------------------------------------------------------------------------------
+// 0	r0                      0	r0                  	 		0	r0              
+// 1	r1                      1	r1                  	 		1	r1              
+// 2	r2                      2	r2                  	 		2	r2              
+// 3	r3                      3	r3                  	 		3	r3              
+// 4	A             			4	A             	    	 		4	A             	
+// 5	X   	           		5	X   	            	 		5	X   	        
+// 6	Y		       			6	Y		       	    	 		6	Y		       	
+// 7	PC			            7	PC			        	 		7	PC_Byte_Swapped		    
+// 8	SP                      8	SP                  	 		8	SP              
+// 9	Flags               	9	Flags               	 		9	Flags           
+// A	Address_out          	A	Address_out 			 		A	Address_out      
+// B	Data_Out             	B	Data_In[7:0] , Data_In[7:0]		B	Data_In[7:0] , Data_In[7:0] 
+// C	              			C	System_Status  	    			C	System_Status
+// D	System_Output			D	System_Output	    			D	System_Output	
+// E	 			            E	 			        			E	 			    
+// F	Dummy					F   16'h0000		    			F  Opcode_Immediate
+// 
+// 	
+// Microsequencer Opcodes
+// -----------------------
+// 0x0 - NOP
+// 
+// 0x1 - JUMP
+// ----------------
+// 	Bits[31:28] : 0x1
+// 	Bits[27:24] : CALL  1=Push next IP address to two-deep call stack
+// 	Bits[22:20] : Jump Source:     	
+// 					0x0=Immediate[9:0]	
+// 					0x1={2'b00 & code_byte}									-- For initial Jump
+// 					0x2=Return to CALL stored IP address					-- CALL Return
+// 					0x3=WAIT_CLK(  +/-)edge									-- Wait for rising/falling edge of CLK
+// 	
+// 	
+// 	Bits[19:16] : Jump Condition:	
+// 					0x0=Unconditional	
+// 					0x1=Last_ALU_Result!=0		
+// 					0x2=Last_ALU_Result==0
+// 					0x3=Wait for CLK=1
+// 					0x4=Wait for CLK=0 *and* READY to be active if not a write cycle
+// 	Bits[12:0]  : Immediate[9:0]
+// 
+// 
+// 0x2 - ADD
+// 0x3 - AND
+// 0x4 - OR
+// 0x5 - XOR
+// 0x6 - Shift Right 
+
+
+// -------------------------------------------------
+// -------------------------------------------------
+// -------------------------------------------------
+
+
 
 // -------------------------------------------------
 //
