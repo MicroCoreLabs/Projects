@@ -21,29 +21,51 @@
 //
 //
 //------------------------------------------------------------------------
+//
+// Copyright (c) 2020 Ted Fried
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//
+//------------------------------------------------------------------------
 
 `timescale 1ns/100ps
 
 
 module four_module_lockstep
   (  
-    input				CORE_CLK,				// Core Signals
-    input				RST_n,
+    input               CORE_CLK,               // Core Signals
+    input               RST_n,
 
-	
-    input  [3:0]		KILL_MODE,
-    input  [3:0]		PB_SWITCH,
-    output [3:0]   		LEDS,
-    output [3:0]   		PROBE,
-		
-    input				UART_RX,				// UART
-    output        		UART_TX,
-    output        		SPEAKER
-		
+    
+    input  [3:0]        KILL_MODE,
+    input  [3:0]        PB_SWITCH,
+    output [3:0]        LEDS,
+    output [3:0]        PROBE,
+        
+    input               UART_RX,                // UART
+    output              UART_TX,
+    output              SPEAKER
+        
   );
 
 //------------------------------------------------------------------------
- 	  
+      
 
 // Internal Signals
 
@@ -123,15 +145,15 @@ assign core_clk_int = CORE_CLK;
 
 
 
-assign LEDS[3]	= ~module3_broadcast_ok;
-assign LEDS[2]	= ~module2_broadcast_ok;
-assign LEDS[1]	= ~module1_broadcast_ok;
-assign LEDS[0]	= ~module0_broadcast_ok;
+assign LEDS[3]  = ~module3_broadcast_ok;
+assign LEDS[2]  = ~module2_broadcast_ok;
+assign LEDS[1]  = ~module1_broadcast_ok;
+assign LEDS[0]  = ~module0_broadcast_ok;
 
-assign PROBE[3]	= ~module3_broadcast_ok;
-assign PROBE[2]	= ~module2_broadcast_ok;
-assign PROBE[1]	= ~module1_broadcast_ok;
-assign PROBE[0]	= ~module0_broadcast_ok;
+assign PROBE[3] = ~module3_broadcast_ok;
+assign PROBE[2] = ~module2_broadcast_ok;
+assign PROBE[1] = ~module1_broadcast_ok;
+assign PROBE[0] = ~module0_broadcast_ok;
 
 assign SPEAKER = speaker_int_d3;
 
@@ -177,207 +199,207 @@ begin : BUTTON_DEBOUNCE
 
  
 
-	
+    
 //------------------------------------------------------------------------
 //
 // Lockstep Modules
 //
-//------------------------------------------------------------------------                  				  
-  														 
-module_block					MODULE0
+//------------------------------------------------------------------------                                    
+                                                         
+module_block                    MODULE0
   (
-    .CORE_CLK					(core_clk_int),
-    .RST_n						(rst_n_d4),
-    .KILL						(kill0),
-    .KILL_MODE					(kmode_d4),
-    .MODULE_ID					(2'h0),
-		
-    .BROADCAST_OK				(module0_broadcast_ok),
-    .BROADCAST_STROBE			(module0_strobe),
-    .BROADCAST_ADDRESS			(module0_address),
-    .BROADCAST_DATA				(module0_data),
-    .BROADCAST_IP				(module0_ip),
-    .BROADCAST_SYNC				(module0_sync),
-	.BROADCAST_IDSBL			(module0_idsbl),
+    .CORE_CLK                   (core_clk_int),
+    .RST_n                      (rst_n_d4),
+    .KILL                       (kill0),
+    .KILL_MODE                  (kmode_d4),
+    .MODULE_ID                  (2'h0),
+        
+    .BROADCAST_OK               (module0_broadcast_ok),
+    .BROADCAST_STROBE           (module0_strobe),
+    .BROADCAST_ADDRESS          (module0_address),
+    .BROADCAST_DATA             (module0_data),
+    .BROADCAST_IP               (module0_ip),
+    .BROADCAST_SYNC             (module0_sync),
+    .BROADCAST_IDSBL            (module0_idsbl),
 
-    .BROADCAST_OK_IN0			(module1_broadcast_ok),
-    .BROADCAST_STROBE_IN0		(module1_strobe),
-    .BROADCAST_ADDRESS_IN0		(module1_address),
-    .BROADCAST_DATA_IN0			(module1_data),
-    .BROADCAST_IP_IN0			(module1_ip),
-    .BROADCAST_SYNC_IN0			(module1_sync),
-	.BROADCAST_IDSBL_IN0		(module1_idsbl),
-	
-    .BROADCAST_OK_IN1			(module2_broadcast_ok),
-    .BROADCAST_STROBE_IN1		(module2_strobe),
-    .BROADCAST_ADDRESS_IN1		(module2_address),
-    .BROADCAST_DATA_IN1			(module2_data),
-    .BROADCAST_IP_IN1			(module2_ip),
-    .BROADCAST_SYNC_IN1			(module2_sync),
-	.BROADCAST_IDSBL_IN1		(module2_idsbl),
+    .BROADCAST_OK_IN0           (module1_broadcast_ok),
+    .BROADCAST_STROBE_IN0       (module1_strobe),
+    .BROADCAST_ADDRESS_IN0      (module1_address),
+    .BROADCAST_DATA_IN0         (module1_data),
+    .BROADCAST_IP_IN0           (module1_ip),
+    .BROADCAST_SYNC_IN0         (module1_sync),
+    .BROADCAST_IDSBL_IN0        (module1_idsbl),
+    
+    .BROADCAST_OK_IN1           (module2_broadcast_ok),
+    .BROADCAST_STROBE_IN1       (module2_strobe),
+    .BROADCAST_ADDRESS_IN1      (module2_address),
+    .BROADCAST_DATA_IN1         (module2_data),
+    .BROADCAST_IP_IN1           (module2_ip),
+    .BROADCAST_SYNC_IN1         (module2_sync),
+    .BROADCAST_IDSBL_IN1        (module2_idsbl),
 
-    .BROADCAST_OK_IN2			(module3_broadcast_ok),
-    .BROADCAST_STROBE_IN2		(module3_strobe),
-    .BROADCAST_ADDRESS_IN2		(module3_address),
-    .BROADCAST_DATA_IN2			(module3_data),
-    .BROADCAST_IP_IN2			(module3_ip),
-    .BROADCAST_SYNC_IN2			(module3_sync),
-	.BROADCAST_IDSBL_IN2		(module3_idsbl),
+    .BROADCAST_OK_IN2           (module3_broadcast_ok),
+    .BROADCAST_STROBE_IN2       (module3_strobe),
+    .BROADCAST_ADDRESS_IN2      (module3_address),
+    .BROADCAST_DATA_IN2         (module3_data),
+    .BROADCAST_IP_IN2           (module3_ip),
+    .BROADCAST_SYNC_IN2         (module3_sync),
+    .BROADCAST_IDSBL_IN2        (module3_idsbl),
 
-    . INT2						(interrupt2),
-    . INT3						(interrupt3),
+    . INT2                      (interrupt2),
+    . INT3                      (interrupt3),
 
-    .PROXY_RD_DATA				(proxy_rd_data_int)
+    .PROXY_RD_DATA              (proxy_rd_data_int)
 
-  );	
+  );    
 
-    														 
-module_block					MODULE1
+                                                             
+module_block                    MODULE1
   (
-    .CORE_CLK					(core_clk_int),
-    .RST_n						(rst_n_d4),
-    .KILL						(kill1),
-    .KILL_MODE					(kmode_d4),
-    .MODULE_ID					(2'h1),
-		
-    .BROADCAST_OK				(module1_broadcast_ok),
-    .BROADCAST_STROBE			(module1_strobe),
-    .BROADCAST_ADDRESS			(module1_address),
-    .BROADCAST_DATA				(module1_data),
-    .BROADCAST_IP				(module1_ip),
-    .BROADCAST_SYNC				(module1_sync),
-	.BROADCAST_IDSBL			(module1_idsbl),
+    .CORE_CLK                   (core_clk_int),
+    .RST_n                      (rst_n_d4),
+    .KILL                       (kill1),
+    .KILL_MODE                  (kmode_d4),
+    .MODULE_ID                  (2'h1),
+        
+    .BROADCAST_OK               (module1_broadcast_ok),
+    .BROADCAST_STROBE           (module1_strobe),
+    .BROADCAST_ADDRESS          (module1_address),
+    .BROADCAST_DATA             (module1_data),
+    .BROADCAST_IP               (module1_ip),
+    .BROADCAST_SYNC             (module1_sync),
+    .BROADCAST_IDSBL            (module1_idsbl),
 
-    .BROADCAST_OK_IN0			(module2_broadcast_ok),
-    .BROADCAST_STROBE_IN0		(module2_strobe),
-    .BROADCAST_ADDRESS_IN0		(module2_address),
-    .BROADCAST_DATA_IN0			(module2_data),
-    .BROADCAST_IP_IN0			(module2_ip),
-    .BROADCAST_SYNC_IN0			(module2_sync),
-	.BROADCAST_IDSBL_IN0		(module2_idsbl),
-	
-    .BROADCAST_OK_IN1			(module3_broadcast_ok),
-    .BROADCAST_STROBE_IN1		(module3_strobe),
-    .BROADCAST_ADDRESS_IN1		(module3_address),
-    .BROADCAST_DATA_IN1			(module3_data),
-    .BROADCAST_IP_IN1			(module3_ip),
-    .BROADCAST_SYNC_IN1			(module3_sync),
-	.BROADCAST_IDSBL_IN1		(module3_idsbl),
+    .BROADCAST_OK_IN0           (module2_broadcast_ok),
+    .BROADCAST_STROBE_IN0       (module2_strobe),
+    .BROADCAST_ADDRESS_IN0      (module2_address),
+    .BROADCAST_DATA_IN0         (module2_data),
+    .BROADCAST_IP_IN0           (module2_ip),
+    .BROADCAST_SYNC_IN0         (module2_sync),
+    .BROADCAST_IDSBL_IN0        (module2_idsbl),
+    
+    .BROADCAST_OK_IN1           (module3_broadcast_ok),
+    .BROADCAST_STROBE_IN1       (module3_strobe),
+    .BROADCAST_ADDRESS_IN1      (module3_address),
+    .BROADCAST_DATA_IN1         (module3_data),
+    .BROADCAST_IP_IN1           (module3_ip),
+    .BROADCAST_SYNC_IN1         (module3_sync),
+    .BROADCAST_IDSBL_IN1        (module3_idsbl),
 
-    .BROADCAST_OK_IN2			(module0_broadcast_ok),
-    .BROADCAST_STROBE_IN2		(module0_strobe),
-    .BROADCAST_ADDRESS_IN2		(module0_address),
-    .BROADCAST_DATA_IN2			(module0_data),
-    .BROADCAST_IP_IN2			(module0_ip),
-    .BROADCAST_SYNC_IN2			(module0_sync),
-	.BROADCAST_IDSBL_IN2		(module0_idsbl),
+    .BROADCAST_OK_IN2           (module0_broadcast_ok),
+    .BROADCAST_STROBE_IN2       (module0_strobe),
+    .BROADCAST_ADDRESS_IN2      (module0_address),
+    .BROADCAST_DATA_IN2         (module0_data),
+    .BROADCAST_IP_IN2           (module0_ip),
+    .BROADCAST_SYNC_IN2         (module0_sync),
+    .BROADCAST_IDSBL_IN2        (module0_idsbl),
 
-    . INT2						(interrupt2),
-    . INT3						(interrupt3),
+    . INT2                      (interrupt2),
+    . INT3                      (interrupt3),
 
-    .PROXY_RD_DATA				(proxy_rd_data_int)
+    .PROXY_RD_DATA              (proxy_rd_data_int)
 
-  );	
+  );    
 
-    														 
-module_block					MODULE2
+                                                             
+module_block                    MODULE2
   (
-    .CORE_CLK					(core_clk_int),
-    .RST_n						(rst_n_d4),
-    .KILL						(kill2),
-    .KILL_MODE					(kmode_d4),
-    .MODULE_ID					(2'h2),
-		
-    .BROADCAST_OK				(module2_broadcast_ok),
-    .BROADCAST_STROBE			(module2_strobe),
-    .BROADCAST_ADDRESS			(module2_address),
-    .BROADCAST_DATA				(module2_data),
-    .BROADCAST_IP				(module2_ip),
-    .BROADCAST_SYNC				(module2_sync),
-	.BROADCAST_IDSBL			(module2_idsbl),
+    .CORE_CLK                   (core_clk_int),
+    .RST_n                      (rst_n_d4),
+    .KILL                       (kill2),
+    .KILL_MODE                  (kmode_d4),
+    .MODULE_ID                  (2'h2),
+        
+    .BROADCAST_OK               (module2_broadcast_ok),
+    .BROADCAST_STROBE           (module2_strobe),
+    .BROADCAST_ADDRESS          (module2_address),
+    .BROADCAST_DATA             (module2_data),
+    .BROADCAST_IP               (module2_ip),
+    .BROADCAST_SYNC             (module2_sync),
+    .BROADCAST_IDSBL            (module2_idsbl),
 
-    .BROADCAST_OK_IN0			(module3_broadcast_ok),
-    .BROADCAST_STROBE_IN0		(module3_strobe),
-    .BROADCAST_ADDRESS_IN0		(module3_address),
-    .BROADCAST_DATA_IN0			(module3_data),
-    .BROADCAST_IP_IN0			(module3_ip),
-    .BROADCAST_SYNC_IN0			(module3_sync),
-	.BROADCAST_IDSBL_IN0		(module3_idsbl),
-	
-    .BROADCAST_OK_IN1			(module0_broadcast_ok),
-    .BROADCAST_STROBE_IN1		(module0_strobe),
-    .BROADCAST_ADDRESS_IN1		(module0_address),
-    .BROADCAST_DATA_IN1			(module0_data),
-    .BROADCAST_IP_IN1			(module0_ip),
-    .BROADCAST_SYNC_IN1			(module0_sync),
-	.BROADCAST_IDSBL_IN1		(module0_idsbl),
+    .BROADCAST_OK_IN0           (module3_broadcast_ok),
+    .BROADCAST_STROBE_IN0       (module3_strobe),
+    .BROADCAST_ADDRESS_IN0      (module3_address),
+    .BROADCAST_DATA_IN0         (module3_data),
+    .BROADCAST_IP_IN0           (module3_ip),
+    .BROADCAST_SYNC_IN0         (module3_sync),
+    .BROADCAST_IDSBL_IN0        (module3_idsbl),
+    
+    .BROADCAST_OK_IN1           (module0_broadcast_ok),
+    .BROADCAST_STROBE_IN1       (module0_strobe),
+    .BROADCAST_ADDRESS_IN1      (module0_address),
+    .BROADCAST_DATA_IN1         (module0_data),
+    .BROADCAST_IP_IN1           (module0_ip),
+    .BROADCAST_SYNC_IN1         (module0_sync),
+    .BROADCAST_IDSBL_IN1        (module0_idsbl),
 
-    .BROADCAST_OK_IN2			(module1_broadcast_ok),
-    .BROADCAST_STROBE_IN2		(module1_strobe),
-    .BROADCAST_ADDRESS_IN2		(module1_address),
-    .BROADCAST_DATA_IN2			(module1_data),
-    .BROADCAST_IP_IN2			(module1_ip),
-    .BROADCAST_SYNC_IN2			(module1_sync),
-	.BROADCAST_IDSBL_IN2		(module1_idsbl),
+    .BROADCAST_OK_IN2           (module1_broadcast_ok),
+    .BROADCAST_STROBE_IN2       (module1_strobe),
+    .BROADCAST_ADDRESS_IN2      (module1_address),
+    .BROADCAST_DATA_IN2         (module1_data),
+    .BROADCAST_IP_IN2           (module1_ip),
+    .BROADCAST_SYNC_IN2         (module1_sync),
+    .BROADCAST_IDSBL_IN2        (module1_idsbl),
 
-    . INT2						(interrupt2),
-    . INT3						(interrupt3),
+    . INT2                      (interrupt2),
+    . INT3                      (interrupt3),
 
-    .PROXY_RD_DATA				(proxy_rd_data_int)
+    .PROXY_RD_DATA              (proxy_rd_data_int)
 
-  );	
+  );    
 
-    														 
-module_block					MODULE3
+                                                             
+module_block                    MODULE3
   (
-    .CORE_CLK					(core_clk_int),
-    .RST_n						(rst_n_d4),
-    .KILL						(kill3),
-    .KILL_MODE					(kmode_d4),
-    .MODULE_ID					(2'h3),
-		
-    .BROADCAST_OK				(module3_broadcast_ok),
-    .BROADCAST_STROBE			(module3_strobe),
-    .BROADCAST_ADDRESS			(module3_address),
-    .BROADCAST_DATA				(module3_data),
-    .BROADCAST_IP				(module3_ip),
-    .BROADCAST_SYNC				(module3_sync),
-	.BROADCAST_IDSBL			(module3_idsbl),
+    .CORE_CLK                   (core_clk_int),
+    .RST_n                      (rst_n_d4),
+    .KILL                       (kill3),
+    .KILL_MODE                  (kmode_d4),
+    .MODULE_ID                  (2'h3),
+        
+    .BROADCAST_OK               (module3_broadcast_ok),
+    .BROADCAST_STROBE           (module3_strobe),
+    .BROADCAST_ADDRESS          (module3_address),
+    .BROADCAST_DATA             (module3_data),
+    .BROADCAST_IP               (module3_ip),
+    .BROADCAST_SYNC             (module3_sync),
+    .BROADCAST_IDSBL            (module3_idsbl),
 
-    .BROADCAST_OK_IN0			(module0_broadcast_ok),
-    .BROADCAST_STROBE_IN0		(module0_strobe),
-    .BROADCAST_ADDRESS_IN0		(module0_address),
-    .BROADCAST_DATA_IN0			(module0_data),
-    .BROADCAST_IP_IN0			(module0_ip),
-    .BROADCAST_SYNC_IN0			(module0_sync),
-	.BROADCAST_IDSBL_IN0		(module0_idsbl),
-	
-    .BROADCAST_OK_IN1			(module1_broadcast_ok),
-    .BROADCAST_STROBE_IN1		(module1_strobe),
-    .BROADCAST_ADDRESS_IN1		(module1_address),
-    .BROADCAST_DATA_IN1			(module1_data),
-    .BROADCAST_IP_IN1			(module1_ip),
-    .BROADCAST_SYNC_IN1			(module1_sync),
-	.BROADCAST_IDSBL_IN1		(module1_idsbl),
+    .BROADCAST_OK_IN0           (module0_broadcast_ok),
+    .BROADCAST_STROBE_IN0       (module0_strobe),
+    .BROADCAST_ADDRESS_IN0      (module0_address),
+    .BROADCAST_DATA_IN0         (module0_data),
+    .BROADCAST_IP_IN0           (module0_ip),
+    .BROADCAST_SYNC_IN0         (module0_sync),
+    .BROADCAST_IDSBL_IN0        (module0_idsbl),
+    
+    .BROADCAST_OK_IN1           (module1_broadcast_ok),
+    .BROADCAST_STROBE_IN1       (module1_strobe),
+    .BROADCAST_ADDRESS_IN1      (module1_address),
+    .BROADCAST_DATA_IN1         (module1_data),
+    .BROADCAST_IP_IN1           (module1_ip),
+    .BROADCAST_SYNC_IN1         (module1_sync),
+    .BROADCAST_IDSBL_IN1        (module1_idsbl),
 
-    .BROADCAST_OK_IN2			(module2_broadcast_ok),
-    .BROADCAST_STROBE_IN2		(module2_strobe),
-    .BROADCAST_ADDRESS_IN2		(module2_address),
-    .BROADCAST_DATA_IN2			(module2_data),
-    .BROADCAST_IP_IN2			(module2_ip),
-    .BROADCAST_SYNC_IN2			(module2_sync),
-	.BROADCAST_IDSBL_IN2		(module2_idsbl),
+    .BROADCAST_OK_IN2           (module2_broadcast_ok),
+    .BROADCAST_STROBE_IN2       (module2_strobe),
+    .BROADCAST_ADDRESS_IN2      (module2_address),
+    .BROADCAST_DATA_IN2         (module2_data),
+    .BROADCAST_IP_IN2           (module2_ip),
+    .BROADCAST_SYNC_IN2         (module2_sync),
+    .BROADCAST_IDSBL_IN2        (module2_idsbl),
 
-    . INT2						(interrupt2),
-    . INT3						(interrupt3),
+    . INT2                      (interrupt2),
+    . INT3                      (interrupt3),
 
-    .PROXY_RD_DATA				(proxy_rd_data_int)
+    .PROXY_RD_DATA              (proxy_rd_data_int)
 
-  );	
+  );    
 
   
   
-//------------------------------------------------------------------------                  				  
+//------------------------------------------------------------------------                                    
   
 // Fixed-priority arbiter that chooses which 
 // core's outputs to direct to the peripherals.
@@ -387,23 +409,23 @@ assign top_strobe  = (module0_broadcast_ok==1'b1) ? module0_strobe :
                      (module1_broadcast_ok==1'b1) ? module1_strobe : 
                      (module2_broadcast_ok==1'b1) ? module2_strobe : 
                      (module3_broadcast_ok==1'b1) ? module3_strobe : 
-					                                8'hEE;
-					
+                                                    8'hEE;
+                    
 
 assign top_address = (module0_broadcast_ok==1'b1) ? module0_address :
                      (module1_broadcast_ok==1'b1) ? module1_address : 
                      (module2_broadcast_ok==1'b1) ? module2_address : 
                      (module3_broadcast_ok==1'b1) ? module3_address : 
-					                                16'hEEEE;
-					
-		
+                                                    16'hEEEE;
+                    
+        
 
 assign top_data    = (module0_broadcast_ok==1'b1) ? module0_data :
                      (module1_broadcast_ok==1'b1) ? module1_data : 
                      (module2_broadcast_ok==1'b1) ? module2_data : 
                      (module3_broadcast_ok==1'b1) ? module3_data : 
-					                                8'hEE;
-					
+                                                    8'hEE;
+                    
 
 
     
@@ -422,39 +444,39 @@ begin : PROXY_ADDRESSING
 
   if (rst_n_d4==1'b0)
     begin
-	  proxy_wr <= 'h0;
-	  proxy_rd <= 'h0;
-	  proxy_address <= 'h0;
-	  prody_wr_data <= 'h0;
+      proxy_wr <= 'h0;
+      proxy_rd <= 'h0;
+      proxy_address <= 'h0;
+      prody_wr_data <= 'h0;
     end
     
   else    
     begin     
-	
-	  if (top_strobe[7:0]==8'h11 && top_address[15:0]==16'h00C1)
-	    begin
-		  proxy_wr <= 1'b1;
-		  prody_wr_data <= top_data;
-		end
+    
+      if (top_strobe[7:0]==8'h11 && top_address[15:0]==16'h00C1)
+        begin
+          proxy_wr <= 1'b1;
+          prody_wr_data <= top_data;
+        end
       else
-	    begin
-		  proxy_wr <= 1'b0;
-		end
-			
-	  if (top_strobe[7:0]==8'h11 && top_address[15:0]==16'h00C2)
-	    begin
-		  proxy_rd <= 1'b1;
-		  proxy_address <= top_data;
-		end
+        begin
+          proxy_wr <= 1'b0;
+        end
+            
+      if (top_strobe[7:0]==8'h11 && top_address[15:0]==16'h00C2)
+        begin
+          proxy_rd <= 1'b1;
+          proxy_address <= top_data;
+        end
       else
-	    begin
-		  proxy_rd <= 1'b0;
-		end
-	end
-end	
-	 
+        begin
+          proxy_rd <= 1'b0;
+        end
+    end
+end 
+     
 
-		
+        
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 //
@@ -471,14 +493,14 @@ end
 
 // Steer the peripheral read data back to the modules
 //
-assign proxy_rd_data_int  = (proxy_address[7:4]==4'h0) ? timer_dataout 	:
-                            (proxy_address[7:4]==4'h1) ? uart_dataout 	:
-                                                         8'hEE		   	;
-											
+assign proxy_rd_data_int  = (proxy_address[7:4]==4'h0) ? timer_dataout  :
+                            (proxy_address[7:4]==4'h1) ? uart_dataout   :
+                                                         8'hEE          ;
+                                            
 // Gate the peripheral read and write strobes
-assign  timer_wr_strobe = (proxy_address[7:4]==4'h0) ? proxy_wr : 1'b0;	
-assign  uart_wr_strobe  = (proxy_address[7:4]==4'h1) ? proxy_wr : 1'b0;	
-assign  uart_rd_strobe  = (proxy_address[7:4]==4'h1) ? proxy_rd : 1'b0;	
+assign  timer_wr_strobe = (proxy_address[7:4]==4'h0) ? proxy_wr : 1'b0; 
+assign  uart_wr_strobe  = (proxy_address[7:4]==4'h1) ? proxy_wr : 1'b0; 
+assign  uart_rd_strobe  = (proxy_address[7:4]==4'h1) ? proxy_rd : 1'b0; 
 
 
 
@@ -490,40 +512,40 @@ assign  uart_rd_strobe  = (proxy_address[7:4]==4'h1) ? proxy_rd : 1'b0;
 // Timer-0 = Frequency generator
 // Timer-1 = Pulse generator
 //
-//------------------------------------------------------------------------                  				  
-  														 
-timer				 TIMER 
+//------------------------------------------------------------------------                                    
+                                                         
+timer                TIMER 
   (
-    .CORE_CLK		(core_clk_int),
-    .RST_n			(rst_n_d4),
-    .ADDRESS		(proxy_address[3:0]),
-    .DATA_IN		(prody_wr_data),
-    .DATA_OUT		(timer_dataout),
-    .STROBE_WR		(timer_wr_strobe),
-    .TIMER0_OUT		(speaker_int),
-    .TIMER1_OUT		(interrupt2)  
+    .CORE_CLK       (core_clk_int),
+    .RST_n          (rst_n_d4),
+    .ADDRESS        (proxy_address[3:0]),
+    .DATA_IN        (prody_wr_data),
+    .DATA_OUT       (timer_dataout),
+    .STROBE_WR      (timer_wr_strobe),
+    .TIMER0_OUT     (speaker_int),
+    .TIMER1_OUT     (interrupt2)  
   );
   
 
-		  
+          
 //------------------------------------------------------------------------
 //
 // UART - Fixed 9600 baud 
 //
-//------------------------------------------------------------------------                  				  
+//------------------------------------------------------------------------                                    
   
-uart				 UART 
+uart                 UART 
   (  
-    .CLK			(core_clk_int),
-    .RST_n			(rst_n_d4),
-    .ADDRESS		(proxy_address[1:0]),
-    .DATA_IN		(prody_wr_data),
-    .DATA_OUT		(uart_dataout),
-    .STROBE_RD		(uart_rd_strobe),
-    .STROBE_WR		(uart_wr_strobe),
-    .UART_RX		(UART_RX),
-    .UART_TX		(UART_TX),
-    .UART_INT		(interrupt3)
+    .CLK            (core_clk_int),
+    .RST_n          (rst_n_d4),
+    .ADDRESS        (proxy_address[1:0]),
+    .DATA_IN        (prody_wr_data),
+    .DATA_OUT       (uart_dataout),
+    .STROBE_RD      (uart_rd_strobe),
+    .STROBE_WR      (uart_wr_strobe),
+    .UART_RX        (UART_RX),
+    .UART_TX        (UART_TX),
+    .UART_INT       (interrupt3)
   );
 
    

@@ -2,7 +2,7 @@
 //
 //  File Name   :  mcl86_eu_core.v
 //  Used on     :  
-//  Author      :  MicroCore Labs
+//  Author      :  Ted Fried, MicroCore Labs
 //  Creation    :  10/8/2015
 //  Code Type   :  Synthesizable
 //
@@ -21,46 +21,68 @@
 //
 //
 //------------------------------------------------------------------------
+//
+// Copyright (c) 2020 Ted Fried
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//
+//------------------------------------------------------------------------
 
 
 module mcl86_eu_core
   (  
-    input				CORE_CLK_INT,			// Core Clock
-    input				RESET_INT,				// Pipelined 8088 RESET pin
-    input				TEST_N_INT,				// Pipelined 8088 TEST_n pin
+    input               CORE_CLK_INT,           // Core Clock
+    input               RESET_INT,              // Pipelined 8088 RESET pin
+    input               TEST_N_INT,             // Pipelined 8088 TEST_n pin
 
-	
-    output [15:0]		EU_BIU_COMMAND,			// EU to BIU Signals
-    output [15:0]		EU_BIU_DATAOUT,			
-    output [15:0]		EU_REGISTER_R3,	
-    output           	EU_PREFIX_LOCK,
-    output       		EU_FLAG_I,			
-	
-	
-    input				BIU_DONE,				// BIU to EU Signals
-	input				BIU_CLK_COUNTER_ZERO,
-	input				BIU_NMI_CAUGHT,
-	output				BIU_NMI_DEBOUNCE,
-	input				BIU_INTR,
+    
+    output [15:0]       EU_BIU_COMMAND,         // EU to BIU Signals
+    output [15:0]       EU_BIU_DATAOUT,         
+    output [15:0]       EU_REGISTER_R3, 
+    output              EU_PREFIX_LOCK,
+    output              EU_FLAG_I,          
+    
+    
+    input               BIU_DONE,               // BIU to EU Signals
+    input               BIU_CLK_COUNTER_ZERO,
+    input               BIU_NMI_CAUGHT,
+    output              BIU_NMI_DEBOUNCE,
+    input               BIU_INTR,
 
-	
-    input [7:0]			PFQ_TOP_BYTE,
-    input				PFQ_EMPTY,
-    input[15:0] 		PFQ_ADDR_OUT,
+    
+    input [7:0]         PFQ_TOP_BYTE,
+    input               PFQ_EMPTY,
+    input[15:0]         PFQ_ADDR_OUT,
 
-	
-    input [15:0]		BIU_REGISTER_ES,
-    input [15:0]		BIU_REGISTER_SS,
-    input [15:0]		BIU_REGISTER_CS,
-    input [15:0]		BIU_REGISTER_DS,
-    input [15:0]		BIU_REGISTER_RM,
-    input [15:0]		BIU_REGISTER_REG,
-    input [15:0]		BIU_RETURN_DATA
+    
+    input [15:0]        BIU_REGISTER_ES,
+    input [15:0]        BIU_REGISTER_SS,
+    input [15:0]        BIU_REGISTER_CS,
+    input [15:0]        BIU_REGISTER_DS,
+    input [15:0]        BIU_REGISTER_RM,
+    input [15:0]        BIU_REGISTER_REG,
+    input [15:0]        BIU_RETURN_DATA
 
   );
 
 //------------------------------------------------------------------------
- 	  
+      
 
 // Internal Signals
 
@@ -140,13 +162,13 @@ wire [31:0] eu_rom_data;
 //
 // EU Microcode RAM.  4Kx32 DPRAM
 //
-//------------------------------------------------------------------------                  				  
+//------------------------------------------------------------------------                                    
 
-eu_rom 		EU_4Kx32 (
+eu_rom      EU_4Kx32 (
   
-  .clka		(CORE_CLK_INT),
-  .addra	(eu_rom_address[11:0]),
-  .douta	(eu_rom_data)
+  .clka     (CORE_CLK_INT),
+  .addra    (eu_rom_address[11:0]),
+  .douta    (eu_rom_data)
   
   );
 
@@ -158,23 +180,23 @@ eu_rom 		EU_4Kx32 (
 //
 //------------------------------------------------------------------------
 
-assign EU_BIU_COMMAND		= eu_biu_command;
-assign EU_BIU_DATAOUT	 	= eu_biu_dataout;
-assign EU_REGISTER_R3	 	= eu_register_r3;
-assign EU_FLAG_I      		= intr_enable_delayed;
-assign EU_PREFIX_LOCK 		= eu_prefix_lock;
+assign EU_BIU_COMMAND       = eu_biu_command;
+assign EU_BIU_DATAOUT       = eu_biu_dataout;
+assign EU_REGISTER_R3       = eu_register_r3;
+assign EU_FLAG_I            = intr_enable_delayed;
+assign EU_PREFIX_LOCK       = eu_prefix_lock;
 
 
 // EU ROM opcode decoder
-assign eu_opcode_type  		= eu_rom_data[30:28];
-assign eu_opcode_dst_sel 	= eu_rom_data[27:24];
-assign eu_opcode_op0_sel 	= eu_rom_data[23:20];
-assign eu_opcode_op1_sel 	= eu_rom_data[19:16];
+assign eu_opcode_type       = eu_rom_data[30:28];
+assign eu_opcode_dst_sel    = eu_rom_data[27:24];
+assign eu_opcode_op0_sel    = eu_rom_data[23:20];
+assign eu_opcode_op1_sel    = eu_rom_data[19:16];
 assign eu_opcode_immediate  = eu_rom_data[15:0];
 
-assign eu_opcode_jump_call	= eu_rom_data[24];
-assign eu_opcode_jump_src	= eu_rom_data[22:20];
-assign eu_opcode_jump_cond	= eu_rom_data[19:16];
+assign eu_opcode_jump_call  = eu_rom_data[24];
+assign eu_opcode_jump_src   = eu_rom_data[22:20];
+assign eu_opcode_jump_cond  = eu_rom_data[19:16];
 
 
 
@@ -195,7 +217,7 @@ assign  eu_operand0 = (eu_opcode_op0_sel==4'h0) ? eu_register_ax  :
                       (eu_opcode_op0_sel==4'hE) ? system_signals  :
                                                   16'h0           ;
 
-												 
+                                                 
 assign  eu_operand1 = (eu_opcode_op1_sel==4'h0) ? BIU_REGISTER_ES     :
                       (eu_opcode_op1_sel==4'h1) ? BIU_REGISTER_SS     :
                       (eu_opcode_op1_sel==4'h2) ? BIU_REGISTER_CS     :
@@ -219,42 +241,42 @@ assign  eu_operand1 = (eu_opcode_op1_sel==4'h0) ? BIU_REGISTER_ES     :
 assign eu_jump_boolean = (eu_opcode_jump_cond==4'h0)                               ? 1'b1 : // unconditional jump
                          (eu_opcode_jump_cond==4'h1 && eu_alu_last_result!=16'h0)  ? 1'b1 : 
                          (eu_opcode_jump_cond==4'h2 && eu_alu_last_result==16'h0)  ? 1'b1 : 
-						                                                             1'b0 ;
+                                                                                     1'b0 ;
 
 
-												  
+                                                  
 // Consolidated system signals
-assign system_signals[13] 	= eu_add_carry8;	  
-assign system_signals[12] 	= BIU_CLK_COUNTER_ZERO;	  
-assign system_signals[11] 	= eu_add_overflow16;	  
-assign system_signals[9]  	= eu_add_overflow8;	  
-assign system_signals[8] 	= eu_tr_latched;
-assign system_signals[7]  	= ~PFQ_EMPTY;	  
-assign system_signals[6]  	= biu_done_caught;	  
-assign system_signals[5]  	= TEST_N_INT;	  
-assign system_signals[4]  	= eu_add_aux_carry;	  
-assign system_signals[3]  	= BIU_NMI_CAUGHT;	  
-assign system_signals[2]  	= eu_parity;	  
-assign system_signals[1]  	= intr_asserted;	  
-assign system_signals[0]  	= eu_add_carry;	  
+assign system_signals[13]   = eu_add_carry8;      
+assign system_signals[12]   = BIU_CLK_COUNTER_ZERO;   
+assign system_signals[11]   = eu_add_overflow16;      
+assign system_signals[9]    = eu_add_overflow8;   
+assign system_signals[8]    = eu_tr_latched;
+assign system_signals[7]    = ~PFQ_EMPTY;     
+assign system_signals[6]    = biu_done_caught;    
+assign system_signals[5]    = TEST_N_INT;     
+assign system_signals[4]    = eu_add_aux_carry;   
+assign system_signals[3]    = BIU_NMI_CAUGHT;     
+assign system_signals[2]    = eu_parity;      
+assign system_signals[1]    = intr_asserted;      
+assign system_signals[0]    = eu_add_carry;   
 
 
-assign eu_prefix_repnz  	= eu_flags[15];
-assign eu_prefix_rep    	= eu_flags[14];
-assign eu_prefix_lock   	= eu_flags[13];
-assign BIU_NMI_DEBOUNCE  	= eu_flags[12];
-assign eu_flag_o        	= eu_flags[11];
-assign eu_flag_d        	= eu_flags[10];
-assign eu_flag_i        	= eu_flags[9];
-assign eu_flag_t        	= eu_flags[8];
-assign eu_flag_s        	= eu_flags[7];
-assign eu_flag_z        	= eu_flags[6];
-assign eu_tf_debounce  		= eu_flags[5];
-assign eu_flag_a        	= eu_flags[4];
-assign eu_nmi_pending		= eu_flags[3];
-assign eu_flag_p       		= eu_flags[2];
-assign eu_flag_temp			= eu_flags[1];
-assign eu_flag_c        	= eu_flags[0];
+assign eu_prefix_repnz      = eu_flags[15];
+assign eu_prefix_rep        = eu_flags[14];
+assign eu_prefix_lock       = eu_flags[13];
+assign BIU_NMI_DEBOUNCE     = eu_flags[12];
+assign eu_flag_o            = eu_flags[11];
+assign eu_flag_d            = eu_flags[10];
+assign eu_flag_i            = eu_flags[9];
+assign eu_flag_t            = eu_flags[8];
+assign eu_flag_s            = eu_flags[7];
+assign eu_flag_z            = eu_flags[6];
+assign eu_tf_debounce       = eu_flags[5];
+assign eu_flag_a            = eu_flags[4];
+assign eu_nmi_pending       = eu_flags[3];
+assign eu_flag_p            = eu_flags[2];
+assign eu_flag_temp         = eu_flags[1];
+assign eu_flag_c            = eu_flags[0];
 
 
 
@@ -262,12 +284,12 @@ assign eu_flag_c        	= eu_flags[0];
 // ------------------------------------------
 //     eu_alu0 = NOP
 //     eu_alu1 = JUMP
-assign eu_alu2 = adder_out;                  					// ADD
-assign eu_alu3 = { eu_operand0[7:0] , eu_operand0[15:8] }; 		// BYTESWAP
-assign eu_alu4 = eu_operand0 & eu_operand1;   					// AND
-assign eu_alu5 = eu_operand0 | eu_operand1;   					// OR
-assign eu_alu6 = eu_operand0 ^ eu_operand1;   					// XOR
-assign eu_alu7 = { 1'b0 , eu_operand0[15:1] }; 					// SHR
+assign eu_alu2 = adder_out;                                     // ADD
+assign eu_alu3 = { eu_operand0[7:0] , eu_operand0[15:8] };      // BYTESWAP
+assign eu_alu4 = eu_operand0 & eu_operand1;                     // AND
+assign eu_alu5 = eu_operand0 | eu_operand1;                     // OR
+assign eu_alu6 = eu_operand0 ^ eu_operand1;                     // XOR
+assign eu_alu7 = { 1'b0 , eu_operand0[15:1] };                  // SHR
 
 
 
@@ -281,7 +303,7 @@ assign eu_alu_out = (eu_opcode_type==3'h2) ? eu_alu2 :
                     (eu_opcode_type==3'h7) ? eu_alu7 :
                                              20'hEEEEE;
 
-	
+    
   
 
 
@@ -291,8 +313,8 @@ genvar i;
 generate
   for (i=0; i < 16; i=i+1) 
     begin : GEN_ADDER
-      assign adder_out[i] =  eu_operand0[i] ^ eu_operand1[i] ^ carry[i];	 
-	  assign carry[i+1]   = (eu_operand0[i] & eu_operand1[i]) | (eu_operand0[i] & carry[i]) | (eu_operand1[i] & carry[i]);	
+      assign adder_out[i] =  eu_operand0[i] ^ eu_operand1[i] ^ carry[i];     
+      assign carry[i+1]   = (eu_operand0[i] & eu_operand1[i]) | (eu_operand0[i] & carry[i]) | (eu_operand1[i] & carry[i]);  
     end
 endgenerate
 
@@ -304,9 +326,9 @@ assign eu_biu_req                      = eu_biu_command[9];
 assign intr_asserted = BIU_INTR & intr_enable_delayed;
 
 
-assign new_instruction = (eu_rom_address[12:8]==5'h01) ? 1'b1 : 1'b0;	
+assign new_instruction = (eu_rom_address[12:8]==5'h01) ? 1'b1 : 1'b0;   
 
-		
+        
 //------------------------------------------------------------------------------------------  
 //
 // EU Microsequencer
@@ -348,117 +370,117 @@ begin : EU_MICROSEQUENCER
       eu_stall_pipeline <= 'h0;
       eu_rom_address <= 13'h0020;
       eu_calling_address <= 'h0;
-	  intr_enable_delayed <= 1'b0;
+      intr_enable_delayed <= 1'b0;
     end
     
 else    
   begin     
   
     // Delay the INTR enable flag until after the next instruction begins.
-	// No delay when it is disabled.
-	if (eu_flag_i==1'b0)
-	  begin
-	    intr_enable_delayed <= 1'b0;
-	  end
+    // No delay when it is disabled.
+    if (eu_flag_i==1'b0)
+      begin
+        intr_enable_delayed <= 1'b0;
+      end
     else
-	if (new_instruction==1'b1)
-	  begin
-	    intr_enable_delayed <= eu_flag_i;
-	  end
-	  
+    if (new_instruction==1'b1)
+      begin
+        intr_enable_delayed <= eu_flag_i;
+      end
+      
     // Latch the TF flag on its rising edge.
-	eu_flag_t_d <= eu_flag_t;
-	if (eu_flag_t_d==1'b0 && eu_flag_t==1'b1) 
-	  begin
-	    eu_tr_latched <= 1'b1;
+    eu_flag_t_d <= eu_flag_t;
+    if (eu_flag_t_d==1'b0 && eu_flag_t==1'b1) 
+      begin
+        eu_tr_latched <= 1'b1;
       end
-	else if (eu_tf_debounce==1'b1)
-	  begin
-	    eu_tr_latched <= 1'b0;
+    else if (eu_tf_debounce==1'b1)
+      begin
+        eu_tr_latched <= 1'b0;
       end
-		
-		
-  		
+        
+        
+        
     // Latch the done bit from the biu.
-	// Debounce it when the request is released.
+    // Debounce it when the request is released.
     biu_done_d1 <= BIU_DONE;
-	biu_done_d2 <= biu_done_d1;
-	eu_biu_req_d1 <= eu_biu_req;	
-	if (biu_done_d2==1'b0 && biu_done_d1==1'b1)
-	  biu_done_caught <= 1'b1;
-	else if (eu_biu_req_d1==1'b1 && eu_biu_req==1'b0)
-	  biu_done_caught <= 1'b0;
-			
+    biu_done_d2 <= biu_done_d1;
+    eu_biu_req_d1 <= eu_biu_req;    
+    if (biu_done_d2==1'b0 && biu_done_d1==1'b1)
+      biu_done_caught <= 1'b1;
+    else if (eu_biu_req_d1==1'b1 && eu_biu_req==1'b0)
+      biu_done_caught <= 1'b0;
+            
 
-			
-	// Generate and store flags for addition
-	if (eu_stall_pipeline==1'b0 && eu_opcode_type==3'h2)
-	  begin
-	    eu_add_carry       <= carry[16];
-		eu_add_carry8      <= carry[8];
-		eu_add_aux_carry   <= carry[4];
-		eu_add_overflow16  <= carry[16] ^ carry[15];
-		eu_add_overflow8   <= carry[8]  ^ carry[7];			 
+            
+    // Generate and store flags for addition
+    if (eu_stall_pipeline==1'b0 && eu_opcode_type==3'h2)
+      begin
+        eu_add_carry       <= carry[16];
+        eu_add_carry8      <= carry[8];
+        eu_add_aux_carry   <= carry[4];
+        eu_add_overflow16  <= carry[16] ^ carry[15];
+        eu_add_overflow8   <= carry[8]  ^ carry[7];          
       end
 
-  	
-    // Register writeback	
+    
+    // Register writeback   
     if (eu_stall_pipeline==1'b0 && eu_opcode_type!=3'h0 && eu_opcode_type!=3'h1) 
-	  begin		  
-	    eu_alu_last_result <= eu_alu_out[15:0];
-		case (eu_opcode_dst_sel)  // synthesis parallel_case
-  	      4'h0 : eu_register_ax   <= eu_alu_out[15:0];
-  	      4'h1 : eu_register_bx   <= eu_alu_out[15:0];
-  	      4'h2 : eu_register_cx   <= eu_alu_out[15:0];
-  	      4'h3 : eu_register_dx   <= eu_alu_out[15:0];
-  	      4'h4 : eu_register_sp   <= eu_alu_out[15:0];
-  	      4'h5 : eu_register_bp   <= eu_alu_out[15:0];
-  	      4'h6 : eu_register_si   <= eu_alu_out[15:0];
-  	      4'h7 : eu_register_di   <= eu_alu_out[15:0];
-  	      4'h8 : eu_flags      	  <= eu_alu_out[15:0];
-  	      4'h9 : eu_register_r0   <= eu_alu_out[15:0];
-  	      4'hA : eu_register_r1   <= eu_alu_out[15:0];
-  	      4'hB : eu_register_r2   <= eu_alu_out[15:0];
-  	      4'hC : eu_register_r3   <= eu_alu_out[15:0];
-  	      4'hD : eu_biu_command   <= eu_alu_out[15:0];
-  	      //4'hE : ;             
-  	      4'hF : eu_biu_dataout   <= eu_alu_out[15:0];
-  	      default :  ;
-  	    endcase
+      begin       
+        eu_alu_last_result <= eu_alu_out[15:0];
+        case (eu_opcode_dst_sel)  // synthesis parallel_case
+          4'h0 : eu_register_ax   <= eu_alu_out[15:0];
+          4'h1 : eu_register_bx   <= eu_alu_out[15:0];
+          4'h2 : eu_register_cx   <= eu_alu_out[15:0];
+          4'h3 : eu_register_dx   <= eu_alu_out[15:0];
+          4'h4 : eu_register_sp   <= eu_alu_out[15:0];
+          4'h5 : eu_register_bp   <= eu_alu_out[15:0];
+          4'h6 : eu_register_si   <= eu_alu_out[15:0];
+          4'h7 : eu_register_di   <= eu_alu_out[15:0];
+          4'h8 : eu_flags         <= eu_alu_out[15:0];
+          4'h9 : eu_register_r0   <= eu_alu_out[15:0];
+          4'hA : eu_register_r1   <= eu_alu_out[15:0];
+          4'hB : eu_register_r2   <= eu_alu_out[15:0];
+          4'hC : eu_register_r3   <= eu_alu_out[15:0];
+          4'hD : eu_biu_command   <= eu_alu_out[15:0];
+          //4'hE : ;             
+          4'hF : eu_biu_dataout   <= eu_alu_out[15:0];
+          default :  ;
+        endcase
     end
 
 
-	// JUMP Opcode
-	if (eu_stall_pipeline==1'b0 && eu_opcode_type==3'h1 && eu_jump_boolean==1'b1)
-	  begin
-	    eu_stall_pipeline <= 1'b1;
-		  
-		 // For subroutine CALLs, store next opcode address
-		if (eu_opcode_jump_call==1'b1)
-		  begin
-		    eu_calling_address[51:0] <= {eu_calling_address[38:0] , eu_rom_address[12:0] };  // 4 deep calling addresses
-		  end			
+    // JUMP Opcode
+    if (eu_stall_pipeline==1'b0 && eu_opcode_type==3'h1 && eu_jump_boolean==1'b1)
+      begin
+        eu_stall_pipeline <= 1'b1;
+          
+         // For subroutine CALLs, store next opcode address
+        if (eu_opcode_jump_call==1'b1)
+          begin
+            eu_calling_address[51:0] <= {eu_calling_address[38:0] , eu_rom_address[12:0] };  // 4 deep calling addresses
+          end           
 
-		case (eu_opcode_jump_src)  // synthesis parallel_case
-		  3'h0 : eu_rom_address <= eu_opcode_immediate[12:0];
-		  3'h1 : eu_rom_address <= { 4'b0 , 1'b1 , PFQ_TOP_BYTE }; // If only used for primary opcode jump, maybe make fixed prepend rather than immediate value prepend?
-		  3'h2 : eu_rom_address <= { eu_opcode_immediate[4:0], PFQ_TOP_BYTE[7:6] , PFQ_TOP_BYTE[2:0] , 3'b000 }; // Rearranged mod_reg_rm byte - imm,MOD,RM,000
-		  3'h3 : begin
-		           eu_rom_address <= eu_calling_address[12:0];
-				   eu_calling_address[38:0] <= eu_calling_address[51:13];
-				 end
-		  3'h4 : eu_rom_address <= { eu_opcode_immediate[7:0],  eu_biu_dataout[3:0] , 1'b0 };  // Jump table for EA register fetch decoding.  Jump Addresses decoded from biu_dataout.
-		  3'h5 : eu_rom_address <= { eu_opcode_immediate[6:0],  eu_biu_dataout[3:0] , 2'b00 }; // Jump table for EA register writeback decoding.  Jump Addresses decoded from biu_dataout.
-	      3'h6 : eu_rom_address <= { eu_opcode_immediate[12:3], eu_biu_dataout[5:3] };         // Jump table for instructions that share same opcode and decode using the REG field.
-					 
-		  default :  ;
-		endcase	
-	  end
-			  	
+        case (eu_opcode_jump_src)  // synthesis parallel_case
+          3'h0 : eu_rom_address <= eu_opcode_immediate[12:0];
+          3'h1 : eu_rom_address <= { 4'b0 , 1'b1 , PFQ_TOP_BYTE }; // If only used for primary opcode jump, maybe make fixed prepend rather than immediate value prepend?
+          3'h2 : eu_rom_address <= { eu_opcode_immediate[4:0], PFQ_TOP_BYTE[7:6] , PFQ_TOP_BYTE[2:0] , 3'b000 }; // Rearranged mod_reg_rm byte - imm,MOD,RM,000
+          3'h3 : begin
+                   eu_rom_address <= eu_calling_address[12:0];
+                   eu_calling_address[38:0] <= eu_calling_address[51:13];
+                 end
+          3'h4 : eu_rom_address <= { eu_opcode_immediate[7:0],  eu_biu_dataout[3:0] , 1'b0 };  // Jump table for EA register fetch decoding.  Jump Addresses decoded from biu_dataout.
+          3'h5 : eu_rom_address <= { eu_opcode_immediate[6:0],  eu_biu_dataout[3:0] , 2'b00 }; // Jump table for EA register writeback decoding.  Jump Addresses decoded from biu_dataout.
+          3'h6 : eu_rom_address <= { eu_opcode_immediate[12:3], eu_biu_dataout[5:3] };         // Jump table for instructions that share same opcode and decode using the REG field.
+                     
+          default :  ;
+        endcase 
+      end
+                
     else
       begin
-	    eu_stall_pipeline <= 1'b0; // Debounce the pipeline stall
-    	eu_rom_address <= eu_rom_address + 1'b1; 
+        eu_stall_pipeline <= 1'b0; // Debounce the pipeline stall
+        eu_rom_address <= eu_rom_address + 1'b1; 
       end
    
 end

@@ -21,6 +21,28 @@
 //
 //
 //------------------------------------------------------------------------
+//
+// Copyright (c) 2020 Ted Fried
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//
+//------------------------------------------------------------------------
 
 `timescale 1ns/100ps
 
@@ -49,7 +71,7 @@ module module_block
     input  [7:0]        BROADCAST_DATA_IN0,         
     input  [15:0]       BROADCAST_IP_IN0,           
     input               BROADCAST_SYNC_IN0,
-	input				BROADCAST_IDSBL_IN0,
+    input               BROADCAST_IDSBL_IN0,
 
     input               BROADCAST_OK_IN1,
     input  [7:0]        BROADCAST_STROBE_IN1,           
@@ -57,7 +79,7 @@ module module_block
     input  [7:0]        BROADCAST_DATA_IN1,         
     input  [15:0]       BROADCAST_IP_IN1,           
     input               BROADCAST_SYNC_IN1,
-	input				BROADCAST_IDSBL_IN1,
+    input               BROADCAST_IDSBL_IN1,
     
     input               BROADCAST_OK_IN2,
     input  [7:0]        BROADCAST_STROBE_IN2,           
@@ -65,7 +87,7 @@ module module_block
     input  [7:0]        BROADCAST_DATA_IN2,         
     input  [15:0]       BROADCAST_IP_IN2,           
     input               BROADCAST_SYNC_IN2,
-	input				BROADCAST_IDSBL_IN2,
+    input               BROADCAST_IDSBL_IN2,
     
     
     
@@ -268,7 +290,7 @@ assign BROADCAST_DATA       = ((KILL_MODE==4'h2 && kill_d4==1'b1) || (run_level!
 assign BROADCAST_IP         = eu_register_ip;
 assign BROADCAST_STROBE     = (run_level!=2'h3) ? { 6'h0 , MODULE_ID } : eu_biu_strobe;
 assign BROADCAST_SYNC       = (eu_rom_address==9'h103) ? 1'b1 : 1'b0; 
-assign BROADCAST_IDSBL		= core_interrupt_disable;
+assign BROADCAST_IDSBL      = core_interrupt_disable;
 
                                                                                                                                                                                                     
     
@@ -589,12 +611,12 @@ kill_d4 <= kill_d3;
 
     
     // Register writeback   
-	if (run_level==2'h1)
-	  begin
+    if (run_level==2'h1)
+      begin
         eu_register_ip <= rebuild_ip_in; 
         eu_biu_strobe <= 'h0;
-	  end
-	  
+      end
+      
     else if (eu_stall_pipeline==1'b0 && eu_opcode_type!=3'h0 && eu_opcode_type!=3'h1) 
       begin       
         eu_alu_last_result <= eu_alu_out[15:0];
@@ -645,14 +667,14 @@ kill_d4 <= kill_d3;
     else
       begin
         eu_stall_pipeline <= 1'b0; // Debounce the pipeline stall
-		if (KILL_MODE==4'h1 && kill_d4==1'b1)
-		  begin
-		    eu_rom_address <= 'h0;
-	      end
-		else
-		  begin
-		    eu_rom_address <= eu_rom_address + 1'b1; 
-	      end
+        if (KILL_MODE==4'h1 && kill_d4==1'b1)
+          begin
+            eu_rom_address <= 'h0;
+          end
+        else
+          begin
+            eu_rom_address <= eu_rom_address + 1'b1; 
+          end
       end
    
 end
@@ -683,7 +705,7 @@ begin : BIU_CONTROLLER
       rebuild_addr_out <= 'h0;
       rebuild_addr_out_d <= 'h0;
       rebuild_cross_zero <= 'h0;
-	  run_level <= 'h3;
+      run_level <= 'h3;
     end
     
   else    
@@ -691,16 +713,16 @@ begin : BIU_CONTROLLER
     
       // Delay address out by one clock to line up with the broadcast data
       if (KILL_MODE==4'h5 && kill_d4==1'b1)
-	    begin
-		  rebuild_addr_out_d <= 'h0;
-		end
-	  else
-	    begin
-		  rebuild_addr_out_d <= rebuild_addr_out;
-		end
-	  
-	  // Pipeline the neighboring code SYNC pulse
-	  rebuild_sync_in_d1 <= rebuild_sync_in;
+        begin
+          rebuild_addr_out_d <= 'h0;
+        end
+      else
+        begin
+          rebuild_addr_out_d <= rebuild_addr_out;
+        end
+      
+      // Pipeline the neighboring code SYNC pulse
+      rebuild_sync_in_d1 <= rebuild_sync_in;
       rebuild_sync_in_d2 <= rebuild_sync_in_d1;
       rebuild_sync_in_d3 <= rebuild_sync_in_d2;
       
@@ -721,17 +743,17 @@ begin : BIU_CONTROLLER
         end
 
       
-	  // Allow four passes of the full range or memory and register addresses when rebuilding a module
+      // Allow four passes of the full range or memory and register addresses when rebuilding a module
       if (run_level==2'h3)
-	    begin
+        begin
           rebuild_cross_zero <= 'h0;
-		end
+        end
       else if (run_level==2'h0 && rebuild_addr=='h0)
         begin
           rebuild_cross_zero <= rebuild_cross_zero + 1'b1;
         end
 
-		
+        
       // If Voter has detected a failure and module is not currently in rebuilding mode, then enter rebuilding mode.
       if ( run_level==2'h3 && voter_good==1'b0)
         begin
@@ -757,12 +779,12 @@ begin : BIU_CONTROLLER
       
     
       eu_register_r3_d1  <= eu_register_r3;
-	  
+      
       if (run_level==2'h2)
-	    begin
-		  core_interrupt_disable <= neighbor_idsbl;
-	    end	
-	  else if (eu_biu_strobe_int==3'h3)
+        begin
+          core_interrupt_disable <= neighbor_idsbl;
+        end 
+      else if (eu_biu_strobe_int==3'h3)
         begin
           core_interrupt_disable <= 1'b1;
         end        

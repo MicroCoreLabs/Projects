@@ -1,37 +1,69 @@
-# 
-#  Microcode for the MCL86
-# 
-# ------------------------------------------------------------------------
-# 
-#  Copyright (C) 2019 by Ted Fried info@MicroCoreLabs.com
-#  
-#  Permission to use, copy, modify, and distribute this software and its 
-#  documentation for any purpose and without fee is hereby granted, provided 
-#  that the above copyright notice appear in all copies and that both that
-#  copyright notice and this permission notice appear in supporting documentation. 
-#  This software is provided "as is" without express or implied warranty.
-# 
-# ------------------------------------------------------------------------
-#  
+//
+//
+//  File Name   :  Microcode_MCL86.txt
+//  Used on     :  MCL86
+//  Author      :  Ted Fried, MicroCore Labs
+//  Creation    :  1/25/2020
+//  Code Type   :  Microcode
+//
+//   Description:
+//   ============
+//   
+//  Microcode for the MCL86
+//
+//------------------------------------------------------------------------
+//
+// Modification History:
+// =====================
+//
+// Revision 1.0 1/25/2020
+// Initial revision
+//
+//
+//------------------------------------------------------------------------
+//
+// Copyright (c) 2020 Ted Fried
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//
+//------------------------------------------------------------------------
 
+// Microcode and microsequencer notes:
+//  
 # 
 # // Consolidated system signals
 # assign system_signals[15] 
 # assign system_signals[14] 
-# assign system_signals[13] = eu_add_carry8;	  
-# assign system_signals[12] = clock_cycle_counter_zero;	  
-# assign system_signals[11] = eu_add_overflow16;	 
+# assign system_signals[13] = eu_add_carry8;      
+# assign system_signals[12] = clock_cycle_counter_zero;   
+# assign system_signals[11] = eu_add_overflow16;     
 # assign system_signals[10] 
-# assign system_signals[9]  = eu_add_overflow8;	  
-# assign system_signals[8]  = eu_flag_t_asserted;	  
-# assign system_signals[7]  = ~pfq_empty;	  
-# assign system_signals[6]  = biu_done_caught;	  
-# assign system_signals[5]  = test_n_int;	  
-# assign system_signals[4]  = eu_add_aux_carry;	  
-# assign system_signals[3]  = nmi_caught;	  
-# assign system_signals[2]  = eu_parity;	  
-# assign system_signals[1]  = int_asserted;	  
-# assign system_signals[0]  = eu_add_carry16;	  
+# assign system_signals[9]  = eu_add_overflow8;   
+# assign system_signals[8]  = eu_flag_t_asserted;     
+# assign system_signals[7]  = ~pfq_empty;     
+# assign system_signals[6]  = biu_done_caught;    
+# assign system_signals[5]  = test_n_int;     
+# assign system_signals[4]  = eu_add_aux_carry;   
+# assign system_signals[3]  = nmi_caught;     
+# assign system_signals[2]  = eu_parity;      
+# assign system_signals[1]  = int_asserted;   
+# assign system_signals[0]  = eu_add_carry16;     
 # 
 # 
 # assign eu_prefix_repnz  = eu_flags[15];
@@ -46,9 +78,9 @@
 # assign eu_flag_z        = eu_flags[6];
 # assign eu_tf_debounce   = eu_flags[5];
 # assign eu_flag_a        = eu_flags[4];
-# assign eu_flag_temp		= eu_flags[3];
+# assign eu_flag_temp       = eu_flags[3];
 # assign eu_flag_p        = eu_flags[2];
-# assign eu_flag_temp		= eu_flags[1];
+# assign eu_flag_temp       = eu_flags[1];
 # assign eu_flag_c        = eu_flags[0];
 # 
 # 
@@ -58,7 +90,7 @@
 # //  eu_biu_strobe[1:0] are available for only one clock cycle and cause BIU to take immediate action.
 # //  eu_biu_req stays asserted until the BIU is available to service the request.
 # //  
-# 								= eu_biu_command[15];
+#                               = eu_biu_command[15];
 # eu_segment_override             = eu_biu_command[14];
 # eu_biu_strobe[1:0]              = eu_biu_command[13:12]; // 01=opcode fetch 10=clock load 11=load biu register(eu_biu_req_code has the register#)
 # eu_biu_segment[1:0]             = eu_biu_command[11:10];
@@ -66,29 +98,29 @@
 # eu_biu_req_code                 = eu_biu_command[8:4];
 # eu_qs_out[1:0]                  = eu_biu_command[3:2];  // Updated for every opcode fetch strobe using biu_strobe and Jump request using eu_biu_rq
 # eu_segment_override_value[1:0]  = eu_biu_command[1:0];
-# 	
+#   
 # 
 # EU Registers
 # --------------
 # 
-# Destination					Operand0					Operand1
+# Destination                   Operand0                    Operand1
 # -----------------------------------------------------------------------------------------------
-# 0	AX                      0	AX                      0	ES
-# 1	BX                      1	BX                      1	SS
-# 2	CX                      2	CX                      2	CS
-# 3	DX                      3	DX                      3	DS
-# 4	SP                      4	SP                      4	{ 8'h00 , pfq_top_byte } 
-# 5	BP                      5	BP                      5	EA_RM from BIU
-# 6	SI                      6	SI                      6	EA_REG from BIU
-# 7	DI                      7	DI                      7	BIU Return Data 
-# 8	Flags                   8	Flags                   8	Prefetch Queue Address (Current IP)
-# 9	r0                      9	r0                      9	r0
-# A	r1                      A	r1                      A	r1
-# B	r2                      B	r2                      B	r2
-# C	r3                      C	r3                      C	r3
-# D	BIU Command             D	BIU Command             D	ALU Last Result
-# E   Dummy Reg               E   System Signals          E	System Signals
-# F	BIU Dataout             F	16'h0000	            F	Opcode Immediate[15:0]
+# 0 AX                      0   AX                      0   ES
+# 1 BX                      1   BX                      1   SS
+# 2 CX                      2   CX                      2   CS
+# 3 DX                      3   DX                      3   DS
+# 4 SP                      4   SP                      4   { 8'h00 , pfq_top_byte } 
+# 5 BP                      5   BP                      5   EA_RM from BIU
+# 6 SI                      6   SI                      6   EA_REG from BIU
+# 7 DI                      7   DI                      7   BIU Return Data 
+# 8 Flags                   8   Flags                   8   Prefetch Queue Address (Current IP)
+# 9 r0                      9   r0                      9   r0
+# A r1                      A   r1                      A   r1
+# B r2                      B   r2                      B   r2
+# C r3                      C   r3                      C   r3
+# D BIU Command             D   BIU Command             D   ALU Last Result
+# E   Dummy Reg               E   System Signals          E System Signals
+# F BIU Dataout             F   16'h0000                F   Opcode Immediate[15:0]
 # 
 # 
 # EU Opcodes
@@ -97,19 +129,19 @@
 # ----------------
 # Bits[31:28] : 0x1
 # Bits[27:24] : CALL  1=Store next IP address
-# Bits[22:20] : Jump Source:     	
-# 				0x0=Immediate[12:0]	
-#                 0x1={immediate[4:0]&pfq_top_byte}	
-#                 0x2={immediate[4:0]&pfq_top_byte[7:6]&pfq_top_byte[2:0]&000}	
-# 				0x3=Return to CALL stored IP address
-# 				0x4={immediate[8:0], eu_biu_dataout[3:0] , 1'b0 }     // For register fetch
-# 				0x5={immediate[7:0], eu_biu_dataout[3:0] , 2'b00 }    // For register writeback
-# 				0x6={eu_opcode_immediate[12:3], eu_biu_dataout[5:3]}  // For opcode group decoding
+# Bits[22:20] : Jump Source:        
+#               0x0=Immediate[12:0] 
+#                 0x1={immediate[4:0]&pfq_top_byte} 
+#                 0x2={immediate[4:0]&pfq_top_byte[7:6]&pfq_top_byte[2:0]&000}  
+#               0x3=Return to CALL stored IP address
+#               0x4={immediate[8:0], eu_biu_dataout[3:0] , 1'b0 }     // For register fetch
+#               0x5={immediate[7:0], eu_biu_dataout[3:0] , 2'b00 }    // For register writeback
+#               0x6={eu_opcode_immediate[12:3], eu_biu_dataout[5:3]}  // For opcode group decoding
 # 
-# Bits[19:16] : Jump Condition:	
-# 				0x0=Unconditional	
-# 				0x1=Last_ALU_Result!=0		
-# 				0x2=Last_ALU_Result==0
+# Bits[19:16] : Jump Condition: 
+#               0x0=Unconditional   
+#               0x1=Last_ALU_Result!=0      
+#               0x2=Last_ALU_Result==0
 # Bits[12:0]  : Immediate[12:0]
 # 
 # 0x2 - ADD
@@ -141,14 +173,14 @@
 #                           (eu_biu_req_code ==  h14   ===>   Memory Word Write - To Stack Segment
 #                           (eu_biu_req_code ==  h16   ===>   Interrupt ACK Cycle
 #                           (eu_biu_req_code ==  h18   ===>   HALT State
-#                           (eu_biu_req_code ==  h19   ===>   Jump Instruction						  
+#                           (eu_biu_req_code ==  h19   ===>   Jump Instruction                        
 #                           (eu_biu_req_code ==  h1A   ===>   IO Word Read   
-#                           (eu_biu_req_code ==  h1C   ===>   IO Word Write   						  
+#                           (eu_biu_req_code ==  h1C   ===>   IO Word Write                           
 #                                                             RESET State
 # 
 # 
-# 															
-# 															
+#                                                           
+#                                                           
 #
 # Stop CPU
 p 00 00000 00010 0001
