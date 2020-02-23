@@ -1,6 +1,7 @@
 # Ted Fried's MicroCore Labs Projects
 
 My blog which has some details on these projects: MicroCoreLabs.Wordpress.com
+
 My YouTube Channel with some videos of the stuff in action: www.youtube.com/channel/UC9B3TaEUon-araO2j7tp9jg/videos
 
 Microsequencer-based processors:
