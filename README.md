@@ -18,7 +18,7 @@ Other processors:
 
     MCLR5 - Quad-Issue Superscalar RISCV
     Lockstep Quad Modular Redundant System 
-    RISCV_C_Version - Simple and compact RISC-V RS32I implementation written in C
+    RISCV C Version - Simple and compact RISC-V RS32I implementation written in C
     
 
 Misc:
