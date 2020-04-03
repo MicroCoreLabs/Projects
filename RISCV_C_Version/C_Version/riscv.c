@@ -16,8 +16,11 @@
 // Modification History:
 // =====================
 //
-// Revision 1 10/8/15
+// Revision 1 3/29/2020
 // Initial revision
+//
+// Revision 2 4/3/2020
+// Fixed BLTU
 //
 //
 //------------------------------------------------------------------------
@@ -88,7 +91,7 @@ int main()
   if (opcode==0b1100011 && funct3==0b001) { if (rv5_reg[rs1]!=rv5_reg[rs2]) rv5_pc = ( (B_immediate_SE) + rv5_pc) - 0x4; printf(" BNE "); } else // BNE
   if (opcode==0b1100011 && funct3==0b100) { if ((signed long)rv5_reg[rs1]< (signed long)rv5_reg[rs2]) rv5_pc = ((B_immediate_SE) + rv5_pc) - 0x4; printf(" BLT "); } else // BLT
   if (opcode==0b1100011 && funct3==0b101) { if ((signed long)rv5_reg[rs1]>=(signed long)rv5_reg[rs2]) rv5_pc = ((B_immediate_SE) + rv5_pc) - 0x4; printf(" BGE "); } else // BGE
-  if (opcode==0b1100011 && funct3==0b110) { if (rv5_reg[rs1]>=rv5_reg[rs2]) rv5_pc = ( (B_immediate_SE) + rv5_pc) - 0x4; printf(" BLTU "); } else // BLTU
+  if (opcode==0b1100011 && funct3==0b110) { if (rv5_reg[rs1]<rv5_reg[rs2]) rv5_pc = ( (B_immediate_SE) + rv5_pc) - 0x4; printf(" BLTU ");  } else // BLTU
   if (opcode==0b1100011 && funct3==0b111) { if (rv5_reg[rs1]>=rv5_reg[rs2]) rv5_pc = ( (B_immediate_SE) + rv5_pc) - 0x4; printf(" BGTU "); } else // BGTU
   if (opcode==0b0000011 && funct3==0b000) { rv5_reg[rd] = (rv5_user_memory[(I_immediate_SE)+rv5_reg[rs1]] & 0x80) ? 0xFFFFFF00| rv5_user_memory[(I_immediate_SE)+rv5_reg[rs1]] : (rv5_user_memory[(I_immediate_SE)+rv5_reg[rs1]] & 0xFF); printf(" LB "); } else // LB
   if (opcode==0b0000011 && funct3==0b001) { rv5_reg[rd] = (rv5_user_memory[(I_immediate_SE)+rv5_reg[rs1]] & 0x8000) ? 0xFFFF0000| rv5_user_memory[(I_immediate_SE)+rv5_reg[rs1]] : (rv5_user_memory[(I_immediate_SE)+rv5_reg[rs1]] & 0xFFFF); printf(" LH "); } else // LH
