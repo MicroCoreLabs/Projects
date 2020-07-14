@@ -9,21 +9,19 @@ Emulated Processors:
 
 	MCL68 - Motorola 68000 Emulator written in C
     RISCV - Simple and compact RISC-V RS32I implementation written in C
+    MCL65 - MOS 6502  written in C
 
 Microsequencer-based processors: 
 
     MCL65 - MOS 6502 
-          - C Version as well
     MCL51 - Intel 8051
     MCL86 - Intel 8086/8088
-
     
 Other processors:
 
     MCLR5 - Quad-Issue Superscalar RISCV
     Lockstep Quad Modular Redundant System 
     
-
 Misc:
 
     Wheelwriter  - FPGA based Printer Option for the IBM Wheelwriter 5
