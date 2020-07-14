@@ -8,7 +8,6 @@ My YouTube Channel with some videos of the stuff in action: www.youtube.com/chan
 Emulated Processors:
 
 	MCL68 - Motorola 68000 Emulator written in C
-    RISCV - Simple and compact RISC-V RS32I implementation written in C
 
 Microsequencer-based processors: 
 
@@ -22,6 +21,7 @@ Other processors:
 
     MCLR5 - Quad-Issue Superscalar RISCV
     Lockstep Quad Modular Redundant System 
+    RISCV C Version - Simple and compact RISC-V RS32I implementation written in C
     
 
 Misc:
