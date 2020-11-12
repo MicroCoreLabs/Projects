@@ -1,0 +1,122 @@
+#-----------------------------------------------------------
+# PlanAhead v14.7 (64-bit)
+# Build 321239 by xbuild on Fri Sep 27 19:29:51 MDT 2013
+# Start of session at: Sat Sep 26 22:54:19 2020
+# Process ID: 7676
+# Log file: C:/MCL/MCL86/MCL86jr/MCL86jr/planAhead_run_1/planAhead.log
+# Journal file: C:/MCL/MCL86/MCL86jr/MCL86jr/planAhead_run_1/planAhead.jou
+#-----------------------------------------------------------
+INFO: [Common 17-78] Attempting to get a license: PlanAhead
+INFO: [Common 17-290] Got license for PlanAhead
+INFO: [Common 17-86] Your PlanAhead license expires in -1275 day(s)
+INFO: [Device 21-36] Loading parts and site information from C:/Xilinx/14.7/ISE_DS/PlanAhead/data/parts/arch.xml
+Parsing RTL primitives file [C:/Xilinx/14.7/ISE_DS/PlanAhead/data/parts/xilinx/rtl/prims/rtl_prims.xml]
+Finished parsing RTL primitives file [C:/Xilinx/14.7/ISE_DS/PlanAhead/data/parts/xilinx/rtl/prims/rtl_prims.xml]
+start_gui
+source C:/MCL/MCL86/MCL86jr/MCL86jr/pa.fromHdl.tcl
+# create_project -name MCL86jr -dir "C:/MCL/MCL86/MCL86jr/MCL86jr/planAhead_run_1" -part xc6slx9tqg144-3
+create_project: Time (s): elapsed = 00:00:06 . Memory (MB): peak = 420.852 ; gain = 66.055
+# set_param project.pinAheadLayout yes
+# set srcset [get_property srcset [current_run -impl]]
+# set_property target_constrs_file "MCL86jr.ucf" [current_fileset -constrset]
+Adding file 'C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.ucf' to fileset 'constrs_1'
+# set hdlfile [add_files [list {ipcore_dir/EU4Kx32.v}]]
+# set_property file_type Verilog $hdlfile
+# set_property library work $hdlfile
+# add_files [list {ipcore_dir/EU4Kx32.ngc}]
+# set hdlfile [add_files [list {../src4synth/eu.v}]]
+# set_property file_type Verilog $hdlfile
+# set_property library work $hdlfile
+# set hdlfile [add_files [list {../src4synth/biu_min.v}]]
+# set_property file_type Verilog $hdlfile
+# set_property library work $hdlfile
+# set hdlfile [add_files [list {../src4synth/MCL86jr.v}]]
+# set_property file_type Verilog $hdlfile
+# set_property library work $hdlfile
+# set_property top MCL86jr $srcset
+# add_files [list {MCL86jr.ucf}] -fileset [get_property constrset [current_run]]
+# add_files [list {ipcore_dir/EU4Kx32.ncf}] -fileset [get_property constrset [current_run]]
+# open_rtl_design -part xc6slx9tqg144-3
+Using Verific elaboration
+Parsing VHDL file "C:/Xilinx/14.7/ISE_DS/PlanAhead/data/parts/xilinx/rtl/lib/synplify/synattr.vhd" into library synplify
+Analyzing Verilog file "C:/MCL/MCL86/MCL86jr/MCL86jr/ipcore_dir/EU4Kx32.v" into library work
+Analyzing Verilog file "C:/MCL/MCL86/MCL86jr/src4synth/eu.v" into library work
+Analyzing Verilog file "C:/MCL/MCL86/MCL86jr/src4synth/biu_min.v" into library work
+Analyzing Verilog file "C:/MCL/MCL86/MCL86jr/src4synth/MCL86jr.v" into library work
+Release 14.7 - ngc2edif P.20131013 (nt64)
+Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
+Reading design EU4Kx32.ngc ...
+WARNING:NetListWriters:298 - No output is written to EU4Kx32.xncf, ignored.
+Processing design ...
+   Preping design's networks ...
+   Preping design's macros ...
+  finished :Prep
+Writing EDIF netlist file EU4Kx32.edif ...
+ngc2edif: Total memory usage is 79384 kilobytes
+
+Reading core file 'C:/MCL/MCL86/MCL86jr/MCL86jr/ipcore_dir/EU4Kx32.ngc' for (cell view 'EU4Kx32', library 'work', file 'EU4Kx32.v')
+Parsing EDIF File [./.Xil/PlanAhead-7676-MicroCoreLabs/ngc2edif/EU4Kx32.edif]
+Finished Parsing EDIF File [./.Xil/PlanAhead-7676-MicroCoreLabs/ngc2edif/EU4Kx32.edif]
+Loading clock regions from C:/Xilinx/14.7/ISE_DS/PlanAhead/data\parts/xilinx/spartan6/spartan6lx/xc6slx9/ClockRegion.xml
+Loading clock buffers from C:/Xilinx/14.7/ISE_DS/PlanAhead/data\parts/xilinx/spartan6/spartan6lx/xc6slx9/ClockBuffers.xml
+Loading package pin functions from C:/Xilinx/14.7/ISE_DS/PlanAhead/data\parts/xilinx/spartan6/PinFunctions.xml...
+Loading package from C:/Xilinx/14.7/ISE_DS/PlanAhead/data\parts/xilinx/spartan6/spartan6lx/xc6slx9/tqg144/Package.xml
+Loading io standards from C:/Xilinx/14.7/ISE_DS/PlanAhead/data\./parts/xilinx/spartan6/IOStandards.xml
+Loading device configuration modes from C:/Xilinx/14.7/ISE_DS/PlanAhead/data\parts/xilinx/spartan6/ConfigModes.xml
+Loading list of drcs for the architecture : C:/Xilinx/14.7/ISE_DS/PlanAhead/data\./parts/xilinx/spartan6/drc.xml
+Parsing UCF File [C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.ucf]
+Finished Parsing UCF File [C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.ucf]
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Phase 0 | Netlist Checksum: 0a7e0a75
+open_rtl_design: Time (s): elapsed = 00:00:21 . Memory (MB): peak = 603.004 ; gain = 171.250
+update_compile_order -fileset sim_1
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[8]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[7]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[6]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[5]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[4]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[3]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[2]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[1]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[0]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+exit
+ERROR: [PlanAhead 12-106] *** Exception: ui.h.b: Found deleted key in HTclEventBroker. Verify if the classes listed here call cleanup()
+HTclEvent: DEBUG_CORE_CONFIG_CHANGE   Classes: ui.views.aR 
+HTclEvent: DEBUG_PORT_CONFIG_CHANGE   Classes: ui.views.aR 
+HTclEvent: SIGNAL_MODIFY   Classes: ui.views.aR 
+HTclEvent: SIGNAL_BUS_MODIFY   Classes: ui.views.aR 
+ (See C:/MCL/MCL86/MCL86jr/MCL86jr\planAhead_pid7676.debug)
+ERROR: [Common 17-39] 'stop_gui' failed due to earlier errors.
+INFO: [Common 17-206] Exiting PlanAhead at Sat Sep 26 22:57:24 2020...
+INFO: [Common 17-83] Releasing license: PlanAhead

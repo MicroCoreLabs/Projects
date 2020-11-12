@@ -1,0 +1,31 @@
+
+BOM
+----
+
+Special instructions:
+----------------------
+1) Dont stuff header  J1
+2) Dont stuff header  U9 Can be purchased here: http://store.go4retro.com/ic-header/
+
+
+    Description                                     Vendor      Part number                             Price   Quantity  Reference     
+---------------------------------------------------------------------------------------------------------------------------------------  
+    CAP CER 4.7UF 10V X5R 0402                      Digikey     1276-1482-1-ND                          $ 0.04      31    C31,C30,C29,C28,C23,C27,C26,C25,C19,C18,C17,C16,C24,C22,C21,C20,C15,C14,C13,C12,C11,C10,C9,C8,C7,C6,C5,C4,C3,C2,C1        
+    RES 33 OHM 1% 1/16W 0402                        Digikey     541-3968-1-ND                           $ 0.10      2     R1,R16            
+    RES SMD 4.7K OHM 5% 1/16W 0402                  Digikey     1276-4392-1-ND                          $ 0.01      6     R15,R14,R13,R12,R11,R10           
+    RES 330 OHM 1% 1/16W 0402                       Digikey     541-3996-1-ND                           $ 0.10      8     R9,R8,R7,R6,R5,R4,R3,R2           
+    LED RED CLEAR 2SMD                              Digikey     1080-EAST1005RA0CT-ND                   $ 0.20      8     D8,D7,D6,D5,D4,D3,D2,D1           
+
+    512x8 SRAM-CY62148GN-45ZSXI                     Mouser      727-CY62148GN-45ZSXI                    $ 4.92      1     U8            
+    Clock Oscillators 50MHz 3.3V 50ppm              Mouser      S774-625L3C050M00000                    $ 1.63      1     Y1            
+    IC REG LINEAR 1.2V 300MA SOT23-5                Digikey     576-4878-1-ND                           $ 0.11      1     U7            
+    IC REG LINEAR 3.3V 300MA SOT23-5                Digikey     576-4764-1-ND                           $ 0.11      1     U3            
+    IC TXRX NON-INVERT 3.6V 20TSSOP                 Digikey     296-26610-5-ND                          $ 0.57      3     U6,U5,U4          
+    IC FPGA 102 I/O 144TQFP                         Digikey     122-1747-ND                             $ 18.70     1     U1            
+    IC FLASH 128M SPI 133MHZ 8SOIC                  Digikey     W25Q128JVSIQ-ND                         $ 1.37      1     U2            
+    
+    
+    
+    
+    
+

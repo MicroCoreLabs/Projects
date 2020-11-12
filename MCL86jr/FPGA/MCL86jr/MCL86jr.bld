@@ -1,0 +1,44 @@
+Release 14.7 ngdbuild P.20131013 (nt64)
+Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
+
+Command Line: C:\Xilinx\14.7\ISE_DS\ISE\bin\nt64\unwrapped\ngdbuild.exe
+-intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p
+xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd
+
+Reading NGO file "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.ngc" ...
+Loading design module "ipcore_dir/EU4Kx32.ngc"...
+Gathering constraint information from source properties...
+Done.
+
+Annotating constraints to design from ucf file "MCL86jr.ucf" ...
+Resolving constraint associations...
+Checking Constraint Associations...
+INFO:ConstraintSystem:178 - TNM 'CORE_CLK', used in period specification
+   'TS_CORE_CLK', was traced into DCM_SP instance SPARTAN6PLL/dcm_sp_inst. The
+   following new TNM groups and period specifications were generated at the
+   DCM_SP output(s): 
+   CLKFX: <TIMESPEC TS_SPARTAN6PLL_clkfx = PERIOD "SPARTAN6PLL_clkfx"
+   TS_CORE_CLK / 2.2 HIGH 50%>
+
+Done...
+
+Checking expanded design ...
+
+Partition Implementation Status
+-------------------------------
+
+  No Partitions were found in this design.
+
+-------------------------------
+
+NGDBUILD Design Results Summary:
+  Number of errors:     0
+  Number of warnings:   0
+
+Total memory usage is 170808 kilobytes
+
+Writing NGD file "MCL86jr.ngd" ...
+Total REAL time to NGDBUILD completion:  4 sec
+Total CPU time to NGDBUILD completion:   4 sec
+
+Writing NGDBUILD log file "MCL86jr.bld"...

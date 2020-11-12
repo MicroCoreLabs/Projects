@@ -1,0 +1,228 @@
+Release 14.7 par P.20131013 (nt64)
+Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
+
+MICROCORELABS::  Wed Nov 11 19:10:59 2020
+
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd
+MCL86jr.pcf 
+
+
+Constraints file: MCL86jr.pcf.
+Loading device for application Rf_Device from file '6slx9.nph' in environment C:\Xilinx\14.7\ISE_DS\ISE\.
+   "MCL86jr" is an NCD, version 3.2, device xc6slx9, package tqg144, speed -3
+
+Initializing temperature to 85.000 Celsius. (default - Range: 0.000 to 85.000 Celsius)
+Initializing voltage to 1.140 Volts. (default - Range: 1.140 to 1.260 Volts)
+
+
+Device speed data version:  "PRODUCTION 1.23 2013-10-13".
+
+
+
+Device Utilization Summary:
+
+Slice Logic Utilization:
+  Number of Slice Registers:                   853 out of  11,440    7%
+    Number used as Flip Flops:                 853
+    Number used as Latches:                      0
+    Number used as Latch-thrus:                  0
+    Number used as AND/OR logics:                0
+  Number of Slice LUTs:                        959 out of   5,720   16%
+    Number used as logic:                      887 out of   5,720   15%
+      Number using O6 output only:             681
+      Number using O5 output only:              54
+      Number using O5 and O6:                  152
+      Number used as ROM:                        0
+    Number used as Memory:                      58 out of   1,440    4%
+      Number used as Dual Port RAM:              0
+      Number used as Single Port RAM:            0
+      Number used as Shift Register:            58
+        Number using O6 output only:             2
+        Number using O5 output only:             0
+        Number using O5 and O6:                 56
+    Number used exclusively as route-thrus:     14
+      Number with same-slice register load:      8
+      Number with same-slice carry load:         6
+      Number with other load:                    0
+
+Slice Logic Distribution:
+  Number of occupied Slices:                   381 out of   1,430   26%
+  Number of MUXCYs used:                       196 out of   2,860    6%
+  Number of LUT Flip Flop pairs used:        1,197
+    Number with an unused Flip Flop:           437 out of   1,197   36%
+    Number with an unused LUT:                 238 out of   1,197   19%
+    Number of fully used LUT-FF pairs:         522 out of   1,197   43%
+    Number of slice register sites lost
+      to control set restrictions:               0 out of  11,440    0%
+
+  A LUT Flip Flop pair for this architecture represents one LUT paired with
+  one Flip Flop within a slice.  A control set is a unique combination of
+  clock, reset, set, and enable signals for a registered element.
+  The Slice Logic Distribution report is not meaningful if the design is
+  over-mapped for a non-slice resource or if Placement fails.
+
+IO Utilization:
+  Number of bonded IOBs:                        75 out of     102   73%
+    Number of LOCed IOBs:                       75 out of      75  100%
+    IOB Flip Flops:                             39
+
+Specific Feature Utilization:
+  Number of RAMB16BWERs:                         7 out of      32   21%
+  Number of RAMB8BWERs:                          1 out of      64    1%
+  Number of BUFIO2/BUFIO2_2CLKs:                 1 out of      32    3%
+    Number used as BUFIO2s:                      1
+    Number used as BUFIO2_2CLKs:                 0
+  Number of BUFIO2FB/BUFIO2FB_2CLKs:             0 out of      32    0%
+  Number of BUFG/BUFGMUXs:                       1 out of      16    6%
+    Number used as BUFGs:                        1
+    Number used as BUFGMUX:                      0
+  Number of DCM/DCM_CLKGENs:                     1 out of       4   25%
+    Number used as DCMs:                         1
+    Number used as DCM_CLKGENs:                  0
+  Number of ILOGIC2/ISERDES2s:                  12 out of     200    6%
+    Number used as ILOGIC2s:                    12
+    Number used as ISERDES2s:                    0
+  Number of IODELAY2/IODRP2/IODRP2_MCBs:         0 out of     200    0%
+  Number of OLOGIC2/OSERDES2s:                  27 out of     200   13%
+    Number used as OLOGIC2s:                    27
+    Number used as OSERDES2s:                    0
+  Number of BSCANs:                              0 out of       4    0%
+  Number of BUFHs:                               0 out of     128    0%
+  Number of BUFPLLs:                             0 out of       8    0%
+  Number of BUFPLL_MCBs:                         0 out of       4    0%
+  Number of DSP48A1s:                            0 out of      16    0%
+  Number of ICAPs:                               0 out of       1    0%
+  Number of MCBs:                                0 out of       2    0%
+  Number of PCILOGICSEs:                         0 out of       2    0%
+  Number of PLL_ADVs:                            0 out of       2    0%
+  Number of PMVs:                                0 out of       1    0%
+  Number of STARTUPs:                            0 out of       1    0%
+  Number of SUSPEND_SYNCs:                       0 out of       1    0%
+
+
+Overall effort level (-ol):   High 
+Router effort level (-rl):    High 
+
+WARNING:Timing:3402 - The Clock Modifying COMP, SPARTAN6PLL/dcm_sp_inst, has the attribute CLK_FEEDBACK set to NONE.  No phase relationship
+   exists between the input and output clocks of this Clock Modifying COMP. Data paths between these clock domains must be constrained using
+   FROM/TO constraints.
+Starting initial Timing Analysis.  REAL time: 4 secs 
+Finished initial Timing Analysis.  REAL time: 4 secs 
+
+Starting Router
+
+
+Phase  1  : 7181 unrouted;      REAL time: 4 secs 
+
+Phase  2  : 5599 unrouted;      REAL time: 5 secs 
+
+Phase  3  : 2119 unrouted;      REAL time: 8 secs 
+
+Phase  4  : 2185 unrouted; (Setup:587, Hold:47, Component Switching Limit:0)     REAL time: 9 secs 
+
+Updating file: MCL86jr.ncd with current fully routed design.
+
+Phase  5  : 0 unrouted; (Setup:6935, Hold:53, Component Switching Limit:0)     REAL time: 19 secs 
+
+Phase  6  : 0 unrouted; (Setup:769, Hold:53, Component Switching Limit:0)     REAL time: 23 secs 
+
+Updating file: MCL86jr.ncd with current fully routed design.
+
+Phase  7  : 0 unrouted; (Setup:769, Hold:53, Component Switching Limit:0)     REAL time: 32 secs 
+
+Phase  8  : 0 unrouted; (Setup:769, Hold:53, Component Switching Limit:0)     REAL time: 32 secs 
+
+Phase  9  : 0 unrouted; (Setup:769, Hold:53, Component Switching Limit:0)     REAL time: 32 secs 
+
+Phase 10  : 0 unrouted; (Setup:769, Hold:0, Component Switching Limit:0)     REAL time: 32 secs 
+
+Phase 11  : 0 unrouted; (Setup:0, Hold:0, Component Switching Limit:0)     REAL time: 33 secs 
+Total REAL time to Router completion: 33 secs 
+Total CPU time to Router completion: 33 secs 
+
+Partition Implementation Status
+-------------------------------
+
+  No Partitions were found in this design.
+
+-------------------------------
+
+Generating "PAR" statistics.
+
+**************************
+Generating Clock Report
+**************************
+
++---------------------+--------------+------+------+------------+-------------+
+|        Clock Net    |   Resource   |Locked|Fanout|Net Skew(ns)|Max Delay(ns)|
++---------------------+--------------+------+------+------------+-------------+
+|        core_clk_int |  BUFGMUX_X2Y3| No   |  321 |  0.601     |  1.669      |
++---------------------+--------------+------+------+------------+-------------+
+
+* Net Skew is the difference between the minimum and maximum routing
+only delays for the net. Note this is different from Clock Skew which
+is reported in TRCE timing report. Clock Skew is the difference between
+the minimum and maximum path delays which includes logic delays.
+
+* The fanout is the number of component pins not the individual BEL loads,
+for example SLICE loads not FF loads.
+
+Timing Score: 0 (Setup: 0, Hold: 0, Component Switching Limit: 0)
+
+Number of Timing Constraints that were not applied: 1
+
+Asterisk (*) preceding a constraint indicates it was not met.
+   This may be due to a setup or hold violation.
+
+----------------------------------------------------------------------------------------------------------
+  Constraint                                |    Check    | Worst Case |  Best Case | Timing |   Timing   
+                                            |             |    Slack   | Achievable | Errors |    Score   
+----------------------------------------------------------------------------------------------------------
+  TS_SPARTAN6PLL_clkfx = PERIOD TIMEGRP "SP | SETUP       |     0.299ns|     8.791ns|       0|           0
+  ARTAN6PLL_clkfx" TS_CORE_CLK / 2.2        | HOLD        |     0.367ns|            |       0|           0
+    HIGH 50%                                |             |            |            |        |            
+----------------------------------------------------------------------------------------------------------
+  TS_CORE_CLK = PERIOD TIMEGRP "CORE_CLK" 2 | MINLOWPULSE |    12.000ns|     8.000ns|       0|           0
+  0 ns HIGH 50%                             |             |            |            |        |            
+----------------------------------------------------------------------------------------------------------
+
+
+Derived Constraint Report
+Review Timing Report for more details on the following derived constraints.
+To create a Timing Report, run "trce -v 12 -fastpaths -o design_timing_report design.ncd design.pcf"
+or "Run Timing Analysis" from Timing Analyzer (timingan).
+Derived Constraints for TS_CORE_CLK
++-------------------------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+
+|                               |   Period    |       Actual Period       |      Timing Errors        |      Paths Analyzed       |
+|           Constraint          | Requirement |-------------+-------------|-------------+-------------|-------------+-------------|
+|                               |             |   Direct    | Derivative  |   Direct    | Derivative  |   Direct    | Derivative  |
++-------------------------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+
+|TS_CORE_CLK                    |     20.000ns|      8.000ns|     19.340ns|            0|            0|            0|       513828|
+| TS_SPARTAN6PLL_clkfx          |      9.091ns|      8.791ns|          N/A|            0|            0|       513828|            0|
++-------------------------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+
+
+All constraints were met.
+
+
+Generating Pad Report.
+
+All signals are completely routed.
+
+Total REAL time to PAR completion: 34 secs 
+Total CPU time to PAR completion: 34 secs 
+
+Peak Memory Usage:  421 MB
+
+Placer: Placement generated during map.
+Routing: Completed - No errors found.
+Timing: Completed - No errors found.
+
+Number of error messages: 0
+Number of warning messages: 1
+Number of info messages: 0
+
+Writing design to file MCL86jr.ncd
+
+
+
+PAR done!

@@ -1,0 +1,6 @@
+(fp_lib_table
+  (lib (name XC6SLX9-2TQG144C)(type KiCad)(uri Z:/Ted/projs/KiCAD_Library/XC6SLX9-2TQG144C)(options "")(descr ""))
+  (lib (name SIT8008BI-13-33E-33)(type KiCad)(uri Z:/Ted/projs/KiCAD_Library/SIT8008BI-13-33E-33.333330E)(options "")(descr ""))
+  (lib (name Xilinx_6_Series)(type KiCad)(uri Z:/Ted/projs/KiCAD_Library/Xilinx_6_Series)(options "")(descr ""))
+  (lib (name CY62148GN-45ZSXI)(type KiCad)(uri Z:/Ted/projs/KiCAD_Library/CY62148GN-45ZSXI)(options "")(descr ""))
+)

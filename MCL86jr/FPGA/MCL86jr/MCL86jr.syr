@@ -1,0 +1,944 @@
+Release 14.7 - xst P.20131013 (nt64)
+Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
+--> Parameter TMPDIR set to xst/projnav.tmp
+
+
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.09 secs
+ 
+--> Parameter xsthdpdir set to xst
+
+
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.09 secs
+ 
+--> Reading design: MCL86jr.prj
+
+TABLE OF CONTENTS
+  1) Synthesis Options Summary
+  2) HDL Parsing
+  3) HDL Elaboration
+  4) HDL Synthesis
+       4.1) HDL Synthesis Report
+  5) Advanced HDL Synthesis
+       5.1) Advanced HDL Synthesis Report
+  6) Low Level Synthesis
+  7) Partition Report
+  8) Design Summary
+       8.1) Primitive and Black Box Usage
+       8.2) Device utilization summary
+       8.3) Partition Resource Summary
+       8.4) Timing Report
+            8.4.1) Clock Information
+            8.4.2) Asynchronous Control Signals Information
+            8.4.3) Timing Summary
+            8.4.4) Timing Details
+            8.4.5) Cross Clock Domains Report
+
+
+=========================================================================
+*                      Synthesis Options Summary                        *
+=========================================================================
+---- Source Parameters
+Input File Name                    : "MCL86jr.prj"
+Ignore Synthesis Constraint File   : NO
+
+---- Target Parameters
+Output File Name                   : "MCL86jr"
+Output Format                      : NGC
+Target Device                      : xc6slx9-3-tqg144
+
+---- Source Options
+Top Module Name                    : MCL86jr
+Automatic FSM Extraction           : YES
+FSM Encoding Algorithm             : Auto
+Safe Implementation                : No
+FSM Style                          : LUT
+RAM Extraction                     : Yes
+RAM Style                          : Auto
+ROM Extraction                     : Yes
+Shift Register Extraction          : YES
+ROM Style                          : Auto
+Resource Sharing                   : YES
+Asynchronous To Synchronous        : NO
+Shift Register Minimum Size        : 2
+Use DSP Block                      : Auto
+Automatic Register Balancing       : No
+
+---- Target Options
+LUT Combining                      : Auto
+Reduce Control Sets                : Auto
+Add IO Buffers                     : YES
+Global Maximum Fanout              : 100000
+Add Generic Clock Buffer(BUFG)     : 16
+Register Duplication               : YES
+Optimize Instantiated Primitives   : NO
+Use Clock Enable                   : Auto
+Use Synchronous Set                : Auto
+Use Synchronous Reset              : Auto
+Pack IO Registers into IOBs        : Auto
+Equivalent register Removal        : YES
+
+---- General Options
+Optimization Goal                  : Speed
+Optimization Effort                : 1
+Power Reduction                    : NO
+Keep Hierarchy                     : No
+Netlist Hierarchy                  : As_Optimized
+RTL Output                         : Yes
+Global Optimization                : AllClockNets
+Read Cores                         : YES
+Write Timing Constraints           : NO
+Cross Clock Analysis               : NO
+Hierarchy Separator                : /
+Bus Delimiter                      : <>
+Case Specifier                     : Maintain
+Slice Utilization Ratio            : 100
+BRAM Utilization Ratio             : 100
+DSP48 Utilization Ratio            : 100
+Auto BRAM Packing                  : NO
+Slice Utilization Ratio Delta      : 5
+
+---- Other Options
+Cores Search Directories           : {"ipcore_dir"  }
+
+=========================================================================
+
+
+=========================================================================
+*                          HDL Parsing                                  *
+=========================================================================
+Analyzing Verilog file "C:\MCL\MCL86\MCL86jr\MCL86jr\ipcore_dir\EU4Kx32.v" into library work
+Parsing module <EU4Kx32>.
+Analyzing Verilog file "C:\MCL\MCL86\MCL86jr\MCL86jr\ipcore_dir\spartan6_pll.v" into library work
+Parsing module <spartan6_pll>.
+Analyzing Verilog file "C:\MCL\MCL86\MCL86jr\src4synth\eu.v" into library work
+Parsing module <mcl86_eu_core>.
+Analyzing Verilog file "C:\MCL\MCL86\MCL86jr\src4synth\biu_min.v" into library work
+Parsing module <biu_min>.
+Analyzing Verilog file "C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" into library work
+Parsing module <MCL86jr>.
+
+=========================================================================
+*                            HDL Elaboration                            *
+=========================================================================
+
+Elaborating module <MCL86jr>.
+
+Elaborating module <spartan6_pll>.
+
+Elaborating module <IBUFG>.
+
+Elaborating module <DCM_SP(CLKDV_DIVIDE=2.0,CLKFX_DIVIDE=5,CLKFX_MULTIPLY=11,CLKIN_DIVIDE_BY_2="FALSE",CLKIN_PERIOD=20.0,CLKOUT_PHASE_SHIFT="NONE",CLK_FEEDBACK="NONE",DESKEW_ADJUST="SYSTEM_SYNCHRONOUS",PHASE_SHIFT=0,STARTUP_WAIT="FALSE")>.
+WARNING:HDLCompiler:1127 - "C:\MCL\MCL86\MCL86jr\MCL86jr\ipcore_dir\spartan6_pll.v" Line 111: Assignment to clk0 ignored, since the identifier is never used
+WARNING:HDLCompiler:1127 - "C:\MCL\MCL86\MCL86jr\MCL86jr\ipcore_dir\spartan6_pll.v" Line 126: Assignment to locked_int ignored, since the identifier is never used
+WARNING:HDLCompiler:1127 - "C:\MCL\MCL86\MCL86jr\MCL86jr\ipcore_dir\spartan6_pll.v" Line 127: Assignment to status_int ignored, since the identifier is never used
+
+Elaborating module <BUFG>.
+WARNING:HDLCompiler:413 - "C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" Line 182: Result of 32-bit expression is truncated to fit in 1-bit target.
+WARNING:HDLCompiler:413 - "C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" Line 183: Result of 32-bit expression is truncated to fit in 1-bit target.
+WARNING:HDLCompiler:413 - "C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" Line 184: Result of 32-bit expression is truncated to fit in 1-bit target.
+WARNING:HDLCompiler:413 - "C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" Line 185: Result of 32-bit expression is truncated to fit in 1-bit target.
+WARNING:HDLCompiler:413 - "C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" Line 186: Result of 32-bit expression is truncated to fit in 1-bit target.
+WARNING:HDLCompiler:413 - "C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" Line 187: Result of 32-bit expression is truncated to fit in 1-bit target.
+WARNING:HDLCompiler:413 - "C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" Line 188: Result of 32-bit expression is truncated to fit in 1-bit target.
+WARNING:HDLCompiler:413 - "C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" Line 189: Result of 32-bit expression is truncated to fit in 1-bit target.
+WARNING:HDLCompiler:1127 - "C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" Line 213: Assignment to t_eu_flag_i_d ignored, since the identifier is never used
+
+Elaborating module <biu_min>.
+WARNING:HDLCompiler:1127 - "C:\MCL\MCL86\MCL86jr\src4synth\biu_min.v" Line 231: Assignment to eu_qs_out ignored, since the identifier is never used
+WARNING:HDLCompiler:413 - "C:\MCL\MCL86\MCL86jr\src4synth\biu_min.v" Line 477: Result of 32-bit expression is truncated to fit in 13-bit target.
+WARNING:HDLCompiler:413 - "C:\MCL\MCL86\MCL86jr\src4synth\biu_min.v" Line 493: Result of 17-bit expression is truncated to fit in 16-bit target.
+WARNING:HDLCompiler:413 - "C:\MCL\MCL86\MCL86jr\src4synth\biu_min.v" Line 503: Result of 17-bit expression is truncated to fit in 16-bit target.
+WARNING:HDLCompiler:413 - "C:\MCL\MCL86\MCL86jr\src4synth\biu_min.v" Line 835: Result of 17-bit expression is truncated to fit in 16-bit target.
+WARNING:HDLCompiler:1127 - "C:\MCL\MCL86\MCL86jr\src4synth\biu_min.v" Line 276: Assignment to ready_d3 ignored, since the identifier is never used
+
+Elaborating module <mcl86_eu_core>.
+
+Elaborating module <EU4Kx32>.
+WARNING:HDLCompiler:1499 - "C:\MCL\MCL86\MCL86jr\MCL86jr\ipcore_dir\EU4Kx32.v" Line 39: Empty module <EU4Kx32> remains a black box.
+WARNING:HDLCompiler:1127 - "C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 264: Assignment to eu_prefix_repnz ignored, since the identifier is never used
+WARNING:HDLCompiler:1127 - "C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 265: Assignment to eu_prefix_rep ignored, since the identifier is never used
+WARNING:HDLCompiler:1127 - "C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 268: Assignment to eu_flag_o ignored, since the identifier is never used
+WARNING:HDLCompiler:1127 - "C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 269: Assignment to eu_flag_d ignored, since the identifier is never used
+WARNING:HDLCompiler:1127 - "C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 272: Assignment to eu_flag_s ignored, since the identifier is never used
+WARNING:HDLCompiler:1127 - "C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 273: Assignment to eu_flag_z ignored, since the identifier is never used
+WARNING:HDLCompiler:1127 - "C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 275: Assignment to eu_flag_a ignored, since the identifier is never used
+WARNING:HDLCompiler:1127 - "C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 276: Assignment to eu_nmi_pending ignored, since the identifier is never used
+WARNING:HDLCompiler:1127 - "C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 277: Assignment to eu_flag_p ignored, since the identifier is never used
+WARNING:HDLCompiler:1127 - "C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 278: Assignment to eu_flag_temp ignored, since the identifier is never used
+WARNING:HDLCompiler:1127 - "C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 279: Assignment to eu_flag_c ignored, since the identifier is never used
+WARNING:HDLCompiler:413 - "C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 298: Result of 20-bit expression is truncated to fit in 16-bit target.
+WARNING:HDLCompiler:1127 - "C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 338: Assignment to biu_done_d2 ignored, since the identifier is never used
+WARNING:HDLCompiler:634 - "C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 147: Net <system_signals[15]> does not have a driver.
+
+=========================================================================
+*                           HDL Synthesis                               *
+=========================================================================
+
+Synthesizing Unit <MCL86jr>.
+    Related source file is "C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v".
+INFO:Xst:3210 - "C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" line 269: Output port <BIU_SEGMENT> of the instance <BIU_CORE> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" line 322: Output port <EU_FLAG_I> of the instance <EU_CORE> is unconnected or connected to loadless signal.
+    Found 1-bit register for signal <t_biu_ad_oe_d2>.
+    Found 20-bit register for signal <t_biu_ad_out_d>.
+    Found 1-bit register for signal <t_reset_d1>.
+    Found 1-bit register for signal <t_reset_d2>.
+    Found 1-bit register for signal <t_reset_d3>.
+    Found 1-bit register for signal <t_reset_d4>.
+    Found 8-bit register for signal <led_int>.
+    Found 27-bit register for signal <prescaler>.
+    Found 1-bit register for signal <prescaler_d>.
+    Found 1-bit register for signal <led_go_left>.
+    Found 1-bit register for signal <t_biu_ad_oe_d1>.
+    Found 27-bit adder for signal <prescaler[26]_GND_1_o_add_24_OUT> created at line 241.
+    Found 1-bit tristate buffer for signal <AD7> created at line 182
+    Found 1-bit tristate buffer for signal <AD6> created at line 183
+    Found 1-bit tristate buffer for signal <AD5> created at line 184
+    Found 1-bit tristate buffer for signal <AD4> created at line 185
+    Found 1-bit tristate buffer for signal <AD3> created at line 186
+    Found 1-bit tristate buffer for signal <AD2> created at line 187
+    Found 1-bit tristate buffer for signal <AD1> created at line 188
+    Found 1-bit tristate buffer for signal <AD0> created at line 189
+    Found 1-bit tristate buffer for signal <SRAM_D<7>> created at line 199
+    Found 1-bit tristate buffer for signal <SRAM_D<6>> created at line 199
+    Found 1-bit tristate buffer for signal <SRAM_D<5>> created at line 199
+    Found 1-bit tristate buffer for signal <SRAM_D<4>> created at line 199
+    Found 1-bit tristate buffer for signal <SRAM_D<3>> created at line 199
+    Found 1-bit tristate buffer for signal <SRAM_D<2>> created at line 199
+    Found 1-bit tristate buffer for signal <SRAM_D<1>> created at line 199
+    Found 1-bit tristate buffer for signal <SRAM_D<0>> created at line 199
+    Summary:
+	inferred   1 Adder/Subtractor(s).
+	inferred  63 D-type flip-flop(s).
+	inferred   1 Multiplexer(s).
+	inferred  16 Tristate(s).
+Unit <MCL86jr> synthesized.
+
+Synthesizing Unit <spartan6_pll>.
+    Related source file is "C:\MCL\MCL86\MCL86jr\MCL86jr\ipcore_dir\spartan6_pll.v".
+    Summary:
+	no macro.
+Unit <spartan6_pll> synthesized.
+
+Synthesizing Unit <biu_min>.
+    Related source file is "C:\MCL\MCL86\MCL86jr\src4synth\biu_min.v".
+WARNING:Xst:647 - Input <EU_BIU_COMMAND<3:2>> is never used. This port will be preserved and left unconnected if it belongs to a top-level block or it belongs to a sub-block and the hierarchy of this sub-block is preserved.
+WARNING:Xst:647 - Input <EU_BIU_COMMAND<15:15>> is never used. This port will be preserved and left unconnected if it belongs to a top-level block or it belongs to a sub-block and the hierarchy of this sub-block is preserved.
+WARNING:Xst:647 - Input <EU_PREFIX_LOCK> is never used. This port will be preserved and left unconnected if it belongs to a top-level block or it belongs to a sub-block and the hierarchy of this sub-block is preserved.
+    Found 1-bit register for signal <clk_d2>.
+    Found 1-bit register for signal <clk_d3>.
+    Found 1-bit register for signal <clk_d4>.
+    Found 1-bit register for signal <nmi_d1>.
+    Found 1-bit register for signal <nmi_d2>.
+    Found 1-bit register for signal <nmi_d3>.
+    Found 1-bit register for signal <nmi_d4>.
+    Found 1-bit register for signal <nmi_d5>.
+    Found 1-bit register for signal <nmi_caught>.
+    Found 16-bit register for signal <eu_register_r3_d>.
+    Found 1-bit register for signal <eu_biu_req_caught>.
+    Found 16-bit register for signal <biu_register_cs>.
+    Found 16-bit register for signal <biu_register_es>.
+    Found 16-bit register for signal <biu_register_ss>.
+    Found 16-bit register for signal <biu_register_ds>.
+    Found 16-bit register for signal <biu_register_rm>.
+    Found 16-bit register for signal <biu_register_reg>.
+    Found 13-bit register for signal <clock_cycle_counter>.
+    Found 16-bit register for signal <pfq_addr_out>.
+    Found 8-bit register for signal <pfq_entry0>.
+    Found 8-bit register for signal <pfq_entry1>.
+    Found 8-bit register for signal <pfq_entry2>.
+    Found 8-bit register for signal <pfq_entry3>.
+    Found 8-bit register for signal <biu_state>.
+    Found 1-bit register for signal <pfq_write>.
+    Found 16-bit register for signal <pfq_addr_in>.
+    Found 1-bit register for signal <biu_return_data_int<15>>.
+    Found 1-bit register for signal <biu_return_data_int<14>>.
+    Found 1-bit register for signal <biu_return_data_int<13>>.
+    Found 1-bit register for signal <biu_return_data_int<12>>.
+    Found 1-bit register for signal <biu_return_data_int<11>>.
+    Found 1-bit register for signal <biu_return_data_int<10>>.
+    Found 1-bit register for signal <biu_return_data_int<9>>.
+    Found 1-bit register for signal <biu_return_data_int<8>>.
+    Found 1-bit register for signal <biu_return_data_int<7>>.
+    Found 1-bit register for signal <biu_return_data_int<6>>.
+    Found 1-bit register for signal <biu_return_data_int<5>>.
+    Found 1-bit register for signal <biu_return_data_int<4>>.
+    Found 1-bit register for signal <biu_return_data_int<3>>.
+    Found 1-bit register for signal <biu_return_data_int<2>>.
+    Found 1-bit register for signal <biu_return_data_int<1>>.
+    Found 1-bit register for signal <biu_return_data_int<0>>.
+    Found 1-bit register for signal <biu_done_int>.
+    Found 1-bit register for signal <ready_d1>.
+    Found 1-bit register for signal <eu_biu_req_d1>.
+    Found 8-bit register for signal <latched_data_in>.
+    Found 1-bit register for signal <addr_out_temp<19>>.
+    Found 1-bit register for signal <addr_out_temp<18>>.
+    Found 1-bit register for signal <addr_out_temp<17>>.
+    Found 1-bit register for signal <addr_out_temp<16>>.
+    Found 1-bit register for signal <addr_out_temp<15>>.
+    Found 1-bit register for signal <addr_out_temp<14>>.
+    Found 1-bit register for signal <addr_out_temp<13>>.
+    Found 1-bit register for signal <addr_out_temp<12>>.
+    Found 1-bit register for signal <addr_out_temp<11>>.
+    Found 1-bit register for signal <addr_out_temp<10>>.
+    Found 1-bit register for signal <addr_out_temp<9>>.
+    Found 1-bit register for signal <addr_out_temp<8>>.
+    Found 1-bit register for signal <addr_out_temp<7>>.
+    Found 1-bit register for signal <addr_out_temp<6>>.
+    Found 1-bit register for signal <addr_out_temp<5>>.
+    Found 1-bit register for signal <addr_out_temp<4>>.
+    Found 1-bit register for signal <addr_out_temp<3>>.
+    Found 1-bit register for signal <addr_out_temp<2>>.
+    Found 1-bit register for signal <addr_out_temp<1>>.
+    Found 1-bit register for signal <addr_out_temp<0>>.
+    Found 3-bit register for signal <s_bits>.
+    Found 1-bit register for signal <AD_OUT<19>>.
+    Found 1-bit register for signal <AD_OUT<18>>.
+    Found 1-bit register for signal <AD_OUT<17>>.
+    Found 1-bit register for signal <AD_OUT<16>>.
+    Found 1-bit register for signal <AD_OUT<15>>.
+    Found 1-bit register for signal <AD_OUT<14>>.
+    Found 1-bit register for signal <AD_OUT<13>>.
+    Found 1-bit register for signal <AD_OUT<12>>.
+    Found 1-bit register for signal <AD_OUT<11>>.
+    Found 1-bit register for signal <AD_OUT<10>>.
+    Found 1-bit register for signal <AD_OUT<9>>.
+    Found 1-bit register for signal <AD_OUT<8>>.
+    Found 1-bit register for signal <AD_OUT<7>>.
+    Found 1-bit register for signal <AD_OUT<6>>.
+    Found 1-bit register for signal <AD_OUT<5>>.
+    Found 1-bit register for signal <AD_OUT<4>>.
+    Found 1-bit register for signal <AD_OUT<3>>.
+    Found 1-bit register for signal <AD_OUT<2>>.
+    Found 1-bit register for signal <AD_OUT<1>>.
+    Found 1-bit register for signal <AD_OUT<0>>.
+    Found 1-bit register for signal <word_cycle>.
+    Found 1-bit register for signal <byte_num>.
+    Found 8-bit register for signal <ad_in_int>.
+    Found 1-bit register for signal <BIU_INTR>.
+    Found 1-bit register for signal <intr_d1>.
+    Found 1-bit register for signal <intr_d2>.
+    Found 1-bit register for signal <intr_d3>.
+    Found 1-bit register for signal <AD_OE>.
+    Found 1-bit register for signal <RD_n>.
+    Found 1-bit register for signal <WR_n>.
+    Found 1-bit register for signal <IOM>.
+    Found 1-bit register for signal <DTR>.
+    Found 1-bit register for signal <DEN>.
+    Found 1-bit register for signal <INTA_n>.
+    Found 1-bit register for signal <inta_n_int>.
+    Found 1-bit register for signal <ale_int>.
+    Found 1-bit register for signal <rd_n_int>.
+    Found 1-bit register for signal <wr_n_int>.
+    Found 1-bit register for signal <iom_int>.
+    Found 1-bit register for signal <dtr_int>.
+    Found 1-bit register for signal <den_int>.
+    Found 1-bit register for signal <SRAM_OE_n>.
+    Found 1-bit register for signal <SRAM_WE_n>.
+    Found 1-bit register for signal <SRAM_D_OE>.
+    Found 16-bit register for signal <biu_register_es_d1>.
+    Found 16-bit register for signal <biu_register_ss_d1>.
+    Found 16-bit register for signal <biu_register_cs_d1>.
+    Found 16-bit register for signal <biu_register_ds_d1>.
+    Found 16-bit register for signal <biu_register_rm_d1>.
+    Found 16-bit register for signal <biu_register_reg_d1>.
+    Found 16-bit register for signal <biu_register_es_d2>.
+    Found 16-bit register for signal <biu_register_ss_d2>.
+    Found 16-bit register for signal <biu_register_cs_d2>.
+    Found 16-bit register for signal <biu_register_ds_d2>.
+    Found 16-bit register for signal <biu_register_rm_d2>.
+    Found 16-bit register for signal <biu_register_reg_d2>.
+    Found 8-bit register for signal <pfq_top_byte_int_d1>.
+    Found 16-bit register for signal <pfq_addr_out_d1>.
+    Found 16-bit register for signal <biu_return_data_int_d1>.
+    Found 16-bit register for signal <biu_return_data_int_d2>.
+    Found 26-bit register for signal <nmi_counter>.
+    Found 1-bit register for signal <ALE>.
+    Found 1-bit register for signal <sram_select>.
+    Found 8-bit register for signal <mcl6_feature>.
+    Found 1-bit register for signal <SRAM_A<18>>.
+    Found 1-bit register for signal <SRAM_A<17>>.
+    Found 1-bit register for signal <SRAM_A<16>>.
+    Found 1-bit register for signal <SRAM_A<15>>.
+    Found 1-bit register for signal <SRAM_A<14>>.
+    Found 1-bit register for signal <SRAM_A<13>>.
+    Found 1-bit register for signal <SRAM_A<12>>.
+    Found 1-bit register for signal <SRAM_A<11>>.
+    Found 1-bit register for signal <SRAM_A<10>>.
+    Found 1-bit register for signal <SRAM_A<9>>.
+    Found 1-bit register for signal <SRAM_A<8>>.
+    Found 1-bit register for signal <SRAM_A<7>>.
+    Found 1-bit register for signal <SRAM_A<6>>.
+    Found 1-bit register for signal <SRAM_A<5>>.
+    Found 1-bit register for signal <SRAM_A<4>>.
+    Found 1-bit register for signal <SRAM_A<3>>.
+    Found 1-bit register for signal <SRAM_A<2>>.
+    Found 1-bit register for signal <SRAM_A<1>>.
+    Found 1-bit register for signal <SRAM_A<0>>.
+    Found 8-bit register for signal <SRAM_D_OUT>.
+    Found 1-bit register for signal <clk_d1>.
+    Found 26-bit adder for signal <nmi_counter[25]_GND_22_o_add_44_OUT> created at line 402.
+    Found 16-bit adder for signal <pfq_addr_out[15]_GND_22_o_add_79_OUT> created at line 493.
+    Found 16-bit adder for signal <pfq_addr_in[15]_GND_22_o_add_85_OUT> created at line 503.
+    Found 8-bit adder for signal <biu_state[7]_GND_22_o_add_97_OUT> created at line 523.
+    Found 20-bit adder for signal <biu_register_cs[15]_GND_22_o_add_99_OUT> created at line 579.
+    Found 20-bit adder for signal <biu_muxed_segment[15]_GND_22_o_add_100_OUT> created at line 586.
+    Found 20-bit adder for signal <biu_register_ss[15]_GND_22_o_add_102_OUT> created at line 601.
+    Found 20-bit adder for signal <biu_register_cs[15]_GND_22_o_add_128_OUT> created at line 651.
+    Found 16-bit adder for signal <addr_out_temp[15]_GND_22_o_add_186_OUT> created at line 875.
+    Found 13-bit subtractor for signal <GND_22_o_GND_22_o_sub_73_OUT<12:0>> created at line 477.
+    Found 16-bit 4-to-1 multiplexer for signal <biu_muxed_segment> created at line 189.
+    Found 8-bit 4-to-1 multiplexer for signal <pfq_top_byte_int> created at line 196.
+    Found 1-bit comparator equal for signal <n0033> created at line 255
+    Found 2-bit comparator equal for signal <pfq_addr_in[1]_pfq_addr_out[1]_equal_33_o> created at line 256
+    Found 4-bit comparator greater for signal <GND_22_o_addr_out_temp[19]_LessThan_140_o> created at line 671
+    Found 4-bit comparator greater for signal <addr_out_temp[19]_PWR_6_o_LessThan_141_o> created at line 671
+    Summary:
+	inferred  10 Adder/Subtractor(s).
+	inferred 621 D-type flip-flop(s).
+	inferred   4 Comparator(s).
+	inferred 101 Multiplexer(s).
+Unit <biu_min> synthesized.
+
+Synthesizing Unit <mcl86_eu_core>.
+    Related source file is "C:\MCL\MCL86\MCL86jr\src4synth\eu.v".
+WARNING:Xst:653 - Signal <system_signals<15:14>> is used but never assigned. This sourceless signal will be automatically connected to value GND.
+WARNING:Xst:653 - Signal <system_signals<10>> is used but never assigned. This sourceless signal will be automatically connected to value GND.
+    Found 1-bit register for signal <eu_biu_req_d1>.
+    Found 1-bit register for signal <biu_done_caught>.
+    Found 1-bit register for signal <eu_flag_t_d>.
+    Found 1-bit register for signal <eu_tr_latched>.
+    Found 1-bit register for signal <eu_add_carry>.
+    Found 1-bit register for signal <eu_add_carry8>.
+    Found 1-bit register for signal <eu_add_aux_carry>.
+    Found 1-bit register for signal <eu_add_overflow16>.
+    Found 1-bit register for signal <eu_add_overflow8>.
+    Found 16-bit register for signal <eu_alu_last_result>.
+    Found 16-bit register for signal <eu_register_ax>.
+    Found 16-bit register for signal <eu_register_bx>.
+    Found 16-bit register for signal <eu_register_cx>.
+    Found 16-bit register for signal <eu_register_dx>.
+    Found 16-bit register for signal <eu_register_sp>.
+    Found 16-bit register for signal <eu_register_bp>.
+    Found 16-bit register for signal <eu_register_si>.
+    Found 16-bit register for signal <eu_register_di>.
+    Found 16-bit register for signal <eu_flags>.
+    Found 16-bit register for signal <eu_register_r0>.
+    Found 16-bit register for signal <eu_register_r1>.
+    Found 16-bit register for signal <eu_register_r2>.
+    Found 16-bit register for signal <eu_register_r3>.
+    Found 16-bit register for signal <eu_biu_command>.
+    Found 16-bit register for signal <eu_biu_dataout>.
+    Found 1-bit register for signal <eu_stall_pipeline>.
+    Found 13-bit register for signal <eu_rom_address>.
+    Found 52-bit register for signal <eu_calling_address>.
+    Found 1-bit register for signal <intr_enable_delayed>.
+    Found 1-bit register for signal <biu_done_d1>.
+    Found 13-bit adder for signal <eu_rom_address[12]_GND_23_o_add_186_OUT> created at line 483.
+    Found 16-bit 16-to-1 multiplexer for signal <eu_operand0> created at line 155.
+    Found 16-bit 16-to-1 multiplexer for signal <eu_operand1> created at line 156.
+    Found 20-bit 7-to-1 multiplexer for signal <n0455> created at line 298.
+    Summary:
+	inferred   1 Adder/Subtractor(s).
+	inferred 333 D-type flip-flop(s).
+	inferred  54 Multiplexer(s).
+Unit <mcl86_eu_core> synthesized.
+
+=========================================================================
+HDL Synthesis Report
+
+Macro Statistics
+# Adders/Subtractors                                   : 12
+ 13-bit adder                                          : 1
+ 13-bit subtractor                                     : 1
+ 16-bit adder                                          : 3
+ 20-bit adder                                          : 4
+ 26-bit adder                                          : 1
+ 27-bit adder                                          : 1
+ 8-bit adder                                           : 1
+# Registers                                            : 129
+ 1-bit register                                        : 68
+ 13-bit register                                       : 2
+ 16-bit register                                       : 41
+ 19-bit register                                       : 1
+ 20-bit register                                       : 3
+ 26-bit register                                       : 1
+ 27-bit register                                       : 1
+ 3-bit register                                        : 1
+ 52-bit register                                       : 1
+ 8-bit register                                        : 10
+# Comparators                                          : 4
+ 1-bit comparator equal                                : 1
+ 2-bit comparator equal                                : 1
+ 4-bit comparator greater                              : 2
+# Multiplexers                                         : 156
+ 1-bit 2-to-1 multiplexer                              : 118
+ 13-bit 2-to-1 multiplexer                             : 9
+ 16-bit 16-to-1 multiplexer                            : 2
+ 16-bit 2-to-1 multiplexer                             : 3
+ 16-bit 4-to-1 multiplexer                             : 1
+ 2-bit 2-to-1 multiplexer                              : 1
+ 20-bit 2-to-1 multiplexer                             : 3
+ 20-bit 7-to-1 multiplexer                             : 1
+ 26-bit 2-to-1 multiplexer                             : 1
+ 3-bit 2-to-1 multiplexer                              : 1
+ 52-bit 2-to-1 multiplexer                             : 1
+ 8-bit 2-to-1 multiplexer                              : 14
+ 8-bit 4-to-1 multiplexer                              : 1
+# Tristates                                            : 16
+ 1-bit tristate buffer                                 : 16
+# Xors                                                 : 20
+ 1-bit xor2                                            : 2
+ 1-bit xor3                                            : 16
+ 1-bit xor8                                            : 1
+ 16-bit xor2                                           : 1
+
+=========================================================================
+
+=========================================================================
+*                       Advanced HDL Synthesis                          *
+=========================================================================
+
+Reading core <ipcore_dir/EU4Kx32.ngc>.
+Loading core <EU4Kx32> for timing and area information for instance <EU4Kx32_i>.
+WARNING:Xst:2677 - Node <mcl6_feature_2> of sequential type is unconnected in block <BIU_CORE>.
+WARNING:Xst:2677 - Node <mcl6_feature_3> of sequential type is unconnected in block <BIU_CORE>.
+WARNING:Xst:2677 - Node <mcl6_feature_4> of sequential type is unconnected in block <BIU_CORE>.
+WARNING:Xst:2677 - Node <mcl6_feature_5> of sequential type is unconnected in block <BIU_CORE>.
+WARNING:Xst:2677 - Node <mcl6_feature_6> of sequential type is unconnected in block <BIU_CORE>.
+WARNING:Xst:2677 - Node <mcl6_feature_7> of sequential type is unconnected in block <BIU_CORE>.
+
+Synthesizing (advanced) Unit <MCL86jr>.
+The following registers are absorbed into counter <prescaler>: 1 register on signal <prescaler>.
+Unit <MCL86jr> synthesized (advanced).
+
+Synthesizing (advanced) Unit <biu_min>.
+The following registers are absorbed into counter <clock_cycle_counter>: 1 register on signal <clock_cycle_counter>.
+The following registers are absorbed into counter <pfq_addr_out>: 1 register on signal <pfq_addr_out>.
+The following registers are absorbed into counter <nmi_counter>: 1 register on signal <nmi_counter>.
+The following registers are absorbed into counter <pfq_addr_in>: 1 register on signal <pfq_addr_in>.
+Unit <biu_min> synthesized (advanced).
+WARNING:Xst:2677 - Node <mcl6_feature_2> of sequential type is unconnected in block <biu_min>.
+WARNING:Xst:2677 - Node <mcl6_feature_3> of sequential type is unconnected in block <biu_min>.
+WARNING:Xst:2677 - Node <mcl6_feature_4> of sequential type is unconnected in block <biu_min>.
+WARNING:Xst:2677 - Node <mcl6_feature_5> of sequential type is unconnected in block <biu_min>.
+WARNING:Xst:2677 - Node <mcl6_feature_6> of sequential type is unconnected in block <biu_min>.
+WARNING:Xst:2677 - Node <mcl6_feature_7> of sequential type is unconnected in block <biu_min>.
+
+=========================================================================
+Advanced HDL Synthesis Report
+
+Macro Statistics
+# Adders/Subtractors                                   : 7
+ 13-bit adder                                          : 1
+ 16-bit adder                                          : 1
+ 20-bit adder                                          : 4
+ 8-bit adder                                           : 1
+# Counters                                             : 5
+ 13-bit down counter                                   : 1
+ 16-bit up counter                                     : 2
+ 26-bit up counter                                     : 1
+ 27-bit up counter                                     : 1
+# Registers                                            : 913
+ Flip-Flops                                            : 913
+# Comparators                                          : 4
+ 1-bit comparator equal                                : 1
+ 2-bit comparator equal                                : 1
+ 4-bit comparator greater                              : 2
+# Multiplexers                                         : 209
+ 1-bit 16-to-1 multiplexer                             : 32
+ 1-bit 2-to-1 multiplexer                              : 131
+ 1-bit 4-to-1 multiplexer                              : 16
+ 13-bit 2-to-1 multiplexer                             : 7
+ 16-bit 2-to-1 multiplexer                             : 1
+ 2-bit 2-to-1 multiplexer                              : 1
+ 20-bit 2-to-1 multiplexer                             : 3
+ 20-bit 7-to-1 multiplexer                             : 1
+ 3-bit 2-to-1 multiplexer                              : 1
+ 52-bit 2-to-1 multiplexer                             : 1
+ 8-bit 2-to-1 multiplexer                              : 14
+ 8-bit 4-to-1 multiplexer                              : 1
+# Xors                                                 : 20
+ 1-bit xor2                                            : 2
+ 1-bit xor3                                            : 16
+ 1-bit xor8                                            : 1
+ 16-bit xor2                                           : 1
+
+=========================================================================
+
+=========================================================================
+*                         Low Level Synthesis                           *
+=========================================================================
+WARNING:Xst:2677 - Node <prescaler_22> of sequential type is unconnected in block <MCL86jr>.
+WARNING:Xst:2677 - Node <prescaler_23> of sequential type is unconnected in block <MCL86jr>.
+WARNING:Xst:2677 - Node <prescaler_24> of sequential type is unconnected in block <MCL86jr>.
+WARNING:Xst:2677 - Node <prescaler_25> of sequential type is unconnected in block <MCL86jr>.
+WARNING:Xst:2677 - Node <prescaler_26> of sequential type is unconnected in block <MCL86jr>.
+
+Optimizing unit <MCL86jr> ...
+
+Optimizing unit <biu_min> ...
+
+Optimizing unit <mcl86_eu_core> ...
+INFO:Xst:2261 - The FF/Latch <BIU_CORE/eu_biu_req_d1> in Unit <MCL86jr> is equivalent to the following FF/Latch, which will be removed : <EU_CORE/eu_biu_req_d1> 
+
+Mapping all equations...
+Building and optimizing final netlist ...
+Found area constraint ratio of 100 (+ 5) on block MCL86jr, actual ratio is 32.
+
+Final Macro Processing ...
+
+Processing Unit <MCL86jr> :
+	Found 2-bit shift register for signal <t_biu_ad_oe_d2>.
+	Found 2-bit shift register for signal <t_reset_d2>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_return_data_int_d2_15>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_return_data_int_d2_14>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_return_data_int_d2_13>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_return_data_int_d2_12>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_return_data_int_d2_11>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_return_data_int_d2_10>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_return_data_int_d2_9>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_return_data_int_d2_8>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_return_data_int_d2_7>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_return_data_int_d2_6>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_return_data_int_d2_5>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_return_data_int_d2_4>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_return_data_int_d2_3>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_return_data_int_d2_2>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_return_data_int_d2_1>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_return_data_int_d2_0>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_rm_d2_15>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_rm_d2_14>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_rm_d2_13>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_rm_d2_12>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_rm_d2_11>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_rm_d2_10>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_rm_d2_9>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_rm_d2_8>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_rm_d2_7>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_rm_d2_6>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_rm_d2_5>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_rm_d2_4>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_rm_d2_3>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_rm_d2_2>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_rm_d2_1>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_rm_d2_0>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ds_d2_15>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ds_d2_14>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ds_d2_13>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ds_d2_12>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ds_d2_11>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ds_d2_10>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ds_d2_9>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ds_d2_8>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ds_d2_7>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ds_d2_6>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ds_d2_5>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ds_d2_4>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ds_d2_3>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ds_d2_2>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ds_d2_1>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ds_d2_0>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_reg_d2_15>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_reg_d2_14>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_reg_d2_13>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_reg_d2_12>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_reg_d2_11>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_reg_d2_10>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_reg_d2_9>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_reg_d2_8>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_reg_d2_7>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_reg_d2_6>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_reg_d2_5>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_reg_d2_4>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_reg_d2_3>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_reg_d2_2>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_reg_d2_1>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_reg_d2_0>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ss_d2_15>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ss_d2_14>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ss_d2_13>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ss_d2_12>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ss_d2_11>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ss_d2_10>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ss_d2_9>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ss_d2_8>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ss_d2_7>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ss_d2_6>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ss_d2_5>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ss_d2_4>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ss_d2_3>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ss_d2_2>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ss_d2_1>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_ss_d2_0>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_es_d2_15>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_es_d2_14>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_es_d2_13>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_es_d2_12>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_es_d2_11>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_es_d2_10>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_es_d2_9>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_es_d2_8>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_es_d2_7>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_es_d2_6>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_es_d2_5>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_es_d2_4>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_es_d2_3>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_es_d2_2>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_es_d2_1>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_es_d2_0>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_cs_d2_15>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_cs_d2_14>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_cs_d2_13>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_cs_d2_12>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_cs_d2_11>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_cs_d2_10>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_cs_d2_9>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_cs_d2_8>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_cs_d2_7>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_cs_d2_6>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_cs_d2_5>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_cs_d2_4>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_cs_d2_3>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_cs_d2_2>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_cs_d2_1>.
+	Found 2-bit shift register for signal <BIU_CORE/biu_register_cs_d2_0>.
+Unit <MCL86jr> processed.
+
+=========================================================================
+Final Register Report
+
+Macro Statistics
+# Registers                                            : 777
+ Flip-Flops                                            : 777
+# Shift Registers                                      : 114
+ 2-bit shift register                                  : 114
+
+=========================================================================
+
+=========================================================================
+*                           Partition Report                            *
+=========================================================================
+
+Partition Implementation Status
+-------------------------------
+
+  No Partitions were found in this design.
+
+-------------------------------
+
+=========================================================================
+*                            Design Summary                             *
+=========================================================================
+
+Top Level Output File Name         : MCL86jr.ngc
+
+Primitive and Black Box Usage:
+------------------------------
+# BELS                             : 1407
+#      GND                         : 2
+#      INV                         : 15
+#      LUT1                        : 60
+#      LUT2                        : 87
+#      LUT3                        : 116
+#      LUT4                        : 73
+#      LUT5                        : 223
+#      LUT6                        : 384
+#      MUXCY                       : 175
+#      MUXF7                       : 59
+#      MUXF8                       : 25
+#      VCC                         : 2
+#      XORCY                       : 186
+# FlipFlops/Latches                : 892
+#      FD                          : 48
+#      FDE                         : 183
+#      FDR                         : 125
+#      FDRE                        : 503
+#      FDS                         : 13
+#      FDSE                        : 20
+# RAMS                             : 8
+#      RAMB16BWER                  : 7
+#      RAMB8BWER                   : 1
+# Shift Registers                  : 114
+#      SRLC16E                     : 114
+# Clock Buffers                    : 1
+#      BUFG                        : 1
+# IO Buffers                       : 75
+#      IBUF                        : 5
+#      IBUFG                       : 1
+#      IOBUF                       : 16
+#      OBUF                        : 53
+# DCMs                             : 1
+#      DCM_SP                      : 1
+
+Device utilization summary:
+---------------------------
+
+Selected Device : 6slx9tqg144-3 
+
+
+Slice Logic Utilization: 
+ Number of Slice Registers:             892  out of  11440     7%  
+ Number of Slice LUTs:                 1072  out of   5720    18%  
+    Number used as Logic:               958  out of   5720    16%  
+    Number used as Memory:              114  out of   1440     7%  
+       Number used as SRL:              114
+
+Slice Logic Distribution: 
+ Number of LUT Flip Flop pairs used:   1452
+   Number with an unused Flip Flop:     560  out of   1452    38%  
+   Number with an unused LUT:           380  out of   1452    26%  
+   Number of fully used LUT-FF pairs:   512  out of   1452    35%  
+   Number of unique control sets:        41
+
+IO Utilization: 
+ Number of IOs:                          75
+ Number of bonded IOBs:                  75  out of    102    73%  
+
+Specific Feature Utilization:
+ Number of Block RAM/FIFO:                8  out of     32    25%  
+    Number using Block RAM only:          8
+ Number of BUFG/BUFGCTRLs:                1  out of     16     6%  
+
+---------------------------
+Partition Resource Summary:
+---------------------------
+
+  No Partitions were found in this design.
+
+---------------------------
+
+
+=========================================================================
+Timing Report
+
+NOTE: THESE TIMING NUMBERS ARE ONLY A SYNTHESIS ESTIMATE.
+      FOR ACCURATE TIMING INFORMATION PLEASE REFER TO THE TRACE REPORT
+      GENERATED AFTER PLACE-and-ROUTE.
+
+Clock Information:
+------------------
+-----------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+-------+
+Clock Signal                       | Clock buffer(FF name)                                                                                                                      | Load  |
+-----------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+-------+
+CORE_CLK                           | DCM_SP:CLKFX                                                                                                                               | 1014  |
+EU_CORE/EU4Kx32_i/N1               | NONE(EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[7].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram)| 8     |
+-----------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+-------+
+INFO:Xst:2169 - HDL ADVISOR - Some clock signals were not automatically buffered by XST with BUFG/BUFR resources. Please use the buffer_type constraint in order to insert these buffers to the clock signals to help prevent skew problems.
+
+Asynchronous Control Signals Information:
+----------------------------------------
+No asynchronous control signals found in this design
+
+Timing Summary:
+---------------
+Speed Grade: -3
+
+   Minimum period: 20.419ns (Maximum Frequency: 48.973MHz)
+   Minimum input arrival time before clock: 3.307ns
+   Maximum output required time after clock: 4.642ns
+   Maximum combinational path delay: No path found
+
+Timing Details:
+---------------
+All values displayed in nanoseconds (ns)
+
+=========================================================================
+Timing constraint: Default period analysis for Clock 'CORE_CLK'
+  Clock period: 20.419ns (frequency: 48.973MHz)
+  Total number of paths / destination ports: 513942 / 2565
+-------------------------------------------------------------------------
+Delay:               9.282ns (Levels of Logic = 9)
+  Source:            EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram (RAM)
+  Destination:       EU_CORE/eu_register_r0_15 (FF)
+  Source Clock:      CORE_CLK rising 2.2X
+  Destination Clock: CORE_CLK rising 2.2X
+
+  Data Path: EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram to EU_CORE/eu_register_r0_15
+                                Gate     Net
+    Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
+    ----------------------------------------  ------------
+     RAMB16BWER:CLKA->DOA7    1   1.850   0.684  U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram (U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.ram_douta<7>)
+     LUT3:I1->O           88   0.203   1.903  U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/has_mux_a.A/Mmux_dout_mux141 (douta<21>)
+     end scope: 'EU_CORE/EU4Kx32_i:douta<21>'
+     LUT5:I3->O            1   0.203   0.000  EU_CORE/mux30_4 (EU_CORE/mux30_4)
+     MUXF7:I1->O           1   0.140   0.000  EU_CORE/mux30_3_f7 (EU_CORE/mux30_3_f7)
+     MUXF8:I1->O          10   0.152   1.085  EU_CORE/mux30_2_f8 (EU_CORE/eu_operand0<8>1)
+     LUT6:I3->O            2   0.205   0.617  EU_CORE/carry<7>1_SW0 (N146)
+     LUT5:I4->O            1   0.205   0.808  EU_CORE/carry<9>1_SW0 (N152)
+     LUT5:I2->O            5   0.205   0.715  EU_CORE/carry<11>1 (EU_CORE/carry<11>)
+     LUT6:I5->O           16   0.205   0.000  EU_CORE/Mmux_n045534 (EU_CORE/n0455<11>)
+     FDRE:D                    0.102          EU_CORE/eu_register_ax_11
+    ----------------------------------------
+    Total                      9.282ns (3.470ns logic, 5.812ns route)
+                                       (37.4% logic, 62.6% route)
+
+=========================================================================
+Timing constraint: Default OFFSET IN BEFORE for Clock 'CORE_CLK'
+  Total number of paths / destination ports: 37 / 37
+-------------------------------------------------------------------------
+Offset:              3.307ns (Levels of Logic = 3)
+  Source:            SRAM_D<1> (PAD)
+  Destination:       BIU_CORE/biu_return_data_int_9 (FF)
+  Destination Clock: CORE_CLK rising 2.2X
+
+  Data Path: SRAM_D<1> to BIU_CORE/biu_return_data_int_9
+                                Gate     Net
+    Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
+    ----------------------------------------  ------------
+     IOBUF:IO->O           3   1.222   0.995  SRAM_D_1_IOBUF (N103)
+     LUT5:I0->O            1   0.203   0.580  BIU_CORE/biu_state[7]_biu_return_data_int[15]_select_249_OUT<6>_SW1 (N215)
+     LUT5:I4->O            1   0.205   0.000  BIU_CORE/biu_state[7]_biu_return_data_int[15]_select_249_OUT<6> (BIU_CORE/biu_state[7]_biu_return_data_int[15]_select_249_OUT<9>)
+     FDR:D                     0.102          BIU_CORE/biu_return_data_int_9
+    ----------------------------------------
+    Total                      3.307ns (1.732ns logic, 1.575ns route)
+                                       (52.4% logic, 47.6% route)
+
+=========================================================================
+Timing constraint: Default OFFSET OUT AFTER for Clock 'CORE_CLK'
+  Total number of paths / destination ports: 82 / 66
+-------------------------------------------------------------------------
+Offset:              4.642ns (Levels of Logic = 2)
+  Source:            BIU_CORE/SRAM_D_OE (FF)
+  Destination:       SRAM_D<7> (PAD)
+  Source Clock:      CORE_CLK rising 2.2X
+
+  Data Path: BIU_CORE/SRAM_D_OE to SRAM_D<7>
+                                Gate     Net
+    Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
+    ----------------------------------------  ------------
+     FDR:C->Q              2   0.447   0.616  BIU_CORE/SRAM_D_OE (BIU_CORE/SRAM_D_OE)
+     INV:I->O              8   0.206   0.802  t_sram_d_oe_inv1_INV_0 (t_sram_d_oe_inv)
+     IOBUF:T->IO               2.571          SRAM_D_7_IOBUF (SRAM_D<7>)
+    ----------------------------------------
+    Total                      4.642ns (3.224ns logic, 1.418ns route)
+                                       (69.5% logic, 30.5% route)
+
+=========================================================================
+
+Cross Clock Domains Report:
+--------------------------
+
+Clock to Setup on destination clock CORE_CLK
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+CORE_CLK       |    9.282|         |         |         |
+---------------+---------+---------+---------+---------+
+
+=========================================================================
+
+
+Total REAL time to Xst completion: 17.00 secs
+Total CPU time to Xst completion: 16.43 secs
+ 
+--> 
+
+Total memory usage is 268688 kilobytes
+
+Number of errors   :    0 (   0 filtered)
+Number of warnings :   55 (   0 filtered)
+Number of infos    :    4 (   0 filtered)
+

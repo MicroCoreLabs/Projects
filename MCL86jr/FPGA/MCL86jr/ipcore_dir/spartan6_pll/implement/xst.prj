@@ -1,0 +1,2 @@
+verilog work ../../spartan6_pll.v
+verilog work ../example_design/spartan6_pll_exdes.v

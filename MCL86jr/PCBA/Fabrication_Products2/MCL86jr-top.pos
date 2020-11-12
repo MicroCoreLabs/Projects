@@ -1,0 +1,20 @@
+### Module positions - created on 10/3/2020 9:18:58 PM ###
+### Printed by Pcbnew version kicad (5.1.5)-3
+## Unit = mm, Angle = deg.
+## Side : top
+# Ref     Val               Package                               PosX       PosY       Rot  Side
+D1        LED               LED_0402_1005Metric                44.2214    -2.1336   90.0000  top
+D2        LED               LED_0402_1005Metric                43.2308    -2.1336   90.0000  top
+D3        LED               LED_0402_1005Metric                42.2148    -2.1336   90.0000  top
+D4        LED               LED_0402_1005Metric                41.2242    -2.1336   90.0000  top
+D5        LED               LED_0402_1005Metric                40.2336    -2.1336   90.0000  top
+D6        LED               LED_0402_1005Metric                39.2430    -2.1336   90.0000  top
+D7        LED               LED_0402_1005Metric                38.2524    -2.1336   90.0000  top
+D8        LED               LED_0402_1005Metric                37.2618    -2.1336   90.0000  top
+R1        33                R_0402_1005Metric                  47.2694   -30.3530  270.0000  top
+U1        XC6SLX9-TQG144    TQFP-144_20x20mm_P0.5mm            37.1348   -19.0500    0.0000  top
+U4        SN74LVC245APW     SOP65P640X120-20N                  10.8204   -47.1678    0.0000  top
+U6        SN74LVC245APW     SOP65P640X120-20N                  10.9728   -28.2194    0.0000  top
+U8        CY62148GN-45ZSXI  SOIC127P1176X120-32N               38.9890   -45.0596  270.0000  top
+Y1        100Mhz            OSC_SIT8008BI-13-33E-33.333330E    47.4218   -33.2486   90.0000  top
+## End

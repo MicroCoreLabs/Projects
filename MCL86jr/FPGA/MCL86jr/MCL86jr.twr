@@ -1,0 +1,694 @@
+--------------------------------------------------------------------------------
+Release 14.7 Trace  (nt64)
+Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
+
+C:\Xilinx\14.7\ISE_DS\ISE\bin\nt64\unwrapped\trce.exe -intstyle ise -v 3 -s 3
+-n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf
+MCL86jr.ucf
+
+Design file:              MCL86jr.ncd
+Physical constraint file: MCL86jr.pcf
+Device,package,speed:     xc6slx9,tqg144,C,-3 (PRODUCTION 1.23 2013-10-13)
+Report level:             verbose report
+
+Environment Variable      Effect 
+--------------------      ------ 
+NONE                      No environment variables were set
+--------------------------------------------------------------------------------
+
+INFO:Timing:3412 - To improve timing, see the Timing Closure User Guide (UG612).
+INFO:Timing:2752 - To get complete path coverage, use the unconstrained paths 
+   option. All paths that are not constrained will be reported in the 
+   unconstrained paths section(s) of the report.
+INFO:Timing:3339 - The clock-to-out numbers in this timing report are based on 
+   a 50 Ohm transmission line loading model.  For the details of this model, 
+   and for more information on accounting for different loading conditions, 
+   please see the device datasheet.
+
+================================================================================
+Timing constraint: TS_CORE_CLK = PERIOD TIMEGRP "CORE_CLK" 20 ns HIGH 50%;
+For more information, see Period Analysis in the Timing Closure User Guide (UG612).
+
+ 0 paths analyzed, 0 endpoints analyzed, 0 failing endpoints
+ 0 timing errors detected. (0 component switching limit errors)
+ Minimum period is   8.000ns.
+--------------------------------------------------------------------------------
+
+Component Switching Limit Checks: TS_CORE_CLK = PERIOD TIMEGRP "CORE_CLK" 20 ns HIGH 50%;
+--------------------------------------------------------------------------------
+Slack: 6.421ns (period - min period limit)
+  Period: 9.091ns
+  Min period limit: 2.670ns (374.532MHz) (Tdcmper_CLKFX)
+  Physical resource: SPARTAN6PLL/dcm_sp_inst/CLKFX
+  Logical resource: SPARTAN6PLL/dcm_sp_inst/CLKFX
+  Location pin: DCM_X0Y1.CLKFX
+  Clock network: SPARTAN6PLL/clkfx
+--------------------------------------------------------------------------------
+Slack: 12.000ns (period - (min low pulse limit / (low pulse / period)))
+  Period: 20.000ns
+  Low pulse: 10.000ns
+  Low pulse limit: 4.000ns (Tdcmpw_CLKIN_50_100)
+  Physical resource: SPARTAN6PLL/dcm_sp_inst/CLKIN
+  Logical resource: SPARTAN6PLL/dcm_sp_inst/CLKIN
+  Location pin: DCM_X0Y1.CLKIN
+  Clock network: SPARTAN6PLL/dcm_sp_inst_ML_NEW_DIVCLK
+--------------------------------------------------------------------------------
+Slack: 12.000ns (period - (min high pulse limit / (high pulse / period)))
+  Period: 20.000ns
+  High pulse: 10.000ns
+  High pulse limit: 4.000ns (Tdcmpw_CLKIN_50_100)
+  Physical resource: SPARTAN6PLL/dcm_sp_inst/CLKIN
+  Logical resource: SPARTAN6PLL/dcm_sp_inst/CLKIN
+  Location pin: DCM_X0Y1.CLKIN
+  Clock network: SPARTAN6PLL/dcm_sp_inst_ML_NEW_DIVCLK
+--------------------------------------------------------------------------------
+
+================================================================================
+Timing constraint: TS_SPARTAN6PLL_clkfx = PERIOD TIMEGRP "SPARTAN6PLL_clkfx" 
+TS_CORE_CLK / 2.2         HIGH 50%;
+For more information, see Period Analysis in the Timing Closure User Guide (UG612).
+
+ 513828 paths analyzed, 3870 endpoints analyzed, 0 failing endpoints
+ 0 timing errors detected. (0 setup errors, 0 hold errors, 0 component switching limit errors)
+ Minimum period is   8.791ns.
+--------------------------------------------------------------------------------
+
+Paths for end point EU_CORE/eu_flags_12 (SLICE_X15Y29.BX), 2245 paths
+--------------------------------------------------------------------------------
+Slack (setup path):     0.299ns (requirement - (data path - clock path skew + uncertainty))
+  Source:               EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram (RAM)
+  Destination:          EU_CORE/eu_flags_12 (FF)
+  Requirement:          9.090ns
+  Data Path Delay:      8.558ns (Levels of Logic = 6)
+  Clock Path Skew:      -0.007ns (0.243 - 0.250)
+  Source Clock:         core_clk_int rising at 0.000ns
+  Destination Clock:    core_clk_int rising at 9.090ns
+  Clock Uncertainty:    0.226ns
+
+  Clock Uncertainty:          0.226ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter (TSJ):  0.070ns
+    Total Input Jitter (TIJ):   0.000ns
+    Discrete Jitter (DJ):       0.381ns
+    Phase Error (PE):           0.000ns
+
+  Maximum Data Path at Slow Process Corner: EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram to EU_CORE/eu_flags_12
+    Location             Delay type         Delay(ns)  Physical Resource
+                                                       Logical Resource(s)
+    -------------------------------------------------  -------------------
+    RAMB16_X1Y10.DOA5    Trcko_DOA             1.850   EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram
+                                                       EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram
+    SLICE_X17Y23.B3      net (fanout=1)        1.070   EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.ram_douta<5>
+    SLICE_X17Y23.B       Tilo                  0.259   EU_CORE/eu_register_r0<3>
+                                                       EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/has_mux_a.A/Mmux_dout_mux111
+    SLICE_X12Y22.BX      net (fanout=18)       0.850   EU_CORE/eu_rom_data<19>
+    SLICE_X12Y22.BMUX    Tbxb                  0.157   EU_CORE/eu_biu_dataout<3>
+                                                       EU_CORE/mux14_2_f8
+    SLICE_X13Y25.D1      net (fanout=5)        0.878   EU_CORE/eu_operand1<8>
+    SLICE_X13Y25.D       Tilo                  0.259   EU_CORE/eu_register_r2<11>
+                                                       EU_CORE/carry<7>1_SW1
+    SLICE_X13Y25.C6      net (fanout=3)        0.132   N147
+    SLICE_X13Y25.C       Tilo                  0.259   EU_CORE/eu_register_r2<11>
+                                                       EU_CORE/carry<9>1_SW1
+    SLICE_X15Y24.C2      net (fanout=1)        0.804   N153
+    SLICE_X15Y24.C       Tilo                  0.259   EU_CORE/eu_alu_last_result<11>
+                                                       EU_CORE/carry<11>1
+    SLICE_X17Y30.A5      net (fanout=7)        0.811   EU_CORE/carry<11>
+    SLICE_X17Y30.A       Tilo                  0.259   EU_CORE/eu_register_r1<15>
+                                                       EU_CORE/Mmux_n045543
+    SLICE_X15Y29.BX      net (fanout=13)       0.648   EU_CORE/n0455<12>
+    SLICE_X15Y29.CLK     Tdick                 0.063   EU_CORE/eu_flags<14>
+                                                       EU_CORE/eu_flags_12
+    -------------------------------------------------  ---------------------------
+    Total                                      8.558ns (3.365ns logic, 5.193ns route)
+                                                       (39.3% logic, 60.7% route)
+
+--------------------------------------------------------------------------------
+Slack (setup path):     0.368ns (requirement - (data path - clock path skew + uncertainty))
+  Source:               EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram (RAM)
+  Destination:          EU_CORE/eu_flags_12 (FF)
+  Requirement:          9.090ns
+  Data Path Delay:      8.492ns (Levels of Logic = 6)
+  Clock Path Skew:      -0.004ns (0.243 - 0.247)
+  Source Clock:         core_clk_int rising at 0.000ns
+  Destination Clock:    core_clk_int rising at 9.090ns
+  Clock Uncertainty:    0.226ns
+
+  Clock Uncertainty:          0.226ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter (TSJ):  0.070ns
+    Total Input Jitter (TIJ):   0.000ns
+    Discrete Jitter (DJ):       0.381ns
+    Phase Error (PE):           0.000ns
+
+  Maximum Data Path at Slow Process Corner: EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram to EU_CORE/eu_flags_12
+    Location             Delay type         Delay(ns)  Physical Resource
+                                                       Logical Resource(s)
+    -------------------------------------------------  -------------------
+    RAMB16_X1Y12.DOA2    Trcko_DOA             1.850   EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram
+                                                       EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram
+    SLICE_X13Y21.B3      net (fanout=2)        1.098   EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.ram_douta<2>
+    SLICE_X13Y21.B       Tilo                  0.259   BIU_CORE/pfq_addr_out_d1<15>
+                                                       EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/has_mux_a.A/Mmux_dout_mux81
+    SLICE_X12Y22.D4      net (fanout=49)       0.520   EU_CORE/eu_rom_data<16>
+    SLICE_X12Y22.BMUX    Topdb                 0.393   EU_CORE/eu_biu_dataout<3>
+                                                       EU_CORE/mux14_6
+                                                       EU_CORE/mux14_4_f7
+                                                       EU_CORE/mux14_2_f8
+    SLICE_X13Y25.D1      net (fanout=5)        0.878   EU_CORE/eu_operand1<8>
+    SLICE_X13Y25.D       Tilo                  0.259   EU_CORE/eu_register_r2<11>
+                                                       EU_CORE/carry<7>1_SW1
+    SLICE_X13Y25.C6      net (fanout=3)        0.132   N147
+    SLICE_X13Y25.C       Tilo                  0.259   EU_CORE/eu_register_r2<11>
+                                                       EU_CORE/carry<9>1_SW1
+    SLICE_X15Y24.C2      net (fanout=1)        0.804   N153
+    SLICE_X15Y24.C       Tilo                  0.259   EU_CORE/eu_alu_last_result<11>
+                                                       EU_CORE/carry<11>1
+    SLICE_X17Y30.A5      net (fanout=7)        0.811   EU_CORE/carry<11>
+    SLICE_X17Y30.A       Tilo                  0.259   EU_CORE/eu_register_r1<15>
+                                                       EU_CORE/Mmux_n045543
+    SLICE_X15Y29.BX      net (fanout=13)       0.648   EU_CORE/n0455<12>
+    SLICE_X15Y29.CLK     Tdick                 0.063   EU_CORE/eu_flags<14>
+                                                       EU_CORE/eu_flags_12
+    -------------------------------------------------  ---------------------------
+    Total                                      8.492ns (3.601ns logic, 4.891ns route)
+                                                       (42.4% logic, 57.6% route)
+
+--------------------------------------------------------------------------------
+Slack (setup path):     0.375ns (requirement - (data path - clock path skew + uncertainty))
+  Source:               EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram (RAM)
+  Destination:          EU_CORE/eu_flags_12 (FF)
+  Requirement:          9.090ns
+  Data Path Delay:      8.485ns (Levels of Logic = 6)
+  Clock Path Skew:      -0.004ns (0.243 - 0.247)
+  Source Clock:         core_clk_int rising at 0.000ns
+  Destination Clock:    core_clk_int rising at 9.090ns
+  Clock Uncertainty:    0.226ns
+
+  Clock Uncertainty:          0.226ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter (TSJ):  0.070ns
+    Total Input Jitter (TIJ):   0.000ns
+    Discrete Jitter (DJ):       0.381ns
+    Phase Error (PE):           0.000ns
+
+  Maximum Data Path at Slow Process Corner: EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram to EU_CORE/eu_flags_12
+    Location             Delay type         Delay(ns)  Physical Resource
+                                                       Logical Resource(s)
+    -------------------------------------------------  -------------------
+    RAMB16_X1Y12.DOA2    Trcko_DOA             1.850   EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram
+                                                       EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram
+    SLICE_X13Y21.B3      net (fanout=2)        1.098   EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.ram_douta<2>
+    SLICE_X13Y21.B       Tilo                  0.259   BIU_CORE/pfq_addr_out_d1<15>
+                                                       EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/has_mux_a.A/Mmux_dout_mux81
+    SLICE_X12Y22.C4      net (fanout=49)       0.520   EU_CORE/eu_rom_data<16>
+    SLICE_X12Y22.BMUX    Topcb                 0.386   EU_CORE/eu_biu_dataout<3>
+                                                       EU_CORE/mux14_51
+                                                       EU_CORE/mux14_4_f7
+                                                       EU_CORE/mux14_2_f8
+    SLICE_X13Y25.D1      net (fanout=5)        0.878   EU_CORE/eu_operand1<8>
+    SLICE_X13Y25.D       Tilo                  0.259   EU_CORE/eu_register_r2<11>
+                                                       EU_CORE/carry<7>1_SW1
+    SLICE_X13Y25.C6      net (fanout=3)        0.132   N147
+    SLICE_X13Y25.C       Tilo                  0.259   EU_CORE/eu_register_r2<11>
+                                                       EU_CORE/carry<9>1_SW1
+    SLICE_X15Y24.C2      net (fanout=1)        0.804   N153
+    SLICE_X15Y24.C       Tilo                  0.259   EU_CORE/eu_alu_last_result<11>
+                                                       EU_CORE/carry<11>1
+    SLICE_X17Y30.A5      net (fanout=7)        0.811   EU_CORE/carry<11>
+    SLICE_X17Y30.A       Tilo                  0.259   EU_CORE/eu_register_r1<15>
+                                                       EU_CORE/Mmux_n045543
+    SLICE_X15Y29.BX      net (fanout=13)       0.648   EU_CORE/n0455<12>
+    SLICE_X15Y29.CLK     Tdick                 0.063   EU_CORE/eu_flags<14>
+                                                       EU_CORE/eu_flags_12
+    -------------------------------------------------  ---------------------------
+    Total                                      8.485ns (3.594ns logic, 4.891ns route)
+                                                       (42.4% logic, 57.6% route)
+
+--------------------------------------------------------------------------------
+
+Paths for end point EU_CORE/eu_alu_last_result_12 (SLICE_X18Y30.AX), 2245 paths
+--------------------------------------------------------------------------------
+Slack (setup path):     0.306ns (requirement - (data path - clock path skew + uncertainty))
+  Source:               EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram (RAM)
+  Destination:          EU_CORE/eu_alu_last_result_12 (FF)
+  Requirement:          9.090ns
+  Data Path Delay:      8.553ns (Levels of Logic = 6)
+  Clock Path Skew:      -0.005ns (0.245 - 0.250)
+  Source Clock:         core_clk_int rising at 0.000ns
+  Destination Clock:    core_clk_int rising at 9.090ns
+  Clock Uncertainty:    0.226ns
+
+  Clock Uncertainty:          0.226ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter (TSJ):  0.070ns
+    Total Input Jitter (TIJ):   0.000ns
+    Discrete Jitter (DJ):       0.381ns
+    Phase Error (PE):           0.000ns
+
+  Maximum Data Path at Slow Process Corner: EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram to EU_CORE/eu_alu_last_result_12
+    Location             Delay type         Delay(ns)  Physical Resource
+                                                       Logical Resource(s)
+    -------------------------------------------------  -------------------
+    RAMB16_X1Y10.DOA5    Trcko_DOA             1.850   EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram
+                                                       EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram
+    SLICE_X17Y23.B3      net (fanout=1)        1.070   EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.ram_douta<5>
+    SLICE_X17Y23.B       Tilo                  0.259   EU_CORE/eu_register_r0<3>
+                                                       EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/has_mux_a.A/Mmux_dout_mux111
+    SLICE_X12Y22.BX      net (fanout=18)       0.850   EU_CORE/eu_rom_data<19>
+    SLICE_X12Y22.BMUX    Tbxb                  0.157   EU_CORE/eu_biu_dataout<3>
+                                                       EU_CORE/mux14_2_f8
+    SLICE_X13Y25.D1      net (fanout=5)        0.878   EU_CORE/eu_operand1<8>
+    SLICE_X13Y25.D       Tilo                  0.259   EU_CORE/eu_register_r2<11>
+                                                       EU_CORE/carry<7>1_SW1
+    SLICE_X13Y25.C6      net (fanout=3)        0.132   N147
+    SLICE_X13Y25.C       Tilo                  0.259   EU_CORE/eu_register_r2<11>
+                                                       EU_CORE/carry<9>1_SW1
+    SLICE_X15Y24.C2      net (fanout=1)        0.804   N153
+    SLICE_X15Y24.C       Tilo                  0.259   EU_CORE/eu_alu_last_result<11>
+                                                       EU_CORE/carry<11>1
+    SLICE_X17Y30.A5      net (fanout=7)        0.811   EU_CORE/carry<11>
+    SLICE_X17Y30.A       Tilo                  0.259   EU_CORE/eu_register_r1<15>
+                                                       EU_CORE/Mmux_n045543
+    SLICE_X18Y30.AX      net (fanout=13)       0.570   EU_CORE/n0455<12>
+    SLICE_X18Y30.CLK     Tdick                 0.136   EU_CORE/eu_alu_last_result<15>
+                                                       EU_CORE/eu_alu_last_result_12
+    -------------------------------------------------  ---------------------------
+    Total                                      8.553ns (3.438ns logic, 5.115ns route)
+                                                       (40.2% logic, 59.8% route)
+
+--------------------------------------------------------------------------------
+Slack (setup path):     0.375ns (requirement - (data path - clock path skew + uncertainty))
+  Source:               EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram (RAM)
+  Destination:          EU_CORE/eu_alu_last_result_12 (FF)
+  Requirement:          9.090ns
+  Data Path Delay:      8.487ns (Levels of Logic = 6)
+  Clock Path Skew:      -0.002ns (0.245 - 0.247)
+  Source Clock:         core_clk_int rising at 0.000ns
+  Destination Clock:    core_clk_int rising at 9.090ns
+  Clock Uncertainty:    0.226ns
+
+  Clock Uncertainty:          0.226ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter (TSJ):  0.070ns
+    Total Input Jitter (TIJ):   0.000ns
+    Discrete Jitter (DJ):       0.381ns
+    Phase Error (PE):           0.000ns
+
+  Maximum Data Path at Slow Process Corner: EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram to EU_CORE/eu_alu_last_result_12
+    Location             Delay type         Delay(ns)  Physical Resource
+                                                       Logical Resource(s)
+    -------------------------------------------------  -------------------
+    RAMB16_X1Y12.DOA2    Trcko_DOA             1.850   EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram
+                                                       EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram
+    SLICE_X13Y21.B3      net (fanout=2)        1.098   EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.ram_douta<2>
+    SLICE_X13Y21.B       Tilo                  0.259   BIU_CORE/pfq_addr_out_d1<15>
+                                                       EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/has_mux_a.A/Mmux_dout_mux81
+    SLICE_X12Y22.D4      net (fanout=49)       0.520   EU_CORE/eu_rom_data<16>
+    SLICE_X12Y22.BMUX    Topdb                 0.393   EU_CORE/eu_biu_dataout<3>
+                                                       EU_CORE/mux14_6
+                                                       EU_CORE/mux14_4_f7
+                                                       EU_CORE/mux14_2_f8
+    SLICE_X13Y25.D1      net (fanout=5)        0.878   EU_CORE/eu_operand1<8>
+    SLICE_X13Y25.D       Tilo                  0.259   EU_CORE/eu_register_r2<11>
+                                                       EU_CORE/carry<7>1_SW1
+    SLICE_X13Y25.C6      net (fanout=3)        0.132   N147
+    SLICE_X13Y25.C       Tilo                  0.259   EU_CORE/eu_register_r2<11>
+                                                       EU_CORE/carry<9>1_SW1
+    SLICE_X15Y24.C2      net (fanout=1)        0.804   N153
+    SLICE_X15Y24.C       Tilo                  0.259   EU_CORE/eu_alu_last_result<11>
+                                                       EU_CORE/carry<11>1
+    SLICE_X17Y30.A5      net (fanout=7)        0.811   EU_CORE/carry<11>
+    SLICE_X17Y30.A       Tilo                  0.259   EU_CORE/eu_register_r1<15>
+                                                       EU_CORE/Mmux_n045543
+    SLICE_X18Y30.AX      net (fanout=13)       0.570   EU_CORE/n0455<12>
+    SLICE_X18Y30.CLK     Tdick                 0.136   EU_CORE/eu_alu_last_result<15>
+                                                       EU_CORE/eu_alu_last_result_12
+    -------------------------------------------------  ---------------------------
+    Total                                      8.487ns (3.674ns logic, 4.813ns route)
+                                                       (43.3% logic, 56.7% route)
+
+--------------------------------------------------------------------------------
+Slack (setup path):     0.382ns (requirement - (data path - clock path skew + uncertainty))
+  Source:               EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram (RAM)
+  Destination:          EU_CORE/eu_alu_last_result_12 (FF)
+  Requirement:          9.090ns
+  Data Path Delay:      8.480ns (Levels of Logic = 6)
+  Clock Path Skew:      -0.002ns (0.245 - 0.247)
+  Source Clock:         core_clk_int rising at 0.000ns
+  Destination Clock:    core_clk_int rising at 9.090ns
+  Clock Uncertainty:    0.226ns
+
+  Clock Uncertainty:          0.226ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter (TSJ):  0.070ns
+    Total Input Jitter (TIJ):   0.000ns
+    Discrete Jitter (DJ):       0.381ns
+    Phase Error (PE):           0.000ns
+
+  Maximum Data Path at Slow Process Corner: EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram to EU_CORE/eu_alu_last_result_12
+    Location             Delay type         Delay(ns)  Physical Resource
+                                                       Logical Resource(s)
+    -------------------------------------------------  -------------------
+    RAMB16_X1Y12.DOA2    Trcko_DOA             1.850   EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram
+                                                       EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram
+    SLICE_X13Y21.B3      net (fanout=2)        1.098   EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.ram_douta<2>
+    SLICE_X13Y21.B       Tilo                  0.259   BIU_CORE/pfq_addr_out_d1<15>
+                                                       EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/has_mux_a.A/Mmux_dout_mux81
+    SLICE_X12Y22.C4      net (fanout=49)       0.520   EU_CORE/eu_rom_data<16>
+    SLICE_X12Y22.BMUX    Topcb                 0.386   EU_CORE/eu_biu_dataout<3>
+                                                       EU_CORE/mux14_51
+                                                       EU_CORE/mux14_4_f7
+                                                       EU_CORE/mux14_2_f8
+    SLICE_X13Y25.D1      net (fanout=5)        0.878   EU_CORE/eu_operand1<8>
+    SLICE_X13Y25.D       Tilo                  0.259   EU_CORE/eu_register_r2<11>
+                                                       EU_CORE/carry<7>1_SW1
+    SLICE_X13Y25.C6      net (fanout=3)        0.132   N147
+    SLICE_X13Y25.C       Tilo                  0.259   EU_CORE/eu_register_r2<11>
+                                                       EU_CORE/carry<9>1_SW1
+    SLICE_X15Y24.C2      net (fanout=1)        0.804   N153
+    SLICE_X15Y24.C       Tilo                  0.259   EU_CORE/eu_alu_last_result<11>
+                                                       EU_CORE/carry<11>1
+    SLICE_X17Y30.A5      net (fanout=7)        0.811   EU_CORE/carry<11>
+    SLICE_X17Y30.A       Tilo                  0.259   EU_CORE/eu_register_r1<15>
+                                                       EU_CORE/Mmux_n045543
+    SLICE_X18Y30.AX      net (fanout=13)       0.570   EU_CORE/n0455<12>
+    SLICE_X18Y30.CLK     Tdick                 0.136   EU_CORE/eu_alu_last_result<15>
+                                                       EU_CORE/eu_alu_last_result_12
+    -------------------------------------------------  ---------------------------
+    Total                                      8.480ns (3.667ns logic, 4.813ns route)
+                                                       (43.2% logic, 56.8% route)
+
+--------------------------------------------------------------------------------
+
+Paths for end point EU_CORE/eu_register_di_12 (SLICE_X17Y27.CX), 2245 paths
+--------------------------------------------------------------------------------
+Slack (setup path):     0.316ns (requirement - (data path - clock path skew + uncertainty))
+  Source:               EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram (RAM)
+  Destination:          EU_CORE/eu_register_di_12 (FF)
+  Requirement:          9.090ns
+  Data Path Delay:      8.538ns (Levels of Logic = 6)
+  Clock Path Skew:      -0.010ns (0.240 - 0.250)
+  Source Clock:         core_clk_int rising at 0.000ns
+  Destination Clock:    core_clk_int rising at 9.090ns
+  Clock Uncertainty:    0.226ns
+
+  Clock Uncertainty:          0.226ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter (TSJ):  0.070ns
+    Total Input Jitter (TIJ):   0.000ns
+    Discrete Jitter (DJ):       0.381ns
+    Phase Error (PE):           0.000ns
+
+  Maximum Data Path at Slow Process Corner: EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram to EU_CORE/eu_register_di_12
+    Location             Delay type         Delay(ns)  Physical Resource
+                                                       Logical Resource(s)
+    -------------------------------------------------  -------------------
+    RAMB16_X1Y10.DOA5    Trcko_DOA             1.850   EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram
+                                                       EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram
+    SLICE_X17Y23.B3      net (fanout=1)        1.070   EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.ram_douta<5>
+    SLICE_X17Y23.B       Tilo                  0.259   EU_CORE/eu_register_r0<3>
+                                                       EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/has_mux_a.A/Mmux_dout_mux111
+    SLICE_X12Y22.BX      net (fanout=18)       0.850   EU_CORE/eu_rom_data<19>
+    SLICE_X12Y22.BMUX    Tbxb                  0.157   EU_CORE/eu_biu_dataout<3>
+                                                       EU_CORE/mux14_2_f8
+    SLICE_X13Y25.D1      net (fanout=5)        0.878   EU_CORE/eu_operand1<8>
+    SLICE_X13Y25.D       Tilo                  0.259   EU_CORE/eu_register_r2<11>
+                                                       EU_CORE/carry<7>1_SW1
+    SLICE_X13Y25.C6      net (fanout=3)        0.132   N147
+    SLICE_X13Y25.C       Tilo                  0.259   EU_CORE/eu_register_r2<11>
+                                                       EU_CORE/carry<9>1_SW1
+    SLICE_X15Y24.C2      net (fanout=1)        0.804   N153
+    SLICE_X15Y24.C       Tilo                  0.259   EU_CORE/eu_alu_last_result<11>
+                                                       EU_CORE/carry<11>1
+    SLICE_X17Y30.A5      net (fanout=7)        0.811   EU_CORE/carry<11>
+    SLICE_X17Y30.A       Tilo                  0.259   EU_CORE/eu_register_r1<15>
+                                                       EU_CORE/Mmux_n045543
+    SLICE_X17Y27.CX      net (fanout=13)       0.628   EU_CORE/n0455<12>
+    SLICE_X17Y27.CLK     Tdick                 0.063   EU_CORE/eu_register_di<12>
+                                                       EU_CORE/eu_register_di_12
+    -------------------------------------------------  ---------------------------
+    Total                                      8.538ns (3.365ns logic, 5.173ns route)
+                                                       (39.4% logic, 60.6% route)
+
+--------------------------------------------------------------------------------
+Slack (setup path):     0.385ns (requirement - (data path - clock path skew + uncertainty))
+  Source:               EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram (RAM)
+  Destination:          EU_CORE/eu_register_di_12 (FF)
+  Requirement:          9.090ns
+  Data Path Delay:      8.472ns (Levels of Logic = 6)
+  Clock Path Skew:      -0.007ns (0.240 - 0.247)
+  Source Clock:         core_clk_int rising at 0.000ns
+  Destination Clock:    core_clk_int rising at 9.090ns
+  Clock Uncertainty:    0.226ns
+
+  Clock Uncertainty:          0.226ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter (TSJ):  0.070ns
+    Total Input Jitter (TIJ):   0.000ns
+    Discrete Jitter (DJ):       0.381ns
+    Phase Error (PE):           0.000ns
+
+  Maximum Data Path at Slow Process Corner: EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram to EU_CORE/eu_register_di_12
+    Location             Delay type         Delay(ns)  Physical Resource
+                                                       Logical Resource(s)
+    -------------------------------------------------  -------------------
+    RAMB16_X1Y12.DOA2    Trcko_DOA             1.850   EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram
+                                                       EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram
+    SLICE_X13Y21.B3      net (fanout=2)        1.098   EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.ram_douta<2>
+    SLICE_X13Y21.B       Tilo                  0.259   BIU_CORE/pfq_addr_out_d1<15>
+                                                       EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/has_mux_a.A/Mmux_dout_mux81
+    SLICE_X12Y22.D4      net (fanout=49)       0.520   EU_CORE/eu_rom_data<16>
+    SLICE_X12Y22.BMUX    Topdb                 0.393   EU_CORE/eu_biu_dataout<3>
+                                                       EU_CORE/mux14_6
+                                                       EU_CORE/mux14_4_f7
+                                                       EU_CORE/mux14_2_f8
+    SLICE_X13Y25.D1      net (fanout=5)        0.878   EU_CORE/eu_operand1<8>
+    SLICE_X13Y25.D       Tilo                  0.259   EU_CORE/eu_register_r2<11>
+                                                       EU_CORE/carry<7>1_SW1
+    SLICE_X13Y25.C6      net (fanout=3)        0.132   N147
+    SLICE_X13Y25.C       Tilo                  0.259   EU_CORE/eu_register_r2<11>
+                                                       EU_CORE/carry<9>1_SW1
+    SLICE_X15Y24.C2      net (fanout=1)        0.804   N153
+    SLICE_X15Y24.C       Tilo                  0.259   EU_CORE/eu_alu_last_result<11>
+                                                       EU_CORE/carry<11>1
+    SLICE_X17Y30.A5      net (fanout=7)        0.811   EU_CORE/carry<11>
+    SLICE_X17Y30.A       Tilo                  0.259   EU_CORE/eu_register_r1<15>
+                                                       EU_CORE/Mmux_n045543
+    SLICE_X17Y27.CX      net (fanout=13)       0.628   EU_CORE/n0455<12>
+    SLICE_X17Y27.CLK     Tdick                 0.063   EU_CORE/eu_register_di<12>
+                                                       EU_CORE/eu_register_di_12
+    -------------------------------------------------  ---------------------------
+    Total                                      8.472ns (3.601ns logic, 4.871ns route)
+                                                       (42.5% logic, 57.5% route)
+
+--------------------------------------------------------------------------------
+Slack (setup path):     0.392ns (requirement - (data path - clock path skew + uncertainty))
+  Source:               EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram (RAM)
+  Destination:          EU_CORE/eu_register_di_12 (FF)
+  Requirement:          9.090ns
+  Data Path Delay:      8.465ns (Levels of Logic = 6)
+  Clock Path Skew:      -0.007ns (0.240 - 0.247)
+  Source Clock:         core_clk_int rising at 0.000ns
+  Destination Clock:    core_clk_int rising at 9.090ns
+  Clock Uncertainty:    0.226ns
+
+  Clock Uncertainty:          0.226ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter (TSJ):  0.070ns
+    Total Input Jitter (TIJ):   0.000ns
+    Discrete Jitter (DJ):       0.381ns
+    Phase Error (PE):           0.000ns
+
+  Maximum Data Path at Slow Process Corner: EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram to EU_CORE/eu_register_di_12
+    Location             Delay type         Delay(ns)  Physical Resource
+                                                       Logical Resource(s)
+    -------------------------------------------------  -------------------
+    RAMB16_X1Y12.DOA2    Trcko_DOA             1.850   EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram
+                                                       EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram
+    SLICE_X13Y21.B3      net (fanout=2)        1.098   EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.ram_douta<2>
+    SLICE_X13Y21.B       Tilo                  0.259   BIU_CORE/pfq_addr_out_d1<15>
+                                                       EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/has_mux_a.A/Mmux_dout_mux81
+    SLICE_X12Y22.C4      net (fanout=49)       0.520   EU_CORE/eu_rom_data<16>
+    SLICE_X12Y22.BMUX    Topcb                 0.386   EU_CORE/eu_biu_dataout<3>
+                                                       EU_CORE/mux14_51
+                                                       EU_CORE/mux14_4_f7
+                                                       EU_CORE/mux14_2_f8
+    SLICE_X13Y25.D1      net (fanout=5)        0.878   EU_CORE/eu_operand1<8>
+    SLICE_X13Y25.D       Tilo                  0.259   EU_CORE/eu_register_r2<11>
+                                                       EU_CORE/carry<7>1_SW1
+    SLICE_X13Y25.C6      net (fanout=3)        0.132   N147
+    SLICE_X13Y25.C       Tilo                  0.259   EU_CORE/eu_register_r2<11>
+                                                       EU_CORE/carry<9>1_SW1
+    SLICE_X15Y24.C2      net (fanout=1)        0.804   N153
+    SLICE_X15Y24.C       Tilo                  0.259   EU_CORE/eu_alu_last_result<11>
+                                                       EU_CORE/carry<11>1
+    SLICE_X17Y30.A5      net (fanout=7)        0.811   EU_CORE/carry<11>
+    SLICE_X17Y30.A       Tilo                  0.259   EU_CORE/eu_register_r1<15>
+                                                       EU_CORE/Mmux_n045543
+    SLICE_X17Y27.CX      net (fanout=13)       0.628   EU_CORE/n0455<12>
+    SLICE_X17Y27.CLK     Tdick                 0.063   EU_CORE/eu_register_di<12>
+                                                       EU_CORE/eu_register_di_12
+    -------------------------------------------------  ---------------------------
+    Total                                      8.465ns (3.594ns logic, 4.871ns route)
+                                                       (42.5% logic, 57.5% route)
+
+--------------------------------------------------------------------------------
+
+Hold Paths: TS_SPARTAN6PLL_clkfx = PERIOD TIMEGRP "SPARTAN6PLL_clkfx" TS_CORE_CLK / 2.2
+        HIGH 50%;
+--------------------------------------------------------------------------------
+
+Paths for end point BIU_CORE/Mshreg_biu_return_data_int_d2_2 (SLICE_X12Y35.BX), 1 path
+--------------------------------------------------------------------------------
+Slack (hold path):      0.367ns (requirement - (clock path skew + uncertainty - data path))
+  Source:               BIU_CORE/biu_return_data_int_2 (FF)
+  Destination:          BIU_CORE/Mshreg_biu_return_data_int_d2_2 (FF)
+  Requirement:          0.000ns
+  Data Path Delay:      0.369ns (Levels of Logic = 0)
+  Clock Path Skew:      0.002ns (0.041 - 0.039)
+  Source Clock:         core_clk_int rising at 0.000ns
+  Destination Clock:    core_clk_int rising at 0.000ns
+  Clock Uncertainty:    0.000ns
+
+  Minimum Data Path at Fast Process Corner: BIU_CORE/biu_return_data_int_2 to BIU_CORE/Mshreg_biu_return_data_int_d2_2
+    Location             Delay type         Delay(ns)  Physical Resource
+                                                       Logical Resource(s)
+    -------------------------------------------------  -------------------
+    SLICE_X13Y35.AQ      Tcko                  0.198   BIU_CORE/biu_return_data_int_5
+                                                       BIU_CORE/biu_return_data_int_2
+    SLICE_X12Y35.BX      net (fanout=2)        0.251   BIU_CORE/biu_return_data_int_2
+    SLICE_X12Y35.CLK     Tdh         (-Th)     0.080   BIU_CORE/biu_return_data_int_d2<5>
+                                                       BIU_CORE/Mshreg_biu_return_data_int_d2_2
+    -------------------------------------------------  ---------------------------
+    Total                                      0.369ns (0.118ns logic, 0.251ns route)
+                                                       (32.0% logic, 68.0% route)
+
+--------------------------------------------------------------------------------
+
+Paths for end point BIU_CORE/Mshreg_biu_register_reg_d2_11 (SLICE_X20Y29.BX), 1 path
+--------------------------------------------------------------------------------
+Slack (hold path):      0.371ns (requirement - (clock path skew + uncertainty - data path))
+  Source:               BIU_CORE/biu_register_reg_11 (FF)
+  Destination:          BIU_CORE/Mshreg_biu_register_reg_d2_11 (FF)
+  Requirement:          0.000ns
+  Data Path Delay:      0.372ns (Levels of Logic = 0)
+  Clock Path Skew:      0.001ns (0.042 - 0.041)
+  Source Clock:         core_clk_int rising at 0.000ns
+  Destination Clock:    core_clk_int rising at 0.000ns
+  Clock Uncertainty:    0.000ns
+
+  Minimum Data Path at Fast Process Corner: BIU_CORE/biu_register_reg_11 to BIU_CORE/Mshreg_biu_register_reg_d2_11
+    Location             Delay type         Delay(ns)  Physical Resource
+                                                       Logical Resource(s)
+    -------------------------------------------------  -------------------
+    SLICE_X20Y30.DQ      Tcko                  0.234   BIU_CORE/biu_register_reg<11>
+                                                       BIU_CORE/biu_register_reg_11
+    SLICE_X20Y29.BX      net (fanout=1)        0.218   BIU_CORE/biu_register_reg<11>
+    SLICE_X20Y29.CLK     Tdh         (-Th)     0.080   BIU_CORE/biu_register_reg_d2<12>
+                                                       BIU_CORE/Mshreg_biu_register_reg_d2_11
+    -------------------------------------------------  ---------------------------
+    Total                                      0.372ns (0.154ns logic, 0.218ns route)
+                                                       (41.4% logic, 58.6% route)
+
+--------------------------------------------------------------------------------
+
+Paths for end point BIU_CORE/Mshreg_biu_register_rm_d2_7 (SLICE_X0Y20.BI), 1 path
+--------------------------------------------------------------------------------
+Slack (hold path):      0.372ns (requirement - (clock path skew + uncertainty - data path))
+  Source:               BIU_CORE/biu_register_rm_7 (FF)
+  Destination:          BIU_CORE/Mshreg_biu_register_rm_d2_7 (FF)
+  Requirement:          0.000ns
+  Data Path Delay:      0.376ns (Levels of Logic = 0)
+  Clock Path Skew:      0.004ns (0.038 - 0.034)
+  Source Clock:         core_clk_int rising at 0.000ns
+  Destination Clock:    core_clk_int rising at 0.000ns
+  Clock Uncertainty:    0.000ns
+
+  Minimum Data Path at Fast Process Corner: BIU_CORE/biu_register_rm_7 to BIU_CORE/Mshreg_biu_register_rm_d2_7
+    Location             Delay type         Delay(ns)  Physical Resource
+                                                       Logical Resource(s)
+    -------------------------------------------------  -------------------
+    SLICE_X0Y21.DQ       Tcko                  0.234   BIU_CORE/biu_register_rm<7>
+                                                       BIU_CORE/biu_register_rm_7
+    SLICE_X0Y20.BI       net (fanout=1)        0.113   BIU_CORE/biu_register_rm<7>
+    SLICE_X0Y20.CLK      Tdh         (-Th)    -0.029   BIU_CORE/biu_register_rm_d2<4>
+                                                       BIU_CORE/Mshreg_biu_register_rm_d2_7
+    -------------------------------------------------  ---------------------------
+    Total                                      0.376ns (0.263ns logic, 0.113ns route)
+                                                       (69.9% logic, 30.1% route)
+
+--------------------------------------------------------------------------------
+
+Component Switching Limit Checks: TS_SPARTAN6PLL_clkfx = PERIOD TIMEGRP "SPARTAN6PLL_clkfx" TS_CORE_CLK / 2.2
+        HIGH 50%;
+--------------------------------------------------------------------------------
+Slack: 5.966ns (period - min period limit)
+  Period: 9.090ns
+  Min period limit: 3.124ns (320.102MHz) (Trper_CLKA(Fmax))
+  Physical resource: EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[6].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram/CLKA
+  Logical resource: EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[6].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram/CLKA
+  Location pin: RAMB16_X1Y14.CLKA
+  Clock network: core_clk_int
+--------------------------------------------------------------------------------
+Slack: 5.966ns (period - min period limit)
+  Period: 9.090ns
+  Min period limit: 3.124ns (320.102MHz) (Trper_CLKA(Fmax))
+  Physical resource: EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram/CLKA
+  Logical resource: EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram/CLKA
+  Location pin: RAMB16_X1Y10.CLKA
+  Clock network: core_clk_int
+--------------------------------------------------------------------------------
+Slack: 5.966ns (period - min period limit)
+  Period: 9.090ns
+  Min period limit: 3.124ns (320.102MHz) (Trper_CLKA(Fmax))
+  Physical resource: EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[1].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram/CLKA
+  Logical resource: EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[1].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram/CLKA
+  Location pin: RAMB16_X0Y12.CLKA
+  Clock network: core_clk_int
+--------------------------------------------------------------------------------
+
+
+Derived Constraint Report
+Derived Constraints for TS_CORE_CLK
++-------------------------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+
+|                               |   Period    |       Actual Period       |      Timing Errors        |      Paths Analyzed       |
+|           Constraint          | Requirement |-------------+-------------|-------------+-------------|-------------+-------------|
+|                               |             |   Direct    | Derivative  |   Direct    | Derivative  |   Direct    | Derivative  |
++-------------------------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+
+|TS_CORE_CLK                    |     20.000ns|      8.000ns|     19.340ns|            0|            0|            0|       513828|
+| TS_SPARTAN6PLL_clkfx          |      9.091ns|      8.791ns|          N/A|            0|            0|       513828|            0|
++-------------------------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+
+
+All constraints were met.
+
+
+Data Sheet report:
+-----------------
+All values displayed in nanoseconds (ns)
+
+Clock to Setup on destination clock CORE_CLK
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+CORE_CLK       |    8.791|         |         |         |
+---------------+---------+---------+---------+---------+
+
+
+Timing summary:
+---------------
+
+Timing errors: 0  Score: 0  (Setup/Max: 0, Hold: 0)
+
+Constraints cover 513828 paths, 0 nets, and 5708 connections
+
+Design statistics:
+   Minimum period:   8.791ns{1}   (Maximum frequency: 113.753MHz)
+
+
+------------------------------------Footnotes-----------------------------------
+1)  The minimum period statistic assumes all single cycle delays.
+
+Analysis completed Wed Nov 11 19:11:41 2020 
+--------------------------------------------------------------------------------
+
+Trace Settings:
+-------------------------
+Trace Settings 
+
+Peak Memory Usage: 236 MB
+
+
+

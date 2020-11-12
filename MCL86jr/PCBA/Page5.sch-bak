@@ -1,0 +1,211 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr B 17000 11000
+encoding utf-8
+Sheet 6 7
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L power:+5V #PWR0128
+U 1 1 5F6C9668
+P 5350 2000
+F 0 "#PWR0128" H 5350 1850 50  0001 C CNN
+F 1 "+5V" H 5365 2173 50  0000 C CNN
+F 2 "" H 5350 2000 50  0001 C CNN
+F 3 "" H 5350 2000 50  0001 C CNN
+	1    5350 2000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5350 2300 5350 2000
+Wire Wire Line
+	5450 6150 5450 6000
+$Comp
+L power:GND #PWR?
+U 1 1 5F6CAA64
+P 5450 6150
+AR Path="/5F609430/5F6CAA64" Ref="#PWR?"  Part="1" 
+AR Path="/5F602591/5F6CAA64" Ref="#PWR?"  Part="1" 
+AR Path="/5F62182D/5F6CAA64" Ref="#PWR0129"  Part="1" 
+F 0 "#PWR0129" H 5450 5900 50  0001 C CNN
+F 1 "GND" H 5455 5977 50  0000 C CNN
+F 2 "" H 5450 6150 50  0001 C CNN
+F 3 "" H 5450 6150 50  0001 C CNN
+	1    5450 6150
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	5450 6000 5250 6000
+Wire Wire Line
+	5250 6000 5250 5900
+Connection ~ 5450 6000
+Wire Wire Line
+	5450 6000 5450 5900
+Text GLabel 6500 2600 2    50   Input ~ 0
+DTR_5V
+Wire Wire Line
+	6500 2600 6050 2600
+Text GLabel 6500 2700 2    50   Input ~ 0
+DEN_5V
+Wire Wire Line
+	6500 2700 6050 2700
+Text GLabel 6500 2800 2    50   Input ~ 0
+ALE_5V
+Wire Wire Line
+	6500 2800 6050 2800
+Text GLabel 6500 3000 2    50   Input ~ 0
+AD0_5V
+Wire Wire Line
+	6500 3000 6050 3000
+Text GLabel 6500 3100 2    50   Input ~ 0
+AD1_5V
+Wire Wire Line
+	6500 3100 6050 3100
+Text GLabel 6500 3200 2    50   Input ~ 0
+AD2_5V
+Wire Wire Line
+	6500 3200 6050 3200
+Text GLabel 6500 3300 2    50   Input ~ 0
+AD3_5V
+Wire Wire Line
+	6500 3300 6050 3300
+Text GLabel 6500 3400 2    50   Input ~ 0
+AD4_5V
+Wire Wire Line
+	6500 3400 6050 3400
+Text GLabel 6500 3500 2    50   Input ~ 0
+AD5_5V
+Wire Wire Line
+	6500 3500 6050 3500
+Text GLabel 6500 3600 2    50   Input ~ 0
+AD6_5V
+Wire Wire Line
+	6500 3600 6050 3600
+Text GLabel 6500 3700 2    50   Input ~ 0
+AD7_5V
+Wire Wire Line
+	6500 3700 6050 3700
+Text GLabel 6500 3900 2    50   Input ~ 0
+A8_5V
+Wire Wire Line
+	6500 3900 6050 3900
+Text GLabel 6500 4000 2    50   Input ~ 0
+A9_5V
+Wire Wire Line
+	6500 4000 6050 4000
+Text GLabel 6500 4100 2    50   Input ~ 0
+A10_5V
+Wire Wire Line
+	6500 4100 6050 4100
+Text GLabel 6500 4200 2    50   Input ~ 0
+A11_5V
+Wire Wire Line
+	6500 4200 6050 4200
+Text GLabel 6500 4300 2    50   Input ~ 0
+A12_5V
+Wire Wire Line
+	6500 4300 6050 4300
+Text GLabel 6500 4400 2    50   Input ~ 0
+A13_5V
+Wire Wire Line
+	6500 4400 6050 4400
+Text GLabel 6500 4500 2    50   Input ~ 0
+A14_5V
+Wire Wire Line
+	6500 4500 6050 4500
+Text GLabel 6500 4600 2    50   Input ~ 0
+A15_5V
+Wire Wire Line
+	6500 4600 6050 4600
+Text GLabel 6500 4800 2    50   Input ~ 0
+A16_5V
+Wire Wire Line
+	6500 4800 6050 4800
+Text GLabel 6500 4900 2    50   Input ~ 0
+A17_5V
+Wire Wire Line
+	6500 4900 6050 4900
+Text GLabel 6500 5000 2    50   Input ~ 0
+A18_5V
+Wire Wire Line
+	6500 5000 6050 5000
+Text GLabel 6500 5100 2    50   Input ~ 0
+A19_5V
+Wire Wire Line
+	6500 5100 6050 5100
+Text GLabel 6500 5300 2    50   Input ~ 0
+IOM_5V
+Wire Wire Line
+	6500 5300 6050 5300
+Text GLabel 6500 5400 2    50   Input ~ 0
+WR_5V
+Wire Wire Line
+	6500 5400 6050 5400
+Text GLabel 6500 5500 2    50   Input ~ 0
+RD_5V
+Wire Wire Line
+	6500 5500 6050 5500
+Text GLabel 4200 2600 0    50   Input ~ 0
+CLK_5V
+Wire Wire Line
+	4200 2600 4650 2600
+Text GLabel 4200 2800 0    50   Input ~ 0
+READY_5V
+Wire Wire Line
+	4200 2800 4650 2800
+Text GLabel 4200 3000 0    50   Input ~ 0
+RESET_5V
+Wire Wire Line
+	4200 3000 4650 3000
+Text GLabel 4200 3200 0    50   Input ~ 0
+NMI_5V
+Wire Wire Line
+	4200 3200 4650 3200
+Text GLabel 4200 3400 0    50   Input ~ 0
+INTR_5V
+Wire Wire Line
+	4200 3400 4650 3400
+Text GLabel 4200 3600 0    50   Input ~ 0
+INTA_n_5V
+Wire Wire Line
+	4200 3600 4650 3600
+Text GLabel 4200 3800 0    50   Input ~ 0
+HLDA_5V
+Wire Wire Line
+	4200 3800 4650 3800
+Text GLabel 4200 4000 0    50   Input ~ 0
+HOLD_5V
+Wire Wire Line
+	4200 4000 4650 4000
+Text GLabel 4200 4200 0    50   Input ~ 0
+SSO_5V
+Wire Wire Line
+	4200 4200 4650 4200
+Text GLabel 4200 4400 0    50   Input ~ 0
+TEST_5V
+Wire Wire Line
+	4200 4400 4650 4400
+Text GLabel 4200 4600 0    50   Input ~ 0
+MINMAX_5V
+Wire Wire Line
+	4200 4600 4650 4600
+$Comp
+L MCU_Intel:8088_Min_Mode U7
+U 1 1 5F629D4A
+P 5350 4100
+F 0 "U7" H 4900 5950 50  0000 C CNN
+F 1 "8088_Min_Mode" H 4900 5850 50  0000 C CNN
+F 2 "Package_DIP:DIP-40_W15.24mm" H 5400 4200 50  0001 C CIN
+F 3 "http://datasheets.chipdb.org/Intel/x86/808x/datashts/8088/231456-006.pdf" H 5350 4150 50  0001 C CNN
+	1    5350 4100
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC

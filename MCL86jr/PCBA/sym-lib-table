@@ -1,0 +1,5 @@
+(sym_lib_table
+  (lib (name FPGA_Xilinx_Spartan6)(type Legacy)(uri Z:/Ted/projs/KiCAD_Library/Xilinx_6_Series/FPGA_Xilinx_Spartan6.lib)(options "")(descr ""))
+  (lib (name SN74LVC245APW)(type Legacy)(uri Z:/Ted/projs/KiCAD_Library/SN74LVC245APW/SN74LVC245APW.lib)(options "")(descr ""))
+  (lib (name MIC5504-1.2YM5-TR)(type Legacy)(uri Z:/Ted/projs/KiCAD_Library/MIC5504-1.2YM5-TR/MIC5504-1.2YM5-TR.lib)(options "")(descr ""))
+)

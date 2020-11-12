@@ -1,0 +1,756 @@
+//! **************************************************************************
+// Written by: Map P.20131013 on Wed Nov 11 19:10:56 2020
+//! **************************************************************************
+
+SCHEMATIC START;
+COMP "A8" LOCATE = SITE "P14" LEVEL 1;
+COMP "A9" LOCATE = SITE "P11" LEVEL 1;
+COMP "A10" LOCATE = SITE "P9" LEVEL 1;
+COMP "A11" LOCATE = SITE "P7" LEVEL 1;
+COMP "A12" LOCATE = SITE "P5" LEVEL 1;
+COMP "A13" LOCATE = SITE "P1" LEVEL 1;
+COMP "A14" LOCATE = SITE "P142" LEVEL 1;
+COMP "A15" LOCATE = SITE "P143" LEVEL 1;
+COMP "A16" LOCATE = SITE "P2" LEVEL 1;
+COMP "A17" LOCATE = SITE "P6" LEVEL 1;
+COMP "A18" LOCATE = SITE "P8" LEVEL 1;
+COMP "A19" LOCATE = SITE "P10" LEVEL 1;
+COMP "AD0" LOCATE = SITE "P35" LEVEL 1;
+COMP "AD1" LOCATE = SITE "P34" LEVEL 1;
+COMP "AD2" LOCATE = SITE "P33" LEVEL 1;
+COMP "AD3" LOCATE = SITE "P32" LEVEL 1;
+COMP "AD4" LOCATE = SITE "P27" LEVEL 1;
+COMP "AD5" LOCATE = SITE "P26" LEVEL 1;
+COMP "AD6" LOCATE = SITE "P23" LEVEL 1;
+COMP "AD7" LOCATE = SITE "P22" LEVEL 1;
+COMP "ALE" LOCATE = SITE "P41" LEVEL 1;
+COMP "DEN" LOCATE = SITE "P57" LEVEL 1;
+COMP "CLK" LOCATE = SITE "P46" LEVEL 1;
+COMP "DTR" LOCATE = SITE "P56" LEVEL 1;
+COMP "IOM" LOCATE = SITE "P55" LEVEL 1;
+COMP "NMI" LOCATE = SITE "P44" LEVEL 1;
+COMP "SRAM_A<0>" LOCATE = SITE "P132" LEVEL 1;
+COMP "SRAM_A<1>" LOCATE = SITE "P126" LEVEL 1;
+COMP "SRAM_A<2>" LOCATE = SITE "P124" LEVEL 1;
+COMP "SRAM_A<3>" LOCATE = SITE "P123" LEVEL 1;
+COMP "SRAM_A<4>" LOCATE = SITE "P61" LEVEL 1;
+COMP "SRAM_A<5>" LOCATE = SITE "P62" LEVEL 1;
+COMP "SRAM_A<6>" LOCATE = SITE "P66" LEVEL 1;
+COMP "SRAM_A<7>" LOCATE = SITE "P67" LEVEL 1;
+COMP "SRAM_A<8>" LOCATE = SITE "P95" LEVEL 1;
+COMP "SRAM_A<9>" LOCATE = SITE "P94" LEVEL 1;
+COMP "SRAM_D<0>" LOCATE = SITE "P119" LEVEL 1;
+COMP "SRAM_D<1>" LOCATE = SITE "P118" LEVEL 1;
+COMP "SRAM_D<2>" LOCATE = SITE "P117" LEVEL 1;
+COMP "SRAM_D<3>" LOCATE = SITE "P80" LEVEL 1;
+COMP "SRAM_D<4>" LOCATE = SITE "P81" LEVEL 1;
+COMP "SRAM_D<5>" LOCATE = SITE "P82" LEVEL 1;
+COMP "SRAM_D<6>" LOCATE = SITE "P83" LEVEL 1;
+COMP "SRAM_D<7>" LOCATE = SITE "P85" LEVEL 1;
+COMP "SRAM_CE_n" LOCATE = SITE "P87" LEVEL 1;
+COMP "SRAM_OE_n" LOCATE = SITE "P92" LEVEL 1;
+COMP "SRAM_WE_n" LOCATE = SITE "P98" LEVEL 1;
+COMP "INTR" LOCATE = SITE "P45" LEVEL 1;
+COMP "RD_n" LOCATE = SITE "P50" LEVEL 1;
+COMP "WR_n" LOCATE = SITE "P51" LEVEL 1;
+COMP "SRAM_A<10>" LOCATE = SITE "P88" LEVEL 1;
+COMP "SRAM_A<11>" LOCATE = SITE "P93" LEVEL 1;
+COMP "SRAM_A<12>" LOCATE = SITE "P74" LEVEL 1;
+COMP "SRAM_A<13>" LOCATE = SITE "P97" LEVEL 1;
+COMP "SRAM_A<14>" LOCATE = SITE "P75" LEVEL 1;
+COMP "SRAM_A<15>" LOCATE = SITE "P100" LEVEL 1;
+COMP "SRAM_A<16>" LOCATE = SITE "P78" LEVEL 1;
+COMP "SRAM_A<17>" LOCATE = SITE "P79" LEVEL 1;
+COMP "SRAM_A<18>" LOCATE = SITE "P99" LEVEL 1;
+COMP "READY" LOCATE = SITE "P48" LEVEL 1;
+COMP "RESET" LOCATE = SITE "P47" LEVEL 1;
+COMP "SSO_n" LOCATE = SITE "P12" LEVEL 1;
+COMP "LED<0>" LOCATE = SITE "P111" LEVEL 1;
+COMP "LED<1>" LOCATE = SITE "P112" LEVEL 1;
+COMP "LED<2>" LOCATE = SITE "P114" LEVEL 1;
+COMP "LED<3>" LOCATE = SITE "P116" LEVEL 1;
+COMP "LED<4>" LOCATE = SITE "P120" LEVEL 1;
+COMP "LED<5>" LOCATE = SITE "P121" LEVEL 1;
+COMP "LED<6>" LOCATE = SITE "P127" LEVEL 1;
+COMP "LED<7>" LOCATE = SITE "P131" LEVEL 1;
+COMP "INTA_n" LOCATE = SITE "P58" LEVEL 1;
+COMP "BUF1_OE_n" LOCATE = SITE "P59" LEVEL 1;
+COMP "BUF2_OE_n" LOCATE = SITE "P21" LEVEL 1;
+COMP "BUF2_DIR" LOCATE = SITE "P16" LEVEL 1;
+COMP "CORE_CLK" LOCATE = SITE "P84" LEVEL 1;
+PIN
+        EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[7].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram_pins<28>
+        = BEL
+        "EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[7].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram"
+        PINNAME CLKA;
+PIN
+        EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram_pins<28>
+        = BEL
+        "EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram"
+        PINNAME CLKA;
+PIN
+        EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[3].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram_pins<28>
+        = BEL
+        "EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[3].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram"
+        PINNAME CLKA;
+PIN
+        EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[2].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram_pins<28>
+        = BEL
+        "EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[2].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram"
+        PINNAME CLKA;
+PIN
+        EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[1].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram_pins<28>
+        = BEL
+        "EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[1].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram"
+        PINNAME CLKA;
+PIN
+        EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/s6_init.ram/SP.SIMPLE_PRIM9.ram_pins<26>
+        = BEL
+        "EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/s6_init.ram/SP.SIMPLE_PRIM9.ram"
+        PINNAME CLKAWRCLK;
+PIN
+        EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram_pins<28>
+        = BEL
+        "EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram"
+        PINNAME CLKA;
+PIN
+        EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[6].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram_pins<28>
+        = BEL
+        "EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[6].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram"
+        PINNAME CLKA;
+TIMEGRP SPARTAN6PLL_clkfx = BEL "t_biu_ad_out_d_0" BEL "t_biu_ad_out_d_1" BEL
+        "t_biu_ad_out_d_2" BEL "t_biu_ad_out_d_3" BEL "t_biu_ad_out_d_4" BEL
+        "t_biu_ad_out_d_5" BEL "t_biu_ad_out_d_6" BEL "t_biu_ad_out_d_7" BEL
+        "t_biu_ad_out_d_8" BEL "t_biu_ad_out_d_9" BEL "t_biu_ad_out_d_10" BEL
+        "t_biu_ad_out_d_11" BEL "t_biu_ad_out_d_12" BEL "t_biu_ad_out_d_13"
+        BEL "t_biu_ad_out_d_14" BEL "t_biu_ad_out_d_15" BEL
+        "t_biu_ad_out_d_16" BEL "t_biu_ad_out_d_17" BEL "t_biu_ad_out_d_18"
+        BEL "t_biu_ad_out_d_19" BEL "led_int_0" BEL "led_int_1" BEL
+        "led_int_2" BEL "led_int_3" BEL "led_int_4" BEL "led_int_5" BEL
+        "led_int_6" BEL "led_int_7" BEL "prescaler_d" BEL "t_reset_d3" BEL
+        "prescaler_0" BEL "prescaler_1" BEL "prescaler_2" BEL "prescaler_3"
+        BEL "prescaler_4" BEL "prescaler_5" BEL "prescaler_6" BEL
+        "prescaler_7" BEL "prescaler_8" BEL "prescaler_9" BEL "prescaler_10"
+        BEL "prescaler_11" BEL "prescaler_12" BEL "prescaler_13" BEL
+        "prescaler_14" BEL "prescaler_15" BEL "prescaler_16" BEL
+        "prescaler_17" BEL "prescaler_18" BEL "prescaler_19" BEL
+        "prescaler_20" BEL "prescaler_21" BEL "SPARTAN6PLL/clkout1_buf" BEL
+        "BIU_CORE/nmi_counter_25" BEL "BIU_CORE/nmi_counter_24" BEL
+        "BIU_CORE/nmi_counter_23" BEL "BIU_CORE/nmi_counter_22" BEL
+        "BIU_CORE/nmi_counter_21" BEL "BIU_CORE/nmi_counter_20" BEL
+        "BIU_CORE/nmi_counter_19" BEL "BIU_CORE/nmi_counter_18" BEL
+        "BIU_CORE/nmi_counter_17" BEL "BIU_CORE/nmi_counter_16" BEL
+        "BIU_CORE/nmi_counter_15" BEL "BIU_CORE/nmi_counter_14" BEL
+        "BIU_CORE/nmi_counter_13" BEL "BIU_CORE/nmi_counter_12" BEL
+        "BIU_CORE/nmi_counter_11" BEL "BIU_CORE/nmi_counter_10" BEL
+        "BIU_CORE/nmi_counter_9" BEL "BIU_CORE/nmi_counter_8" BEL
+        "BIU_CORE/nmi_counter_7" BEL "BIU_CORE/nmi_counter_6" BEL
+        "BIU_CORE/nmi_counter_5" BEL "BIU_CORE/nmi_counter_4" BEL
+        "BIU_CORE/nmi_counter_3" BEL "BIU_CORE/nmi_counter_2" BEL
+        "BIU_CORE/nmi_counter_1" BEL "BIU_CORE/nmi_counter_0" BEL
+        "BIU_CORE/pfq_addr_out_15" BEL "BIU_CORE/pfq_addr_out_14" BEL
+        "BIU_CORE/pfq_addr_out_13" BEL "BIU_CORE/pfq_addr_out_12" BEL
+        "BIU_CORE/pfq_addr_out_11" BEL "BIU_CORE/pfq_addr_out_10" BEL
+        "BIU_CORE/pfq_addr_out_9" BEL "BIU_CORE/pfq_addr_out_8" BEL
+        "BIU_CORE/pfq_addr_out_7" BEL "BIU_CORE/pfq_addr_out_6" BEL
+        "BIU_CORE/pfq_addr_out_5" BEL "BIU_CORE/pfq_addr_out_4" BEL
+        "BIU_CORE/pfq_addr_out_3" BEL "BIU_CORE/pfq_addr_out_2" BEL
+        "BIU_CORE/pfq_addr_out_1" BEL "BIU_CORE/pfq_addr_out_0" BEL
+        "BIU_CORE/pfq_addr_in_15" BEL "BIU_CORE/pfq_addr_in_14" BEL
+        "BIU_CORE/pfq_addr_in_13" BEL "BIU_CORE/pfq_addr_in_12" BEL
+        "BIU_CORE/pfq_addr_in_11" BEL "BIU_CORE/pfq_addr_in_10" BEL
+        "BIU_CORE/pfq_addr_in_9" BEL "BIU_CORE/pfq_addr_in_8" BEL
+        "BIU_CORE/pfq_addr_in_7" BEL "BIU_CORE/pfq_addr_in_6" BEL
+        "BIU_CORE/pfq_addr_in_5" BEL "BIU_CORE/pfq_addr_in_4" BEL
+        "BIU_CORE/pfq_addr_in_3" BEL "BIU_CORE/pfq_addr_in_2" BEL
+        "BIU_CORE/pfq_addr_in_1" BEL "BIU_CORE/pfq_addr_in_0" BEL
+        "BIU_CORE/clock_cycle_counter_12" BEL
+        "BIU_CORE/clock_cycle_counter_11" BEL
+        "BIU_CORE/clock_cycle_counter_10" BEL "BIU_CORE/clock_cycle_counter_9"
+        BEL "BIU_CORE/clock_cycle_counter_8" BEL
+        "BIU_CORE/clock_cycle_counter_7" BEL "BIU_CORE/clock_cycle_counter_6"
+        BEL "BIU_CORE/clock_cycle_counter_5" BEL
+        "BIU_CORE/clock_cycle_counter_4" BEL "BIU_CORE/clock_cycle_counter_3"
+        BEL "BIU_CORE/clock_cycle_counter_2" BEL
+        "BIU_CORE/clock_cycle_counter_1" BEL "BIU_CORE/clock_cycle_counter_0"
+        BEL "BIU_CORE/nmi_d5" BEL "BIU_CORE/s_bits_2" BEL "BIU_CORE/s_bits_1"
+        BEL "BIU_CORE/s_bits_0" BEL "BIU_CORE/ALE" BEL
+        "BIU_CORE/pfq_top_byte_int_d1_7" BEL "BIU_CORE/pfq_top_byte_int_d1_6"
+        BEL "BIU_CORE/pfq_top_byte_int_d1_5" BEL
+        "BIU_CORE/pfq_top_byte_int_d1_4" BEL "BIU_CORE/pfq_top_byte_int_d1_3"
+        BEL "BIU_CORE/pfq_top_byte_int_d1_2" BEL
+        "BIU_CORE/pfq_top_byte_int_d1_1" BEL "BIU_CORE/pfq_top_byte_int_d1_0"
+        BEL "BIU_CORE/nmi_d4" BEL "BIU_CORE/clk_d4" BEL
+        "BIU_CORE/pfq_addr_out_d1_15" BEL "BIU_CORE/pfq_addr_out_d1_14" BEL
+        "BIU_CORE/pfq_addr_out_d1_13" BEL "BIU_CORE/pfq_addr_out_d1_12" BEL
+        "BIU_CORE/pfq_addr_out_d1_11" BEL "BIU_CORE/pfq_addr_out_d1_10" BEL
+        "BIU_CORE/pfq_addr_out_d1_9" BEL "BIU_CORE/pfq_addr_out_d1_8" BEL
+        "BIU_CORE/pfq_addr_out_d1_7" BEL "BIU_CORE/pfq_addr_out_d1_6" BEL
+        "BIU_CORE/pfq_addr_out_d1_5" BEL "BIU_CORE/pfq_addr_out_d1_4" BEL
+        "BIU_CORE/pfq_addr_out_d1_3" BEL "BIU_CORE/pfq_addr_out_d1_2" BEL
+        "BIU_CORE/pfq_addr_out_d1_1" BEL "BIU_CORE/pfq_addr_out_d1_0" BEL
+        "BIU_CORE/intr_d3" BEL "BIU_CORE/nmi_d3" BEL "BIU_CORE/clk_d3" BEL
+        "BIU_CORE/pfq_entry2_7" BEL "BIU_CORE/pfq_entry2_6" BEL
+        "BIU_CORE/pfq_entry2_5" BEL "BIU_CORE/pfq_entry2_4" BEL
+        "BIU_CORE/pfq_entry2_3" BEL "BIU_CORE/pfq_entry2_2" BEL
+        "BIU_CORE/pfq_entry2_1" BEL "BIU_CORE/pfq_entry2_0" BEL
+        "BIU_CORE/pfq_entry1_7" BEL "BIU_CORE/pfq_entry1_6" BEL
+        "BIU_CORE/pfq_entry1_5" BEL "BIU_CORE/pfq_entry1_4" BEL
+        "BIU_CORE/pfq_entry1_3" BEL "BIU_CORE/pfq_entry1_2" BEL
+        "BIU_CORE/pfq_entry1_1" BEL "BIU_CORE/pfq_entry1_0" BEL
+        "BIU_CORE/pfq_entry3_7" BEL "BIU_CORE/pfq_entry3_6" BEL
+        "BIU_CORE/pfq_entry3_5" BEL "BIU_CORE/pfq_entry3_4" BEL
+        "BIU_CORE/pfq_entry3_3" BEL "BIU_CORE/pfq_entry3_2" BEL
+        "BIU_CORE/pfq_entry3_1" BEL "BIU_CORE/pfq_entry3_0" BEL
+        "BIU_CORE/pfq_entry0_7" BEL "BIU_CORE/pfq_entry0_6" BEL
+        "BIU_CORE/pfq_entry0_5" BEL "BIU_CORE/pfq_entry0_4" BEL
+        "BIU_CORE/pfq_entry0_3" BEL "BIU_CORE/pfq_entry0_2" BEL
+        "BIU_CORE/pfq_entry0_1" BEL "BIU_CORE/pfq_entry0_0" BEL
+        "BIU_CORE/INTA_n" BEL "BIU_CORE/DEN" BEL "BIU_CORE/RD_n" BEL
+        "BIU_CORE/WR_n" BEL "BIU_CORE/DTR" BEL "BIU_CORE/IOM" BEL
+        "BIU_CORE/intr_d2" BEL "BIU_CORE/clk_d2" BEL "BIU_CORE/SRAM_A_18" BEL
+        "BIU_CORE/SRAM_A_17" BEL "BIU_CORE/SRAM_A_16" BEL "BIU_CORE/SRAM_A_15"
+        BEL "BIU_CORE/SRAM_A_14" BEL "BIU_CORE/SRAM_A_13" BEL
+        "BIU_CORE/SRAM_A_12" BEL "BIU_CORE/SRAM_A_11" BEL "BIU_CORE/SRAM_A_10"
+        BEL "BIU_CORE/SRAM_A_9" BEL "BIU_CORE/SRAM_A_8" BEL
+        "BIU_CORE/SRAM_A_7" BEL "BIU_CORE/SRAM_A_6" BEL "BIU_CORE/SRAM_A_5"
+        BEL "BIU_CORE/SRAM_A_4" BEL "BIU_CORE/SRAM_A_3" BEL
+        "BIU_CORE/SRAM_A_2" BEL "BIU_CORE/SRAM_A_1" BEL "BIU_CORE/SRAM_A_0"
+        BEL "BIU_CORE/latched_data_in_7" BEL "BIU_CORE/latched_data_in_6" BEL
+        "BIU_CORE/latched_data_in_5" BEL "BIU_CORE/latched_data_in_4" BEL
+        "BIU_CORE/latched_data_in_3" BEL "BIU_CORE/latched_data_in_2" BEL
+        "BIU_CORE/latched_data_in_1" BEL "BIU_CORE/latched_data_in_0" BEL
+        "BIU_CORE/biu_return_data_int_7" BEL "BIU_CORE/biu_return_data_int_6"
+        BEL "BIU_CORE/biu_return_data_int_5" BEL
+        "BIU_CORE/biu_return_data_int_4" BEL "BIU_CORE/biu_return_data_int_3"
+        BEL "BIU_CORE/biu_return_data_int_2" BEL
+        "BIU_CORE/biu_return_data_int_1" BEL "BIU_CORE/biu_return_data_int_0"
+        BEL "BIU_CORE/addr_out_temp_19" BEL "BIU_CORE/addr_out_temp_18" BEL
+        "BIU_CORE/addr_out_temp_17" BEL "BIU_CORE/addr_out_temp_16" BEL
+        "BIU_CORE/addr_out_temp_15" BEL "BIU_CORE/addr_out_temp_14" BEL
+        "BIU_CORE/addr_out_temp_13" BEL "BIU_CORE/addr_out_temp_12" BEL
+        "BIU_CORE/addr_out_temp_11" BEL "BIU_CORE/addr_out_temp_10" BEL
+        "BIU_CORE/addr_out_temp_9" BEL "BIU_CORE/addr_out_temp_8" BEL
+        "BIU_CORE/addr_out_temp_7" BEL "BIU_CORE/addr_out_temp_6" BEL
+        "BIU_CORE/addr_out_temp_5" BEL "BIU_CORE/addr_out_temp_4" BEL
+        "BIU_CORE/addr_out_temp_3" BEL "BIU_CORE/addr_out_temp_2" BEL
+        "BIU_CORE/addr_out_temp_1" BEL "BIU_CORE/addr_out_temp_0" BEL
+        "BIU_CORE/AD_OUT_19" BEL "BIU_CORE/AD_OUT_18" BEL "BIU_CORE/AD_OUT_17"
+        BEL "BIU_CORE/AD_OUT_16" BEL "BIU_CORE/AD_OUT_15" BEL
+        "BIU_CORE/AD_OUT_14" BEL "BIU_CORE/AD_OUT_13" BEL "BIU_CORE/AD_OUT_12"
+        BEL "BIU_CORE/AD_OUT_11" BEL "BIU_CORE/AD_OUT_10" BEL
+        "BIU_CORE/AD_OUT_9" BEL "BIU_CORE/AD_OUT_8" BEL "BIU_CORE/AD_OUT_7"
+        BEL "BIU_CORE/AD_OUT_6" BEL "BIU_CORE/AD_OUT_5" BEL
+        "BIU_CORE/AD_OUT_4" BEL "BIU_CORE/AD_OUT_3" BEL "BIU_CORE/AD_OUT_2"
+        BEL "BIU_CORE/AD_OUT_1" BEL "BIU_CORE/AD_OUT_0" BEL
+        "BIU_CORE/SRAM_D_OUT_7" BEL "BIU_CORE/SRAM_D_OUT_6" BEL
+        "BIU_CORE/SRAM_D_OUT_5" BEL "BIU_CORE/SRAM_D_OUT_4" BEL
+        "BIU_CORE/SRAM_D_OUT_3" BEL "BIU_CORE/SRAM_D_OUT_2" BEL
+        "BIU_CORE/SRAM_D_OUT_1" BEL "BIU_CORE/SRAM_D_OUT_0" BEL
+        "BIU_CORE/mcl6_feature_1" BEL "BIU_CORE/mcl6_feature_0" BEL
+        "BIU_CORE/sram_select" BEL "BIU_CORE/SRAM_WE_n" BEL
+        "BIU_CORE/SRAM_OE_n" BEL "BIU_CORE/biu_state_7" BEL
+        "BIU_CORE/biu_state_6" BEL "BIU_CORE/biu_state_5" BEL
+        "BIU_CORE/biu_state_4" BEL "BIU_CORE/biu_state_3" BEL
+        "BIU_CORE/biu_state_2" BEL "BIU_CORE/biu_state_1" BEL
+        "BIU_CORE/biu_state_0" BEL "BIU_CORE/wr_n_int" BEL "BIU_CORE/rd_n_int"
+        BEL "BIU_CORE/den_int" BEL "BIU_CORE/inta_n_int" BEL "BIU_CORE/clk_d1"
+        BEL "BIU_CORE/dtr_int" BEL "BIU_CORE/SRAM_D_OE" BEL "BIU_CORE/AD_OE"
+        BEL "BIU_CORE/intr_d1" BEL "BIU_CORE/byte_num" BEL "BIU_CORE/ready_d1"
+        BEL "BIU_CORE/biu_done_int" BEL "BIU_CORE/eu_biu_req_d1" BEL
+        "BIU_CORE/biu_return_data_int_9" BEL "BIU_CORE/biu_return_data_int_10"
+        BEL "BIU_CORE/biu_return_data_int_8" BEL
+        "BIU_CORE/biu_return_data_int_12" BEL
+        "BIU_CORE/biu_return_data_int_13" BEL
+        "BIU_CORE/biu_return_data_int_11" BEL
+        "BIU_CORE/biu_return_data_int_15" BEL "BIU_CORE/pfq_write" BEL
+        "BIU_CORE/biu_return_data_int_14" BEL "BIU_CORE/nmi_d1" BEL
+        "BIU_CORE/eu_register_r3_d_15" BEL "BIU_CORE/eu_register_r3_d_14" BEL
+        "BIU_CORE/eu_register_r3_d_13" BEL "BIU_CORE/eu_register_r3_d_12" BEL
+        "BIU_CORE/eu_register_r3_d_11" BEL "BIU_CORE/eu_register_r3_d_10" BEL
+        "BIU_CORE/eu_register_r3_d_9" BEL "BIU_CORE/eu_register_r3_d_8" BEL
+        "BIU_CORE/eu_register_r3_d_7" BEL "BIU_CORE/eu_register_r3_d_6" BEL
+        "BIU_CORE/eu_register_r3_d_5" BEL "BIU_CORE/eu_register_r3_d_4" BEL
+        "BIU_CORE/eu_register_r3_d_3" BEL "BIU_CORE/eu_register_r3_d_2" BEL
+        "BIU_CORE/eu_register_r3_d_1" BEL "BIU_CORE/eu_register_r3_d_0" BEL
+        "BIU_CORE/biu_register_reg_15" BEL "BIU_CORE/biu_register_reg_14" BEL
+        "BIU_CORE/biu_register_reg_13" BEL "BIU_CORE/biu_register_reg_12" BEL
+        "BIU_CORE/biu_register_reg_11" BEL "BIU_CORE/biu_register_reg_10" BEL
+        "BIU_CORE/biu_register_reg_9" BEL "BIU_CORE/biu_register_reg_8" BEL
+        "BIU_CORE/biu_register_reg_7" BEL "BIU_CORE/biu_register_reg_6" BEL
+        "BIU_CORE/biu_register_reg_5" BEL "BIU_CORE/biu_register_reg_4" BEL
+        "BIU_CORE/biu_register_reg_3" BEL "BIU_CORE/biu_register_reg_2" BEL
+        "BIU_CORE/biu_register_reg_1" BEL "BIU_CORE/biu_register_reg_0" BEL
+        "BIU_CORE/biu_register_rm_15" BEL "BIU_CORE/biu_register_rm_14" BEL
+        "BIU_CORE/biu_register_rm_13" BEL "BIU_CORE/biu_register_rm_12" BEL
+        "BIU_CORE/biu_register_rm_11" BEL "BIU_CORE/biu_register_rm_10" BEL
+        "BIU_CORE/biu_register_rm_9" BEL "BIU_CORE/biu_register_rm_8" BEL
+        "BIU_CORE/biu_register_rm_7" BEL "BIU_CORE/biu_register_rm_6" BEL
+        "BIU_CORE/biu_register_rm_5" BEL "BIU_CORE/biu_register_rm_4" BEL
+        "BIU_CORE/biu_register_rm_3" BEL "BIU_CORE/biu_register_rm_2" BEL
+        "BIU_CORE/biu_register_rm_1" BEL "BIU_CORE/biu_register_rm_0" BEL
+        "BIU_CORE/biu_register_cs_15" BEL "BIU_CORE/biu_register_cs_14" BEL
+        "BIU_CORE/biu_register_cs_13" BEL "BIU_CORE/biu_register_cs_12" BEL
+        "BIU_CORE/biu_register_cs_11" BEL "BIU_CORE/biu_register_cs_10" BEL
+        "BIU_CORE/biu_register_cs_9" BEL "BIU_CORE/biu_register_cs_8" BEL
+        "BIU_CORE/biu_register_cs_7" BEL "BIU_CORE/biu_register_cs_6" BEL
+        "BIU_CORE/biu_register_cs_5" BEL "BIU_CORE/biu_register_cs_4" BEL
+        "BIU_CORE/biu_register_cs_3" BEL "BIU_CORE/biu_register_cs_2" BEL
+        "BIU_CORE/biu_register_cs_1" BEL "BIU_CORE/biu_register_cs_0" BEL
+        "BIU_CORE/biu_register_ds_15" BEL "BIU_CORE/biu_register_ds_14" BEL
+        "BIU_CORE/biu_register_ds_13" BEL "BIU_CORE/biu_register_ds_12" BEL
+        "BIU_CORE/biu_register_ds_11" BEL "BIU_CORE/biu_register_ds_10" BEL
+        "BIU_CORE/biu_register_ds_9" BEL "BIU_CORE/biu_register_ds_8" BEL
+        "BIU_CORE/biu_register_ds_7" BEL "BIU_CORE/biu_register_ds_6" BEL
+        "BIU_CORE/biu_register_ds_5" BEL "BIU_CORE/biu_register_ds_4" BEL
+        "BIU_CORE/biu_register_ds_3" BEL "BIU_CORE/biu_register_ds_2" BEL
+        "BIU_CORE/biu_register_ds_1" BEL "BIU_CORE/biu_register_ds_0" BEL
+        "BIU_CORE/biu_register_ss_15" BEL "BIU_CORE/biu_register_ss_14" BEL
+        "BIU_CORE/biu_register_ss_13" BEL "BIU_CORE/biu_register_ss_12" BEL
+        "BIU_CORE/biu_register_ss_11" BEL "BIU_CORE/biu_register_ss_10" BEL
+        "BIU_CORE/biu_register_ss_9" BEL "BIU_CORE/biu_register_ss_8" BEL
+        "BIU_CORE/biu_register_ss_7" BEL "BIU_CORE/biu_register_ss_6" BEL
+        "BIU_CORE/biu_register_ss_5" BEL "BIU_CORE/biu_register_ss_4" BEL
+        "BIU_CORE/biu_register_ss_3" BEL "BIU_CORE/biu_register_ss_2" BEL
+        "BIU_CORE/biu_register_ss_1" BEL "BIU_CORE/biu_register_ss_0" BEL
+        "BIU_CORE/biu_register_es_15" BEL "BIU_CORE/biu_register_es_14" BEL
+        "BIU_CORE/biu_register_es_13" BEL "BIU_CORE/biu_register_es_12" BEL
+        "BIU_CORE/biu_register_es_11" BEL "BIU_CORE/biu_register_es_10" BEL
+        "BIU_CORE/biu_register_es_9" BEL "BIU_CORE/biu_register_es_8" BEL
+        "BIU_CORE/biu_register_es_7" BEL "BIU_CORE/biu_register_es_6" BEL
+        "BIU_CORE/biu_register_es_5" BEL "BIU_CORE/biu_register_es_4" BEL
+        "BIU_CORE/biu_register_es_3" BEL "BIU_CORE/biu_register_es_2" BEL
+        "BIU_CORE/biu_register_es_1" BEL "BIU_CORE/biu_register_es_0" BEL
+        "BIU_CORE/ad_in_int_7" BEL "BIU_CORE/ad_in_int_6" BEL
+        "BIU_CORE/ad_in_int_5" BEL "BIU_CORE/ad_in_int_4" BEL
+        "BIU_CORE/ad_in_int_3" BEL "BIU_CORE/ad_in_int_2" BEL
+        "BIU_CORE/ad_in_int_1" BEL "BIU_CORE/ad_in_int_0" BEL
+        "EU_CORE/eu_register_r0_15" BEL "EU_CORE/eu_register_r0_14" BEL
+        "EU_CORE/eu_register_r0_13" BEL "EU_CORE/eu_register_r0_12" BEL
+        "EU_CORE/eu_register_r0_11" BEL "EU_CORE/eu_register_r0_10" BEL
+        "EU_CORE/eu_register_r0_9" BEL "EU_CORE/eu_register_r0_8" BEL
+        "EU_CORE/eu_register_r0_7" BEL "EU_CORE/eu_register_r0_6" BEL
+        "EU_CORE/eu_register_r0_5" BEL "EU_CORE/eu_register_r0_4" BEL
+        "EU_CORE/eu_register_r0_3" BEL "EU_CORE/eu_register_r0_2" BEL
+        "EU_CORE/eu_register_r0_1" BEL "EU_CORE/eu_register_r0_0" BEL
+        "EU_CORE/eu_alu_last_result_15" BEL "EU_CORE/eu_alu_last_result_14"
+        BEL "EU_CORE/eu_alu_last_result_13" BEL
+        "EU_CORE/eu_alu_last_result_12" BEL "EU_CORE/eu_alu_last_result_11"
+        BEL "EU_CORE/eu_alu_last_result_10" BEL "EU_CORE/eu_alu_last_result_9"
+        BEL "EU_CORE/eu_alu_last_result_8" BEL "EU_CORE/eu_alu_last_result_7"
+        BEL "EU_CORE/eu_alu_last_result_6" BEL "EU_CORE/eu_alu_last_result_5"
+        BEL "EU_CORE/eu_alu_last_result_4" BEL "EU_CORE/eu_alu_last_result_3"
+        BEL "EU_CORE/eu_alu_last_result_2" BEL "EU_CORE/eu_alu_last_result_1"
+        BEL "EU_CORE/eu_alu_last_result_0" BEL "EU_CORE/eu_rom_address_12" BEL
+        "EU_CORE/eu_rom_address_11" BEL "EU_CORE/eu_rom_address_10" BEL
+        "EU_CORE/eu_rom_address_9" BEL "EU_CORE/eu_rom_address_8" BEL
+        "EU_CORE/eu_rom_address_7" BEL "EU_CORE/eu_rom_address_6" BEL
+        "EU_CORE/eu_rom_address_5" BEL "EU_CORE/eu_rom_address_4" BEL
+        "EU_CORE/eu_rom_address_3" BEL "EU_CORE/eu_rom_address_2" BEL
+        "EU_CORE/eu_rom_address_1" BEL "EU_CORE/eu_rom_address_0" BEL
+        "EU_CORE/eu_calling_address_51" BEL "EU_CORE/eu_calling_address_50"
+        BEL "EU_CORE/eu_calling_address_49" BEL
+        "EU_CORE/eu_calling_address_48" BEL "EU_CORE/eu_calling_address_47"
+        BEL "EU_CORE/eu_calling_address_46" BEL
+        "EU_CORE/eu_calling_address_45" BEL "EU_CORE/eu_calling_address_44"
+        BEL "EU_CORE/eu_calling_address_43" BEL
+        "EU_CORE/eu_calling_address_42" BEL "EU_CORE/eu_calling_address_41"
+        BEL "EU_CORE/eu_calling_address_40" BEL
+        "EU_CORE/eu_calling_address_39" BEL "EU_CORE/eu_calling_address_38"
+        BEL "EU_CORE/eu_calling_address_37" BEL
+        "EU_CORE/eu_calling_address_36" BEL "EU_CORE/eu_calling_address_35"
+        BEL "EU_CORE/eu_calling_address_34" BEL
+        "EU_CORE/eu_calling_address_33" BEL "EU_CORE/eu_calling_address_32"
+        BEL "EU_CORE/eu_calling_address_31" BEL
+        "EU_CORE/eu_calling_address_30" BEL "EU_CORE/eu_calling_address_29"
+        BEL "EU_CORE/eu_calling_address_28" BEL
+        "EU_CORE/eu_calling_address_27" BEL "EU_CORE/eu_calling_address_26"
+        BEL "EU_CORE/eu_calling_address_25" BEL
+        "EU_CORE/eu_calling_address_24" BEL "EU_CORE/eu_calling_address_23"
+        BEL "EU_CORE/eu_calling_address_22" BEL
+        "EU_CORE/eu_calling_address_21" BEL "EU_CORE/eu_calling_address_20"
+        BEL "EU_CORE/eu_calling_address_19" BEL
+        "EU_CORE/eu_calling_address_18" BEL "EU_CORE/eu_calling_address_17"
+        BEL "EU_CORE/eu_calling_address_16" BEL
+        "EU_CORE/eu_calling_address_15" BEL "EU_CORE/eu_calling_address_14"
+        BEL "EU_CORE/eu_calling_address_13" BEL
+        "EU_CORE/eu_calling_address_12" BEL "EU_CORE/eu_calling_address_11"
+        BEL "EU_CORE/eu_calling_address_10" BEL "EU_CORE/eu_calling_address_9"
+        BEL "EU_CORE/eu_calling_address_8" BEL "EU_CORE/eu_calling_address_7"
+        BEL "EU_CORE/eu_calling_address_6" BEL "EU_CORE/eu_calling_address_5"
+        BEL "EU_CORE/eu_calling_address_4" BEL "EU_CORE/eu_calling_address_3"
+        BEL "EU_CORE/eu_calling_address_2" BEL "EU_CORE/eu_calling_address_1"
+        BEL "EU_CORE/eu_calling_address_0" BEL "EU_CORE/eu_add_overflow8" BEL
+        "EU_CORE/eu_add_overflow16" BEL "EU_CORE/eu_flag_t_d" BEL
+        "EU_CORE/eu_biu_dataout_15" BEL "EU_CORE/eu_biu_dataout_14" BEL
+        "EU_CORE/eu_biu_dataout_13" BEL "EU_CORE/eu_biu_dataout_12" BEL
+        "EU_CORE/eu_biu_dataout_11" BEL "EU_CORE/eu_biu_dataout_10" BEL
+        "EU_CORE/eu_biu_dataout_9" BEL "EU_CORE/eu_biu_dataout_8" BEL
+        "EU_CORE/eu_biu_dataout_7" BEL "EU_CORE/eu_biu_dataout_6" BEL
+        "EU_CORE/eu_biu_dataout_5" BEL "EU_CORE/eu_biu_dataout_4" BEL
+        "EU_CORE/eu_biu_dataout_3" BEL "EU_CORE/eu_biu_dataout_2" BEL
+        "EU_CORE/eu_biu_dataout_1" BEL "EU_CORE/eu_biu_dataout_0" BEL
+        "EU_CORE/eu_register_r3_15" BEL "EU_CORE/eu_register_r3_14" BEL
+        "EU_CORE/eu_register_r3_13" BEL "EU_CORE/eu_register_r3_12" BEL
+        "EU_CORE/eu_register_r3_11" BEL "EU_CORE/eu_register_r3_10" BEL
+        "EU_CORE/eu_register_r3_9" BEL "EU_CORE/eu_register_r3_8" BEL
+        "EU_CORE/eu_register_r3_7" BEL "EU_CORE/eu_register_r3_6" BEL
+        "EU_CORE/eu_register_r3_5" BEL "EU_CORE/eu_register_r3_4" BEL
+        "EU_CORE/eu_register_r3_3" BEL "EU_CORE/eu_register_r3_2" BEL
+        "EU_CORE/eu_register_r3_1" BEL "EU_CORE/eu_register_r3_0" BEL
+        "EU_CORE/eu_register_r2_15" BEL "EU_CORE/eu_register_r2_14" BEL
+        "EU_CORE/eu_register_r2_13" BEL "EU_CORE/eu_register_r2_12" BEL
+        "EU_CORE/eu_register_r2_11" BEL "EU_CORE/eu_register_r2_10" BEL
+        "EU_CORE/eu_register_r2_9" BEL "EU_CORE/eu_register_r2_8" BEL
+        "EU_CORE/eu_register_r2_7" BEL "EU_CORE/eu_register_r2_6" BEL
+        "EU_CORE/eu_register_r2_5" BEL "EU_CORE/eu_register_r2_4" BEL
+        "EU_CORE/eu_register_r2_3" BEL "EU_CORE/eu_register_r2_2" BEL
+        "EU_CORE/eu_register_r2_1" BEL "EU_CORE/eu_register_r2_0" BEL
+        "EU_CORE/eu_biu_command_15" BEL "EU_CORE/eu_biu_command_14" BEL
+        "EU_CORE/eu_biu_command_13" BEL "EU_CORE/eu_biu_command_12" BEL
+        "EU_CORE/eu_biu_command_11" BEL "EU_CORE/eu_biu_command_10" BEL
+        "EU_CORE/eu_biu_command_9" BEL "EU_CORE/eu_biu_command_8" BEL
+        "EU_CORE/eu_biu_command_7" BEL "EU_CORE/eu_biu_command_6" BEL
+        "EU_CORE/eu_biu_command_5" BEL "EU_CORE/eu_biu_command_4" BEL
+        "EU_CORE/eu_biu_command_3" BEL "EU_CORE/eu_biu_command_2" BEL
+        "EU_CORE/eu_biu_command_1" BEL "EU_CORE/eu_biu_command_0" BEL
+        "EU_CORE/eu_flags_15" BEL "EU_CORE/eu_flags_14" BEL
+        "EU_CORE/eu_flags_13" BEL "EU_CORE/eu_flags_12" BEL
+        "EU_CORE/eu_flags_11" BEL "EU_CORE/eu_flags_10" BEL
+        "EU_CORE/eu_flags_9" BEL "EU_CORE/eu_flags_8" BEL "EU_CORE/eu_flags_7"
+        BEL "EU_CORE/eu_flags_6" BEL "EU_CORE/eu_flags_5" BEL
+        "EU_CORE/eu_flags_4" BEL "EU_CORE/eu_flags_3" BEL "EU_CORE/eu_flags_2"
+        BEL "EU_CORE/eu_flags_1" BEL "EU_CORE/eu_flags_0" BEL
+        "EU_CORE/eu_register_r1_15" BEL "EU_CORE/eu_register_r1_14" BEL
+        "EU_CORE/eu_register_r1_13" BEL "EU_CORE/eu_register_r1_12" BEL
+        "EU_CORE/eu_register_r1_11" BEL "EU_CORE/eu_register_r1_10" BEL
+        "EU_CORE/eu_register_r1_9" BEL "EU_CORE/eu_register_r1_8" BEL
+        "EU_CORE/eu_register_r1_7" BEL "EU_CORE/eu_register_r1_6" BEL
+        "EU_CORE/eu_register_r1_5" BEL "EU_CORE/eu_register_r1_4" BEL
+        "EU_CORE/eu_register_r1_3" BEL "EU_CORE/eu_register_r1_2" BEL
+        "EU_CORE/eu_register_r1_1" BEL "EU_CORE/eu_register_r1_0" BEL
+        "EU_CORE/eu_register_si_15" BEL "EU_CORE/eu_register_si_14" BEL
+        "EU_CORE/eu_register_si_13" BEL "EU_CORE/eu_register_si_12" BEL
+        "EU_CORE/eu_register_si_11" BEL "EU_CORE/eu_register_si_10" BEL
+        "EU_CORE/eu_register_si_9" BEL "EU_CORE/eu_register_si_8" BEL
+        "EU_CORE/eu_register_si_7" BEL "EU_CORE/eu_register_si_6" BEL
+        "EU_CORE/eu_register_si_5" BEL "EU_CORE/eu_register_si_4" BEL
+        "EU_CORE/eu_register_si_3" BEL "EU_CORE/eu_register_si_2" BEL
+        "EU_CORE/eu_register_si_1" BEL "EU_CORE/eu_register_si_0" BEL
+        "EU_CORE/eu_register_bp_15" BEL "EU_CORE/eu_register_bp_14" BEL
+        "EU_CORE/eu_register_bp_13" BEL "EU_CORE/eu_register_bp_12" BEL
+        "EU_CORE/eu_register_bp_11" BEL "EU_CORE/eu_register_bp_10" BEL
+        "EU_CORE/eu_register_bp_9" BEL "EU_CORE/eu_register_bp_8" BEL
+        "EU_CORE/eu_register_bp_7" BEL "EU_CORE/eu_register_bp_6" BEL
+        "EU_CORE/eu_register_bp_5" BEL "EU_CORE/eu_register_bp_4" BEL
+        "EU_CORE/eu_register_bp_3" BEL "EU_CORE/eu_register_bp_2" BEL
+        "EU_CORE/eu_register_bp_1" BEL "EU_CORE/eu_register_bp_0" BEL
+        "EU_CORE/eu_register_di_15" BEL "EU_CORE/eu_register_di_14" BEL
+        "EU_CORE/eu_register_di_13" BEL "EU_CORE/eu_register_di_12" BEL
+        "EU_CORE/eu_register_di_11" BEL "EU_CORE/eu_register_di_10" BEL
+        "EU_CORE/eu_register_di_9" BEL "EU_CORE/eu_register_di_8" BEL
+        "EU_CORE/eu_register_di_7" BEL "EU_CORE/eu_register_di_6" BEL
+        "EU_CORE/eu_register_di_5" BEL "EU_CORE/eu_register_di_4" BEL
+        "EU_CORE/eu_register_di_3" BEL "EU_CORE/eu_register_di_2" BEL
+        "EU_CORE/eu_register_di_1" BEL "EU_CORE/eu_register_di_0" BEL
+        "EU_CORE/eu_register_sp_15" BEL "EU_CORE/eu_register_sp_14" BEL
+        "EU_CORE/eu_register_sp_13" BEL "EU_CORE/eu_register_sp_12" BEL
+        "EU_CORE/eu_register_sp_11" BEL "EU_CORE/eu_register_sp_10" BEL
+        "EU_CORE/eu_register_sp_9" BEL "EU_CORE/eu_register_sp_8" BEL
+        "EU_CORE/eu_register_sp_7" BEL "EU_CORE/eu_register_sp_6" BEL
+        "EU_CORE/eu_register_sp_5" BEL "EU_CORE/eu_register_sp_4" BEL
+        "EU_CORE/eu_register_sp_3" BEL "EU_CORE/eu_register_sp_2" BEL
+        "EU_CORE/eu_register_sp_1" BEL "EU_CORE/eu_register_sp_0" BEL
+        "EU_CORE/eu_register_dx_15" BEL "EU_CORE/eu_register_dx_14" BEL
+        "EU_CORE/eu_register_dx_13" BEL "EU_CORE/eu_register_dx_12" BEL
+        "EU_CORE/eu_register_dx_11" BEL "EU_CORE/eu_register_dx_10" BEL
+        "EU_CORE/eu_register_dx_9" BEL "EU_CORE/eu_register_dx_8" BEL
+        "EU_CORE/eu_register_dx_7" BEL "EU_CORE/eu_register_dx_6" BEL
+        "EU_CORE/eu_register_dx_5" BEL "EU_CORE/eu_register_dx_4" BEL
+        "EU_CORE/eu_register_dx_3" BEL "EU_CORE/eu_register_dx_2" BEL
+        "EU_CORE/eu_register_dx_1" BEL "EU_CORE/eu_register_dx_0" BEL
+        "EU_CORE/eu_register_cx_15" BEL "EU_CORE/eu_register_cx_14" BEL
+        "EU_CORE/eu_register_cx_13" BEL "EU_CORE/eu_register_cx_12" BEL
+        "EU_CORE/eu_register_cx_11" BEL "EU_CORE/eu_register_cx_10" BEL
+        "EU_CORE/eu_register_cx_9" BEL "EU_CORE/eu_register_cx_8" BEL
+        "EU_CORE/eu_register_cx_7" BEL "EU_CORE/eu_register_cx_6" BEL
+        "EU_CORE/eu_register_cx_5" BEL "EU_CORE/eu_register_cx_4" BEL
+        "EU_CORE/eu_register_cx_3" BEL "EU_CORE/eu_register_cx_2" BEL
+        "EU_CORE/eu_register_cx_1" BEL "EU_CORE/eu_register_cx_0" BEL
+        "EU_CORE/eu_register_bx_15" BEL "EU_CORE/eu_register_bx_14" BEL
+        "EU_CORE/eu_register_bx_13" BEL "EU_CORE/eu_register_bx_12" BEL
+        "EU_CORE/eu_register_bx_11" BEL "EU_CORE/eu_register_bx_10" BEL
+        "EU_CORE/eu_register_bx_9" BEL "EU_CORE/eu_register_bx_8" BEL
+        "EU_CORE/eu_register_bx_7" BEL "EU_CORE/eu_register_bx_6" BEL
+        "EU_CORE/eu_register_bx_5" BEL "EU_CORE/eu_register_bx_4" BEL
+        "EU_CORE/eu_register_bx_3" BEL "EU_CORE/eu_register_bx_2" BEL
+        "EU_CORE/eu_register_bx_1" BEL "EU_CORE/eu_register_bx_0" BEL
+        "EU_CORE/eu_register_ax_15" BEL "EU_CORE/eu_register_ax_14" BEL
+        "EU_CORE/eu_register_ax_13" BEL "EU_CORE/eu_register_ax_12" BEL
+        "EU_CORE/eu_register_ax_11" BEL "EU_CORE/eu_register_ax_10" BEL
+        "EU_CORE/eu_register_ax_9" BEL "EU_CORE/eu_register_ax_8" BEL
+        "EU_CORE/eu_register_ax_7" BEL "EU_CORE/eu_register_ax_6" BEL
+        "EU_CORE/eu_register_ax_5" BEL "EU_CORE/eu_register_ax_4" BEL
+        "EU_CORE/eu_register_ax_3" BEL "EU_CORE/eu_register_ax_2" BEL
+        "EU_CORE/eu_register_ax_1" BEL "EU_CORE/eu_register_ax_0" BEL
+        "EU_CORE/eu_add_aux_carry" BEL "EU_CORE/eu_add_carry8" BEL
+        "EU_CORE/eu_add_carry" BEL "EU_CORE/biu_done_d1" BEL
+        "EU_CORE/eu_stall_pipeline" BEL "t_reset_d4" BEL
+        "BIU_CORE/eu_biu_req_caught" BEL "BIU_CORE/nmi_caught" BEL
+        "EU_CORE/eu_tr_latched" BEL "EU_CORE/biu_done_caught" BEL
+        "BIU_CORE/BIU_INTR" BEL "BIU_CORE/ale_int" BEL "BIU_CORE/iom_int" BEL
+        "EU_CORE/intr_enable_delayed" BEL "BIU_CORE/nmi_d2" BEL "led_go_left"
+        BEL "BIU_CORE/word_cycle" BEL "Mshreg_t_biu_ad_oe_d2" BEL
+        "t_biu_ad_oe_d2" BEL "Mshreg_t_reset_d2" BEL "t_reset_d2" BEL
+        "BIU_CORE/Mshreg_biu_return_data_int_d2_15" BEL
+        "BIU_CORE/biu_return_data_int_d2_15" BEL
+        "BIU_CORE/Mshreg_biu_return_data_int_d2_14" BEL
+        "BIU_CORE/biu_return_data_int_d2_14" BEL
+        "BIU_CORE/Mshreg_biu_return_data_int_d2_13" BEL
+        "BIU_CORE/biu_return_data_int_d2_13" BEL
+        "BIU_CORE/Mshreg_biu_return_data_int_d2_12" BEL
+        "BIU_CORE/biu_return_data_int_d2_12" BEL
+        "BIU_CORE/Mshreg_biu_return_data_int_d2_11" BEL
+        "BIU_CORE/biu_return_data_int_d2_11" BEL
+        "BIU_CORE/Mshreg_biu_return_data_int_d2_10" BEL
+        "BIU_CORE/biu_return_data_int_d2_10" BEL
+        "BIU_CORE/Mshreg_biu_return_data_int_d2_9" BEL
+        "BIU_CORE/biu_return_data_int_d2_9" BEL
+        "BIU_CORE/Mshreg_biu_return_data_int_d2_8" BEL
+        "BIU_CORE/biu_return_data_int_d2_8" BEL
+        "BIU_CORE/Mshreg_biu_return_data_int_d2_7" BEL
+        "BIU_CORE/biu_return_data_int_d2_7" BEL
+        "BIU_CORE/Mshreg_biu_return_data_int_d2_6" BEL
+        "BIU_CORE/biu_return_data_int_d2_6" BEL
+        "BIU_CORE/Mshreg_biu_return_data_int_d2_3" BEL
+        "BIU_CORE/biu_return_data_int_d2_3" BEL
+        "BIU_CORE/Mshreg_biu_return_data_int_d2_5" BEL
+        "BIU_CORE/biu_return_data_int_d2_5" BEL
+        "BIU_CORE/Mshreg_biu_return_data_int_d2_4" BEL
+        "BIU_CORE/biu_return_data_int_d2_4" BEL
+        "BIU_CORE/Mshreg_biu_return_data_int_d2_2" BEL
+        "BIU_CORE/biu_return_data_int_d2_2" BEL
+        "BIU_CORE/Mshreg_biu_return_data_int_d2_1" BEL
+        "BIU_CORE/biu_return_data_int_d2_1" BEL
+        "BIU_CORE/Mshreg_biu_return_data_int_d2_0" BEL
+        "BIU_CORE/biu_return_data_int_d2_0" BEL
+        "BIU_CORE/Mshreg_biu_register_rm_d2_15" BEL
+        "BIU_CORE/biu_register_rm_d2_15" BEL
+        "BIU_CORE/Mshreg_biu_register_rm_d2_12" BEL
+        "BIU_CORE/biu_register_rm_d2_12" BEL
+        "BIU_CORE/Mshreg_biu_register_rm_d2_14" BEL
+        "BIU_CORE/biu_register_rm_d2_14" BEL
+        "BIU_CORE/Mshreg_biu_register_rm_d2_13" BEL
+        "BIU_CORE/biu_register_rm_d2_13" BEL
+        "BIU_CORE/Mshreg_biu_register_rm_d2_11" BEL
+        "BIU_CORE/biu_register_rm_d2_11" BEL
+        "BIU_CORE/Mshreg_biu_register_rm_d2_10" BEL
+        "BIU_CORE/biu_register_rm_d2_10" BEL
+        "BIU_CORE/Mshreg_biu_register_rm_d2_9" BEL
+        "BIU_CORE/biu_register_rm_d2_9" BEL
+        "BIU_CORE/Mshreg_biu_register_rm_d2_8" BEL
+        "BIU_CORE/biu_register_rm_d2_8" BEL
+        "BIU_CORE/Mshreg_biu_register_rm_d2_5" BEL
+        "BIU_CORE/biu_register_rm_d2_5" BEL
+        "BIU_CORE/Mshreg_biu_register_rm_d2_7" BEL
+        "BIU_CORE/biu_register_rm_d2_7" BEL
+        "BIU_CORE/Mshreg_biu_register_rm_d2_6" BEL
+        "BIU_CORE/biu_register_rm_d2_6" BEL
+        "BIU_CORE/Mshreg_biu_register_rm_d2_4" BEL
+        "BIU_CORE/biu_register_rm_d2_4" BEL
+        "BIU_CORE/Mshreg_biu_register_rm_d2_3" BEL
+        "BIU_CORE/biu_register_rm_d2_3" BEL
+        "BIU_CORE/Mshreg_biu_register_rm_d2_2" BEL
+        "BIU_CORE/biu_register_rm_d2_2" BEL
+        "BIU_CORE/Mshreg_biu_register_rm_d2_1" BEL
+        "BIU_CORE/biu_register_rm_d2_1" BEL
+        "BIU_CORE/Mshreg_biu_register_ds_d2_14" BEL
+        "BIU_CORE/biu_register_ds_d2_14" BEL
+        "BIU_CORE/Mshreg_biu_register_rm_d2_0" BEL
+        "BIU_CORE/biu_register_rm_d2_0" BEL
+        "BIU_CORE/Mshreg_biu_register_ds_d2_15" BEL
+        "BIU_CORE/biu_register_ds_d2_15" BEL
+        "BIU_CORE/Mshreg_biu_register_ds_d2_13" BEL
+        "BIU_CORE/biu_register_ds_d2_13" BEL
+        "BIU_CORE/Mshreg_biu_register_ds_d2_12" BEL
+        "BIU_CORE/biu_register_ds_d2_12" BEL
+        "BIU_CORE/Mshreg_biu_register_ds_d2_11" BEL
+        "BIU_CORE/biu_register_ds_d2_11" BEL
+        "BIU_CORE/Mshreg_biu_register_ds_d2_10" BEL
+        "BIU_CORE/biu_register_ds_d2_10" BEL
+        "BIU_CORE/Mshreg_biu_register_ds_d2_7" BEL
+        "BIU_CORE/biu_register_ds_d2_7" BEL
+        "BIU_CORE/Mshreg_biu_register_ds_d2_9" BEL
+        "BIU_CORE/biu_register_ds_d2_9" BEL
+        "BIU_CORE/Mshreg_biu_register_ds_d2_8" BEL
+        "BIU_CORE/biu_register_ds_d2_8" BEL
+        "BIU_CORE/Mshreg_biu_register_ds_d2_6" BEL
+        "BIU_CORE/biu_register_ds_d2_6" BEL
+        "BIU_CORE/Mshreg_biu_register_ds_d2_5" BEL
+        "BIU_CORE/biu_register_ds_d2_5" BEL
+        "BIU_CORE/Mshreg_biu_register_ds_d2_4" BEL
+        "BIU_CORE/biu_register_ds_d2_4" BEL
+        "BIU_CORE/Mshreg_biu_register_ds_d2_3" BEL
+        "BIU_CORE/biu_register_ds_d2_3" BEL
+        "BIU_CORE/Mshreg_biu_register_ds_d2_0" BEL
+        "BIU_CORE/biu_register_ds_d2_0" BEL
+        "BIU_CORE/Mshreg_biu_register_ds_d2_2" BEL
+        "BIU_CORE/biu_register_ds_d2_2" BEL
+        "BIU_CORE/Mshreg_biu_register_ds_d2_1" BEL
+        "BIU_CORE/biu_register_ds_d2_1" BEL
+        "BIU_CORE/Mshreg_biu_register_reg_d2_15" BEL
+        "BIU_CORE/biu_register_reg_d2_15" BEL
+        "BIU_CORE/Mshreg_biu_register_reg_d2_14" BEL
+        "BIU_CORE/biu_register_reg_d2_14" BEL
+        "BIU_CORE/Mshreg_biu_register_reg_d2_13" BEL
+        "BIU_CORE/biu_register_reg_d2_13" BEL
+        "BIU_CORE/Mshreg_biu_register_reg_d2_12" BEL
+        "BIU_CORE/biu_register_reg_d2_12" BEL
+        "BIU_CORE/Mshreg_biu_register_reg_d2_9" BEL
+        "BIU_CORE/biu_register_reg_d2_9" BEL
+        "BIU_CORE/Mshreg_biu_register_reg_d2_11" BEL
+        "BIU_CORE/biu_register_reg_d2_11" BEL
+        "BIU_CORE/Mshreg_biu_register_reg_d2_10" BEL
+        "BIU_CORE/biu_register_reg_d2_10" BEL
+        "BIU_CORE/Mshreg_biu_register_reg_d2_8" BEL
+        "BIU_CORE/biu_register_reg_d2_8" BEL
+        "BIU_CORE/Mshreg_biu_register_reg_d2_7" BEL
+        "BIU_CORE/biu_register_reg_d2_7" BEL
+        "BIU_CORE/Mshreg_biu_register_reg_d2_6" BEL
+        "BIU_CORE/biu_register_reg_d2_6" BEL
+        "BIU_CORE/Mshreg_biu_register_reg_d2_5" BEL
+        "BIU_CORE/biu_register_reg_d2_5" BEL
+        "BIU_CORE/Mshreg_biu_register_reg_d2_4" BEL
+        "BIU_CORE/biu_register_reg_d2_4" BEL
+        "BIU_CORE/Mshreg_biu_register_reg_d2_3" BEL
+        "BIU_CORE/biu_register_reg_d2_3" BEL
+        "BIU_CORE/Mshreg_biu_register_reg_d2_2" BEL
+        "BIU_CORE/biu_register_reg_d2_2" BEL
+        "BIU_CORE/Mshreg_biu_register_reg_d2_1" BEL
+        "BIU_CORE/biu_register_reg_d2_1" BEL
+        "BIU_CORE/Mshreg_biu_register_reg_d2_0" BEL
+        "BIU_CORE/biu_register_reg_d2_0" BEL
+        "BIU_CORE/Mshreg_biu_register_ss_d2_15" BEL
+        "BIU_CORE/biu_register_ss_d2_15" BEL
+        "BIU_CORE/Mshreg_biu_register_ss_d2_14" BEL
+        "BIU_CORE/biu_register_ss_d2_14" BEL
+        "BIU_CORE/Mshreg_biu_register_ss_d2_13" BEL
+        "BIU_CORE/biu_register_ss_d2_13" BEL
+        "BIU_CORE/Mshreg_biu_register_ss_d2_10" BEL
+        "BIU_CORE/biu_register_ss_d2_10" BEL
+        "BIU_CORE/Mshreg_biu_register_ss_d2_12" BEL
+        "BIU_CORE/biu_register_ss_d2_12" BEL
+        "BIU_CORE/Mshreg_biu_register_ss_d2_11" BEL
+        "BIU_CORE/biu_register_ss_d2_11" BEL
+        "BIU_CORE/Mshreg_biu_register_ss_d2_9" BEL
+        "BIU_CORE/biu_register_ss_d2_9" BEL
+        "BIU_CORE/Mshreg_biu_register_ss_d2_8" BEL
+        "BIU_CORE/biu_register_ss_d2_8" BEL
+        "BIU_CORE/Mshreg_biu_register_ss_d2_7" BEL
+        "BIU_CORE/biu_register_ss_d2_7" BEL
+        "BIU_CORE/Mshreg_biu_register_ss_d2_6" BEL
+        "BIU_CORE/biu_register_ss_d2_6" BEL
+        "BIU_CORE/Mshreg_biu_register_ss_d2_3" BEL
+        "BIU_CORE/biu_register_ss_d2_3" BEL
+        "BIU_CORE/Mshreg_biu_register_ss_d2_5" BEL
+        "BIU_CORE/biu_register_ss_d2_5" BEL
+        "BIU_CORE/Mshreg_biu_register_ss_d2_4" BEL
+        "BIU_CORE/biu_register_ss_d2_4" BEL
+        "BIU_CORE/Mshreg_biu_register_ss_d2_2" BEL
+        "BIU_CORE/biu_register_ss_d2_2" BEL
+        "BIU_CORE/Mshreg_biu_register_ss_d2_1" BEL
+        "BIU_CORE/biu_register_ss_d2_1" BEL
+        "BIU_CORE/Mshreg_biu_register_ss_d2_0" BEL
+        "BIU_CORE/biu_register_ss_d2_0" BEL
+        "BIU_CORE/Mshreg_biu_register_es_d2_15" BEL
+        "BIU_CORE/biu_register_es_d2_15" BEL
+        "BIU_CORE/Mshreg_biu_register_es_d2_12" BEL
+        "BIU_CORE/biu_register_es_d2_12" BEL
+        "BIU_CORE/Mshreg_biu_register_es_d2_14" BEL
+        "BIU_CORE/biu_register_es_d2_14" BEL
+        "BIU_CORE/Mshreg_biu_register_es_d2_13" BEL
+        "BIU_CORE/biu_register_es_d2_13" BEL
+        "BIU_CORE/Mshreg_biu_register_es_d2_11" BEL
+        "BIU_CORE/biu_register_es_d2_11" BEL
+        "BIU_CORE/Mshreg_biu_register_es_d2_10" BEL
+        "BIU_CORE/biu_register_es_d2_10" BEL
+        "BIU_CORE/Mshreg_biu_register_es_d2_9" BEL
+        "BIU_CORE/biu_register_es_d2_9" BEL
+        "BIU_CORE/Mshreg_biu_register_es_d2_8" BEL
+        "BIU_CORE/biu_register_es_d2_8" BEL
+        "BIU_CORE/Mshreg_biu_register_es_d2_5" BEL
+        "BIU_CORE/biu_register_es_d2_5" BEL
+        "BIU_CORE/Mshreg_biu_register_es_d2_7" BEL
+        "BIU_CORE/biu_register_es_d2_7" BEL
+        "BIU_CORE/Mshreg_biu_register_es_d2_6" BEL
+        "BIU_CORE/biu_register_es_d2_6" BEL
+        "BIU_CORE/Mshreg_biu_register_es_d2_4" BEL
+        "BIU_CORE/biu_register_es_d2_4" BEL
+        "BIU_CORE/Mshreg_biu_register_es_d2_3" BEL
+        "BIU_CORE/biu_register_es_d2_3" BEL
+        "BIU_CORE/Mshreg_biu_register_es_d2_2" BEL
+        "BIU_CORE/biu_register_es_d2_2" BEL
+        "BIU_CORE/Mshreg_biu_register_es_d2_1" BEL
+        "BIU_CORE/biu_register_es_d2_1" BEL
+        "BIU_CORE/Mshreg_biu_register_cs_d2_14" BEL
+        "BIU_CORE/biu_register_cs_d2_14" BEL
+        "BIU_CORE/Mshreg_biu_register_es_d2_0" BEL
+        "BIU_CORE/biu_register_es_d2_0" BEL
+        "BIU_CORE/Mshreg_biu_register_cs_d2_15" BEL
+        "BIU_CORE/biu_register_cs_d2_15" BEL
+        "BIU_CORE/Mshreg_biu_register_cs_d2_13" BEL
+        "BIU_CORE/biu_register_cs_d2_13" BEL
+        "BIU_CORE/Mshreg_biu_register_cs_d2_12" BEL
+        "BIU_CORE/biu_register_cs_d2_12" BEL
+        "BIU_CORE/Mshreg_biu_register_cs_d2_11" BEL
+        "BIU_CORE/biu_register_cs_d2_11" BEL
+        "BIU_CORE/Mshreg_biu_register_cs_d2_10" BEL
+        "BIU_CORE/biu_register_cs_d2_10" BEL
+        "BIU_CORE/Mshreg_biu_register_cs_d2_7" BEL
+        "BIU_CORE/biu_register_cs_d2_7" BEL
+        "BIU_CORE/Mshreg_biu_register_cs_d2_9" BEL
+        "BIU_CORE/biu_register_cs_d2_9" BEL
+        "BIU_CORE/Mshreg_biu_register_cs_d2_8" BEL
+        "BIU_CORE/biu_register_cs_d2_8" BEL
+        "BIU_CORE/Mshreg_biu_register_cs_d2_6" BEL
+        "BIU_CORE/biu_register_cs_d2_6" BEL
+        "BIU_CORE/Mshreg_biu_register_cs_d2_5" BEL
+        "BIU_CORE/biu_register_cs_d2_5" BEL
+        "BIU_CORE/Mshreg_biu_register_cs_d2_4" BEL
+        "BIU_CORE/biu_register_cs_d2_4" BEL
+        "BIU_CORE/Mshreg_biu_register_cs_d2_3" BEL
+        "BIU_CORE/biu_register_cs_d2_3" BEL
+        "BIU_CORE/Mshreg_biu_register_cs_d2_0" BEL
+        "BIU_CORE/biu_register_cs_d2_0" BEL
+        "BIU_CORE/Mshreg_biu_register_cs_d2_2" BEL
+        "BIU_CORE/biu_register_cs_d2_2" BEL
+        "BIU_CORE/Mshreg_biu_register_cs_d2_1" BEL
+        "BIU_CORE/biu_register_cs_d2_1" PIN
+        "EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[7].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram_pins<28>"
+        PIN
+        "EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram_pins<28>"
+        PIN
+        "EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[3].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram_pins<28>"
+        PIN
+        "EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[2].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram_pins<28>"
+        PIN
+        "EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[1].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram_pins<28>"
+        PIN
+        "EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/s6_init.ram/SP.SIMPLE_PRIM9.ram_pins<26>"
+        BEL
+        "EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/has_mux_a.A/sel_pipe_0"
+        PIN
+        "EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram_pins<28>"
+        PIN
+        "EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[6].ram.r/s6_init.ram/SP.SIMPLE_PRIM18.ram_pins<28>";
+PIN SP6_BUFIO_INSERT_ML_BUFIO2_0_pins<0> = BEL "SP6_BUFIO_INSERT_ML_BUFIO2_0"
+        PINNAME DIVCLK;
+PIN SPARTAN6PLL/dcm_sp_inst_pins<2> = BEL "SPARTAN6PLL/dcm_sp_inst" PINNAME
+        CLKIN;
+TIMEGRP CORE_CLK = PIN "SP6_BUFIO_INSERT_ML_BUFIO2_0_pins<0>" PIN
+        "SPARTAN6PLL/dcm_sp_inst_pins<2>";
+TS_CORE_CLK = PERIOD TIMEGRP "CORE_CLK" 20 ns HIGH 50%;
+TS_SPARTAN6PLL_clkfx = PERIOD TIMEGRP "SPARTAN6PLL_clkfx" TS_CORE_CLK / 2.2
+        HIGH 50%;
+SCHEMATIC END;
+

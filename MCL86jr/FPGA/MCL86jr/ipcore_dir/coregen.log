@@ -1,0 +1,49 @@
+INFO:sim:172 - Generating IP...
+Applying current project options...
+Finished applying current project options.
+WARNING:sim - A core named 'spartan6_pll' already exists in the project. Output
+   products for this core may be overwritten.
+Resolving generics for 'spartan6_pll'...
+WARNING:sim - A core named 'spartan6_pll' already exists in the project. Output
+   products for this core may be overwritten.
+Applying external generics to 'spartan6_pll'...
+Delivering associated files for 'spartan6_pll'...
+WARNING:sim - Component clk_wiz_v3_6 does not have a valid model name for
+   Verilog synthesis
+Delivering EJava files for 'spartan6_pll'...
+Delivered 3 files into directory
+C:/MCL/MCL86/MCL86jr/MCL86jr/ipcore_dir/tmp/_cg/spartan6_pll
+Delivered 1 file into directory
+C:/MCL/MCL86/MCL86jr/MCL86jr/ipcore_dir/tmp/_cg/spartan6_pll
+Generating ASY schematic symbol...
+Loading device for application Rf_Device from file '6slx9.nph' in environment
+C:\Xilinx\14.7\ISE_DS\ISE\.
+INFO:sim:949 - Finished generation of ASY schematic symbol.
+Generating SYM schematic symbol for 'spartan6_pll'...
+Generating ISE project...
+XCO file found: spartan6_pll.xco
+XMDF file found: spartan6_pll_xmdf.tcl
+Adding C:/MCL/MCL86/MCL86jr/MCL86jr/ipcore_dir/tmp/_cg/spartan6_pll.asy -view
+all -origin_type imported
+Adding C:/MCL/MCL86/MCL86jr/MCL86jr/ipcore_dir/tmp/_cg/spartan6_pll.ucf -view
+all -origin_type created
+Adding C:/MCL/MCL86/MCL86jr/MCL86jr/ipcore_dir/tmp/_cg/spartan6_pll.v -view all
+-origin_type created
+INFO:HDLCompiler:1845 - Analyzing Verilog file
+   "C:/MCL/MCL86/MCL86jr/MCL86jr/ipcore_dir/tmp/_cg/spartan6_pll.v" into library
+   work
+INFO:ProjectMgmt - Parsing design hierarchy completed successfully.
+Adding C:/MCL/MCL86/MCL86jr/MCL86jr/ipcore_dir/tmp/_cg/spartan6_pll.veo -view
+all -origin_type imported
+INFO:TclTasksC:2116 - The automatic calculation of top has been turned-off.
+   Please set the new top explicitly by running the "project set top" command.
+   To re-calculate the new top automatically, set the "Auto Implementation Top"
+   property to true.
+Top level has been set to "/spartan6_pll"
+Generating README file...
+Generating FLIST file...
+INFO:sim:948 - Finished FLIST file generation.
+Launching README viewer...
+Moving files to output directory...
+Finished moving files to output directory
+Wrote CGP file for project 'spartan6_pll'.

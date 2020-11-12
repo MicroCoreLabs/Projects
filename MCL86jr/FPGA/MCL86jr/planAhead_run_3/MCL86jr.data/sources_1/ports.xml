@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<Interface Version="1" Minor="1">
+	<Ifc Id="ROOT" Top="1">
+		<Bus Id="SRAM_A">
+			<Port Id="18" Dir="OUT"/>
+			<Port Id="17" Dir="OUT"/>
+			<Port Id="16" Dir="OUT"/>
+			<Port Id="15" Dir="OUT"/>
+			<Port Id="14" Dir="OUT"/>
+			<Port Id="13" Dir="OUT"/>
+			<Port Id="12" Dir="OUT"/>
+			<Port Id="11" Dir="OUT"/>
+			<Port Id="10" Dir="OUT"/>
+			<Port Id="9" Dir="OUT"/>
+			<Port Id="8" Dir="OUT"/>
+			<Port Id="7" Dir="OUT"/>
+			<Port Id="6" Dir="OUT"/>
+			<Port Id="5" Dir="OUT"/>
+			<Port Id="4" Dir="OUT"/>
+			<Port Id="3" Dir="OUT"/>
+			<Port Id="2" Dir="OUT"/>
+			<Port Id="1" Dir="OUT"/>
+			<Port Id="0" Dir="OUT"/>
+		</Bus>
+		<Bus Id="SRAM_D">
+			<Port Id="7" Dir="INOUT"/>
+			<Port Id="6" Dir="INOUT"/>
+			<Port Id="5" Dir="INOUT"/>
+			<Port Id="4" Dir="INOUT"/>
+			<Port Id="3" Dir="INOUT"/>
+			<Port Id="2" Dir="INOUT"/>
+			<Port Id="1" Dir="INOUT"/>
+			<Port Id="0" Dir="INOUT"/>
+		</Bus>
+		<Bus Id="LED">
+			<Port Id="7" Dir="OUT"/>
+			<Port Id="6" Dir="OUT"/>
+			<Port Id="5" Dir="OUT"/>
+			<Port Id="4" Dir="OUT"/>
+			<Port Id="3" Dir="OUT"/>
+			<Port Id="2" Dir="OUT"/>
+			<Port Id="1" Dir="OUT"/>
+			<Port Id="0" Dir="OUT"/>
+		</Bus>
+		<Port Id="CORE_CLK" Dir="IN"/>
+		<Port Id="CLK" Dir="IN"/>
+		<Port Id="RESET" Dir="IN"/>
+		<Port Id="READY" Dir="IN"/>
+		<Port Id="INTR" Dir="IN"/>
+		<Port Id="NMI" Dir="IN"/>
+		<Port Id="A19" Dir="OUT"/>
+		<Port Id="A18" Dir="OUT"/>
+		<Port Id="A17" Dir="OUT"/>
+		<Port Id="A16" Dir="OUT"/>
+		<Port Id="A15" Dir="OUT"/>
+		<Port Id="A14" Dir="OUT"/>
+		<Port Id="A13" Dir="OUT"/>
+		<Port Id="A12" Dir="OUT"/>
+		<Port Id="A11" Dir="OUT"/>
+		<Port Id="A10" Dir="OUT"/>
+		<Port Id="A9" Dir="OUT"/>
+		<Port Id="A8" Dir="OUT"/>
+		<Port Id="AD7" Dir="INOUT"/>
+		<Port Id="AD6" Dir="INOUT"/>
+		<Port Id="AD5" Dir="INOUT"/>
+		<Port Id="AD4" Dir="INOUT"/>
+		<Port Id="AD3" Dir="INOUT"/>
+		<Port Id="AD2" Dir="INOUT"/>
+		<Port Id="AD1" Dir="INOUT"/>
+		<Port Id="AD0" Dir="INOUT"/>
+		<Port Id="ALE" Dir="OUT"/>
+		<Port Id="INTA_n" Dir="OUT"/>
+		<Port Id="RD_n" Dir="OUT"/>
+		<Port Id="WR_n" Dir="OUT"/>
+		<Port Id="IOM" Dir="OUT"/>
+		<Port Id="DTR" Dir="OUT"/>
+		<Port Id="DEN" Dir="OUT"/>
+		<Port Id="SSO_n" Dir="OUT"/>
+		<Port Id="SRAM_CE_n" Dir="OUT"/>
+		<Port Id="SRAM_OE_n" Dir="OUT"/>
+		<Port Id="SRAM_WE_n" Dir="OUT"/>
+		<Port Id="BUF1_OE_n" Dir="OUT"/>
+		<Port Id="BUF2_OE_n" Dir="OUT"/>
+		<Port Id="BUF2_DIR" Dir="OUT"/>
+	</Ifc>
+</Interface>
+

@@ -1,0 +1,10 @@
+#-----------------------------------------------------------
+# PlanAhead v14.7 (64-bit)
+# Build 321239 by xbuild on Fri Sep 27 19:29:51 MDT 2013
+# Start of session at: Sat Sep 26 22:57:51 2020
+# Process ID: 6304
+# Log file: C:/MCL/MCL86/MCL86jr/MCL86jr/planAhead_run_2/planAhead.log
+# Journal file: C:/MCL/MCL86/MCL86jr/MCL86jr/planAhead_run_2/planAhead.jou
+#-----------------------------------------------------------
+start_gui
+source C:/MCL/MCL86/MCL86jr/MCL86jr/pa.fromNetlist.tcl

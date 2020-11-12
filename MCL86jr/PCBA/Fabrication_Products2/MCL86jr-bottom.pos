@@ -1,0 +1,56 @@
+### Module positions - created on 10/3/2020 9:18:58 PM ###
+### Printed by Pcbnew version kicad (5.1.5)-3
+## Unit = mm, Angle = deg.
+## Side : bottom
+# Ref     Val                Package                          PosX       PosY       Rot  Side
+C1        4.7uF              C_0402_1005Metric            -24.5110   -29.4386  180.0000  bottom
+C2        4.7uF              C_0402_1005Metric            -48.2600   -33.1216   90.0000  bottom
+C3        4.7uF              C_0402_1005Metric            -23.0378   -13.8430   90.0000  bottom
+C4        4.7uF              C_0402_1005Metric            -50.6476   -11.5062   90.0000  bottom
+C5        4.7uF              C_0402_1005Metric            -26.6470   -31.4198    0.0000  bottom
+C6        4.7uF              C_0402_1005Metric            -23.7744   -20.1168  270.0000  bottom
+C7        4.7uF              C_0402_1005Metric            -35.4584    -5.6388  180.0000  bottom
+C8        4.7uF              C_0402_1005Metric            -36.3474   -32.8676  270.0000  bottom
+C9        4.7uF              C_0402_1005Metric            -50.7238   -20.7010  270.0000  bottom
+C10       4.7uF              C_0402_1005Metric            -41.7322   -44.5516  270.0000  bottom
+C11       4.7uF              C_0402_1005Metric            -29.6418   -19.3040    0.0000  bottom
+C12       4.7uF              C_0402_1005Metric            -36.3728   -11.9380  270.0000  bottom
+C13       4.7uF              C_0402_1005Metric            -44.3738   -19.8120  180.0000  bottom
+C14       4.7uF              C_0402_1005Metric            -50.5206   -27.0510  270.0000  bottom
+C15       4.7uF              C_0402_1005Metric            -35.8648   -25.9080   90.0000  bottom
+C16       4.7uF              C_0402_1005Metric            -21.5138    -6.7310    0.0000  bottom
+C17       4.7uF              C_0402_1005Metric            -26.7208    -4.5720    0.0000  bottom
+C18       4.7uF              C_0402_1005Metric            -26.7208    -5.8420    0.0000  bottom
+C19       4.7uF              C_0402_1005Metric            -29.8196   -12.6492  270.0000  bottom
+C20       4.7uF              C_0402_1005Metric            -50.0634   -49.3268   90.0000  bottom
+C21       4.7uF              C_0402_1005Metric            -25.0698   -43.5610    0.0000  bottom
+C22       4.7uF              C_0402_1005Metric            -11.1252   -26.0350  270.0000  bottom
+C23       4.7uF              C_0402_1005Metric            -13.6144   -41.4274   90.0000  bottom
+C24       4.7uF              C_0402_1005Metric            -28.2702   -42.3926  270.0000  bottom
+C25       4.7uF              C_0402_1005Metric            -31.1658    -5.8420    0.0000  bottom
+C26       4.7uF              C_0402_1005Metric            -45.1358    -5.8420    0.0000  bottom
+C27       4.7uF              C_0402_1005Metric            -43.8150   -32.8676   90.0000  bottom
+C28       4.7uF              C_0402_1005Metric            -32.6898   -22.4790  270.0000  bottom
+C29       4.7uF              C_0402_1005Metric            -48.9990    -7.2644    0.0000  bottom
+C30       4.7uF              C_0402_1005Metric            -30.5816   -45.1866    0.0000  bottom
+C31       4.7uF              C_0402_1005Metric            -36.1188   -20.4470  270.0000  bottom
+R2        330                R_0402_1005Metric            -44.2468    -2.1590  270.0000  bottom
+R3        330                R_0402_1005Metric            -43.2562    -2.1590  270.0000  bottom
+R4        330                R_0402_1005Metric            -42.2656    -2.1590  270.0000  bottom
+R5        330                R_0402_1005Metric            -41.2750    -2.1590  270.0000  bottom
+R6        330                R_0402_1005Metric            -40.2844    -2.1590  270.0000  bottom
+R7        330                R_0402_1005Metric            -39.3192    -2.1590  270.0000  bottom
+R8        330                R_0402_1005Metric            -38.3286    -2.1590  270.0000  bottom
+R9        330                R_0402_1005Metric            -37.3634    -2.1590  270.0000  bottom
+R10       4.7k               R_0402_1005Metric            -44.3738   -26.6700  270.0000  bottom
+R11       4.7k               R_0402_1005Metric            -39.9288   -26.6700  270.0000  bottom
+R12       4.7k               R_0402_1005Metric            -45.5168   -26.6700  270.0000  bottom
+R13       4.7k               R_0402_1005Metric            -28.2448   -26.6700  270.0000  bottom
+R14       4.7k               R_0402_1005Metric            -29.7180   -26.2128  270.0000  bottom
+R15       4.7k               R_0402_1005Metric            -22.5806   -45.6184    0.0000  bottom
+R16       33                 R_0402_1005Metric            -44.9326   -33.2232  270.0000  bottom
+U2        W25Q128JVS         SOIC-8_5.23x5.23mm_P1.27mm   -45.5168   -40.2844   90.0000  bottom
+U3        MIC5504-3.3YM5-TR  SOT23-5P95_280X145XL45X37N   -22.5298    -4.5720    0.0000  bottom
+U5        SN74LVC245APW      SOP65P640X120-20N            -25.3238   -37.6428    0.0000  bottom
+U7        MIC5504-1.2YM5-TR  SOT23-5P95_280X145XL45X37N   -27.3304    -8.9662    0.0000  bottom
+## End

@@ -1,0 +1,329 @@
+Release 14.7 Map P.20131013 (nt64)
+Xilinx Mapping Report File for Design 'MCL86jr'
+
+Design Information
+------------------
+Command Line   : map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol
+high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir
+off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+Target Device  : xc6slx9
+Target Package : tqg144
+Target Speed   : -3
+Mapper Version : spartan6 -- $Revision: 1.55 $
+Mapped Date    : Wed Nov 11 19:10:23 2020
+
+Design Summary
+--------------
+Number of errors:      0
+Number of warnings:    2
+Slice Logic Utilization:
+  Number of Slice Registers:                   853 out of  11,440    7%
+    Number used as Flip Flops:                 853
+    Number used as Latches:                      0
+    Number used as Latch-thrus:                  0
+    Number used as AND/OR logics:                0
+  Number of Slice LUTs:                        959 out of   5,720   16%
+    Number used as logic:                      887 out of   5,720   15%
+      Number using O6 output only:             681
+      Number using O5 output only:              54
+      Number using O5 and O6:                  152
+      Number used as ROM:                        0
+    Number used as Memory:                      58 out of   1,440    4%
+      Number used as Dual Port RAM:              0
+      Number used as Single Port RAM:            0
+      Number used as Shift Register:            58
+        Number using O6 output only:             2
+        Number using O5 output only:             0
+        Number using O5 and O6:                 56
+    Number used exclusively as route-thrus:     14
+      Number with same-slice register load:      8
+      Number with same-slice carry load:         6
+      Number with other load:                    0
+
+Slice Logic Distribution:
+  Number of occupied Slices:                   381 out of   1,430   26%
+  Number of MUXCYs used:                       196 out of   2,860    6%
+  Number of LUT Flip Flop pairs used:        1,197
+    Number with an unused Flip Flop:           437 out of   1,197   36%
+    Number with an unused LUT:                 238 out of   1,197   19%
+    Number of fully used LUT-FF pairs:         522 out of   1,197   43%
+    Number of unique control sets:              40
+    Number of slice register sites lost
+      to control set restrictions:              41 out of  11,440    1%
+
+  A LUT Flip Flop pair for this architecture represents one LUT paired with
+  one Flip Flop within a slice.  A control set is a unique combination of
+  clock, reset, set, and enable signals for a registered element.
+  The Slice Logic Distribution report is not meaningful if the design is
+  over-mapped for a non-slice resource or if Placement fails.
+
+IO Utilization:
+  Number of bonded IOBs:                        75 out of     102   73%
+    Number of LOCed IOBs:                       75 out of      75  100%
+    IOB Flip Flops:                             39
+
+Specific Feature Utilization:
+  Number of RAMB16BWERs:                         7 out of      32   21%
+  Number of RAMB8BWERs:                          1 out of      64    1%
+  Number of BUFIO2/BUFIO2_2CLKs:                 1 out of      32    3%
+    Number used as BUFIO2s:                      1
+    Number used as BUFIO2_2CLKs:                 0
+  Number of BUFIO2FB/BUFIO2FB_2CLKs:             0 out of      32    0%
+  Number of BUFG/BUFGMUXs:                       1 out of      16    6%
+    Number used as BUFGs:                        1
+    Number used as BUFGMUX:                      0
+  Number of DCM/DCM_CLKGENs:                     1 out of       4   25%
+    Number used as DCMs:                         1
+    Number used as DCM_CLKGENs:                  0
+  Number of ILOGIC2/ISERDES2s:                  12 out of     200    6%
+    Number used as ILOGIC2s:                    12
+    Number used as ISERDES2s:                    0
+  Number of IODELAY2/IODRP2/IODRP2_MCBs:         0 out of     200    0%
+  Number of OLOGIC2/OSERDES2s:                  27 out of     200   13%
+    Number used as OLOGIC2s:                    27
+    Number used as OSERDES2s:                    0
+  Number of BSCANs:                              0 out of       4    0%
+  Number of BUFHs:                               0 out of     128    0%
+  Number of BUFPLLs:                             0 out of       8    0%
+  Number of BUFPLL_MCBs:                         0 out of       4    0%
+  Number of DSP48A1s:                            0 out of      16    0%
+  Number of ICAPs:                               0 out of       1    0%
+  Number of MCBs:                                0 out of       2    0%
+  Number of PCILOGICSEs:                         0 out of       2    0%
+  Number of PLL_ADVs:                            0 out of       2    0%
+  Number of PMVs:                                0 out of       1    0%
+  Number of STARTUPs:                            0 out of       1    0%
+  Number of SUSPEND_SYNCs:                       0 out of       1    0%
+
+Average Fanout of Non-Clock Nets:                4.04
+
+Peak Memory Usage:  441 MB
+Total REAL time to MAP completion:  33 secs 
+Total CPU time to MAP completion:   32 secs 
+
+Table of Contents
+-----------------
+Section 1 - Errors
+Section 2 - Warnings
+Section 3 - Informational
+Section 4 - Removed Logic Summary
+Section 5 - Removed Logic
+Section 6 - IOB Properties
+Section 7 - RPMs
+Section 8 - Guide Report
+Section 9 - Area Group and Partition Summary
+Section 10 - Timing Report
+Section 11 - Configuration String Information
+Section 12 - Control Set Information
+Section 13 - Utilization by Hierarchy
+
+Section 1 - Errors
+------------------
+
+Section 2 - Warnings
+--------------------
+WARNING:Timing:3402 - The Clock Modifying COMP, SPARTAN6PLL/dcm_sp_inst, has the attribute CLK_FEEDBACK set to NONE.  No phase relationship
+   exists between the input and output clocks of this Clock Modifying COMP. Data paths between these clock domains must be constrained using
+   FROM/TO constraints.
+WARNING:PhysDesignRules:2410 - This design is using one or more 9K Block RAMs
+   (RAMB8BWER).  9K Block RAM initialization data, both user defined and
+   default, may be incorrect and should not be used.  For more information,
+   please reference Xilinx Answer Record 39999.
+
+Section 3 - Informational
+-------------------------
+INFO:LIT:243 - Logical network EU_CORE/EU4Kx32_i/douta<31> has no load.
+INFO:MapLib:562 - No environment variables are currently set.
+INFO:LIT:244 - All of the single ended outputs in this design are using slew
+   rate limited output drivers. The delay on speed critical single ended outputs
+   can be dramatically reduced by designating them as fast outputs.
+INFO:Pack:1716 - Initializing temperature to 85.000 Celsius. (default - Range:
+   0.000 to 85.000 Celsius)
+INFO:Pack:1720 - Initializing voltage to 1.140 Volts. (default - Range: 1.140 to
+   1.260 Volts)
+INFO:Map:215 - The Interim Design Summary has been generated in the MAP Report
+   (.mrp).
+INFO:Pack:1650 - Map created a placed design.
+INFO:PhysDesignRules:1861 - To achieve optimal frequency synthesis performance
+   with the CLKFX and CLKFX180 outputs of the DCM comp SPARTAN6PLL/dcm_sp_inst,
+   consult the device Data Sheet.
+
+Section 4 - Removed Logic Summary
+---------------------------------
+   1 block(s) removed
+   4 block(s) optimized away
+   3 signal(s) removed
+
+Section 5 - Removed Logic
+-------------------------
+
+The trimmed logic report below shows the logic removed from your design due to
+sourceless or loadless signals, and VCC or ground connections.  If the removal
+of a signal or symbol results in the subsequent removal of an additional signal
+or symbol, the message explaining that second removal will be indented.  This
+indentation will be repeated as a chain of related logic is removed.
+
+To quickly locate the original cause for the removal of a chain of logic, look
+above the place where that logic is listed in the trimming report, then locate
+the lines that are least indented (begin at the leftmost edge).
+
+The signal "EU_CORE/EU4Kx32_i/douta<31>" is sourceless and has been removed.
+The signal
+"EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.
+cstr/ramloop[7].ram.ram_douta<8>" is sourceless and has been removed.
+ Sourceless block
+"EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.
+cstr/has_mux_a.A/Mmux_dout_mux251" (ROM) removed.
+The signal
+"EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.
+cstr/ramloop[6].ram.ram_douta<8>" is sourceless and has been removed.
+
+Optimized Block(s):
+TYPE 		BLOCK
+GND 		EU_CORE/EU4Kx32_i/XST_GND
+VCC 		EU_CORE/EU4Kx32_i/XST_VCC
+GND 		XST_GND
+VCC 		XST_VCC
+
+To enable printing of redundant blocks removed and signals merged, set the
+detailed map report option and rerun map.
+
+Section 6 - IOB Properties
+--------------------------
+
++---------------------------------------------------------------------------------------------------------------------------------------------------------+
+| IOB Name                           | Type             | Direction | IO Standard          | Diff  | Drive    | Slew | Reg (s)      | Resistor | IOB      |
+|                                    |                  |           |                      | Term  | Strength | Rate |              |          | Delay    |
++---------------------------------------------------------------------------------------------------------------------------------------------------------+
+| A8                                 | IOB              | OUTPUT    | PCI33_3              |       |          |      | OFF          |          |          |
+| A9                                 | IOB              | OUTPUT    | PCI33_3              |       |          |      | OFF          |          |          |
+| A10                                | IOB              | OUTPUT    | PCI33_3              |       |          |      | OFF          |          |          |
+| A11                                | IOB              | OUTPUT    | PCI33_3              |       |          |      | OFF          |          |          |
+| A12                                | IOB              | OUTPUT    | PCI33_3              |       |          |      | OFF          |          |          |
+| A13                                | IOB              | OUTPUT    | PCI33_3              |       |          |      | OFF          |          |          |
+| A14                                | IOB              | OUTPUT    | PCI33_3              |       |          |      | OFF          |          |          |
+| A15                                | IOB              | OUTPUT    | PCI33_3              |       |          |      | OFF          |          |          |
+| A16                                | IOB              | OUTPUT    | PCI33_3              |       |          |      | OFF          |          |          |
+| A17                                | IOB              | OUTPUT    | PCI33_3              |       |          |      | OFF          |          |          |
+| A18                                | IOB              | OUTPUT    | PCI33_3              |       |          |      | OFF          |          |          |
+| A19                                | IOB              | OUTPUT    | PCI33_3              |       |          |      | OFF          |          |          |
+| AD0                                | IOB              | BIDIR     | PCI33_3              |       |          |      | IFF          |          |          |
+|                                    |                  |           |                      |       |          |      | OFF          |          |          |
+| AD1                                | IOB              | BIDIR     | PCI33_3              |       |          |      | IFF          |          |          |
+|                                    |                  |           |                      |       |          |      | OFF          |          |          |
+| AD2                                | IOB              | BIDIR     | PCI33_3              |       |          |      | IFF          |          |          |
+|                                    |                  |           |                      |       |          |      | OFF          |          |          |
+| AD3                                | IOB              | BIDIR     | PCI33_3              |       |          |      | IFF          |          |          |
+|                                    |                  |           |                      |       |          |      | OFF          |          |          |
+| AD4                                | IOB              | BIDIR     | PCI33_3              |       |          |      | IFF          |          |          |
+|                                    |                  |           |                      |       |          |      | OFF          |          |          |
+| AD5                                | IOB              | BIDIR     | PCI33_3              |       |          |      | IFF          |          |          |
+|                                    |                  |           |                      |       |          |      | OFF          |          |          |
+| AD6                                | IOB              | BIDIR     | PCI33_3              |       |          |      | IFF          |          |          |
+|                                    |                  |           |                      |       |          |      | OFF          |          |          |
+| AD7                                | IOB              | BIDIR     | PCI33_3              |       |          |      | IFF          |          |          |
+|                                    |                  |           |                      |       |          |      | OFF          |          |          |
+| ALE                                | IOB              | OUTPUT    | PCI33_3              |       |          |      | OFF          |          |          |
+| BUF1_OE_n                          | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| BUF2_DIR                           | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| BUF2_OE_n                          | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| CLK                                | IOB              | INPUT     | PCI33_3              |       |          |      | IFF          |          |          |
+| CORE_CLK                           | IOB              | INPUT     | PCI33_3              |       |          |      |              |          |          |
+| DEN                                | IOB              | OUTPUT    | PCI33_3              |       |          |      | OFF          |          |          |
+| DTR                                | IOB              | OUTPUT    | PCI33_3              |       |          |      | OFF          |          |          |
+| INTA_n                             | IOB              | OUTPUT    | PCI33_3              |       |          |      | OFF          |          |          |
+| INTR                               | IOB              | INPUT     | PCI33_3              |       |          |      | IFF          |          |          |
+| IOM                                | IOB              | OUTPUT    | PCI33_3              |       |          |      | OFF          |          |          |
+| LED<0>                             | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| LED<1>                             | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| LED<2>                             | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| LED<3>                             | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| LED<4>                             | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| LED<5>                             | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| LED<6>                             | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| LED<7>                             | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| NMI                                | IOB              | INPUT     | LVCMOS33             |       |          |      | IFF          | PULLDOWN |          |
+| RD_n                               | IOB              | OUTPUT    | PCI33_3              |       |          |      | OFF          |          |          |
+| READY                              | IOB              | INPUT     | PCI33_3              |       |          |      | IFF          |          |          |
+| RESET                              | IOB              | INPUT     | PCI33_3              |       |          |      |              |          |          |
+| SRAM_A<0>                          | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_A<1>                          | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_A<2>                          | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_A<3>                          | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_A<4>                          | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_A<5>                          | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_A<6>                          | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_A<7>                          | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_A<8>                          | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_A<9>                          | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_A<10>                         | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_A<11>                         | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_A<12>                         | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_A<13>                         | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_A<14>                         | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_A<15>                         | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_A<16>                         | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_A<17>                         | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_A<18>                         | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_CE_n                          | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_D<0>                          | IOB              | BIDIR     | PCI33_3              |       |          |      |              |          |          |
+| SRAM_D<1>                          | IOB              | BIDIR     | PCI33_3              |       |          |      |              |          |          |
+| SRAM_D<2>                          | IOB              | BIDIR     | PCI33_3              |       |          |      |              |          |          |
+| SRAM_D<3>                          | IOB              | BIDIR     | PCI33_3              |       |          |      |              |          |          |
+| SRAM_D<4>                          | IOB              | BIDIR     | PCI33_3              |       |          |      |              |          |          |
+| SRAM_D<5>                          | IOB              | BIDIR     | PCI33_3              |       |          |      |              |          |          |
+| SRAM_D<6>                          | IOB              | BIDIR     | PCI33_3              |       |          |      |              |          |          |
+| SRAM_D<7>                          | IOB              | BIDIR     | PCI33_3              |       |          |      |              |          |          |
+| SRAM_OE_n                          | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SRAM_WE_n                          | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| SSO_n                              | IOB              | OUTPUT    | PCI33_3              |       |          |      |              |          |          |
+| WR_n                               | IOB              | OUTPUT    | PCI33_3              |       |          |      | OFF          |          |          |
++---------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+Section 7 - RPMs
+----------------
+
+Section 8 - Guide Report
+------------------------
+Guide not run on this design.
+
+Section 9 - Area Group and Partition Summary
+--------------------------------------------
+
+Partition Implementation Status
+-------------------------------
+
+  No Partitions were found in this design.
+
+-------------------------------
+
+Area Group Information
+----------------------
+
+  No area groups were found in this design.
+
+----------------------
+
+Section 10 - Timing Report
+--------------------------
+A logic-level (pre-route) timing report can be generated by using Xilinx static
+timing analysis tools, Timing Analyzer (GUI) or TRCE (command line), with the
+mapped NCD and PCF files. Please note that this timing report will be generated
+using estimated delay information. For accurate numbers, please generate a
+timing report with the post Place and Route NCD file.
+
+For more information about the Timing Analyzer, consult the Xilinx Timing
+Analyzer Reference Manual; for more information about TRCE, consult the Xilinx
+Command Line Tools User Guide "TRACE" chapter.
+
+Section 11 - Configuration String Details
+-----------------------------------------
+Use the "-detail" map option to print out Configuration Strings
+
+Section 12 - Control Set Information
+------------------------------------
+Use the "-detail" map option to print out Control Set Information.
+
+Section 13 - Utilization by Hierarchy
+-------------------------------------
+Use the "-detail" map option to print out the Utilization by Hierarchy section.

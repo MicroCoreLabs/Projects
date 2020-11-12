@@ -1,0 +1,5 @@
+verilog work "ipcore_dir/EU4Kx32.v"
+verilog work "ipcore_dir/spartan6_pll.v"
+verilog work "../src4synth/eu.v"
+verilog work "../src4synth/biu_min.v"
+verilog work "../src4synth/MCL86jr.v"

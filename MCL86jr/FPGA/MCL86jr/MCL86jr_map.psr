@@ -1,0 +1,62 @@
+Release 14.7 Physical Synthesis Report P.20131013 (nt64)
+Copyright (c) 1995-2013 Xilinx, Inc. All rights reserved.
+
+TABLE OF CONTENTS
+  1) Physical Synthesis Options Summary
+  2) Optimizations statistics and details
+
+
+=========================================================================
+*                 Physical Synthesis Options Summary                    *
+=========================================================================
+---- Options
+Global Optimization                 : OFF
+    Retiming                        : OFF
+    Equivalent Register Removal     : OFF
+Timing-Driven Packing and Placement : ON
+    Logic Optimization              : OFF
+    Register Duplication            : ON
+
+---- Intelligent clock gating       : OFF
+
+---- Target Parameters
+Target Device                       : 6slx9tqg144-3
+
+=========================================================================
+
+
+=========================================================================
+*                        Optimizations                                  *
+=========================================================================
+---- Statistics
+   Number of LUTs added by Replication                       | 19              
+
+   Overall change in number of design objects                | +19              
+
+
+---- Details
+
+New or modified components                             | Optimization             | Objective           
+-------------------------------------------------------|--------------------------|----------------------
+EU_CORE/EU4Kx32_i/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/has_mux_a.A/Mmux_dout_mux131_REPLICA_14| Replication              | Fanout Optimization
+EU_CORE/Mmux_n045543_REPLICA_16                        | Replication              | Fanout Optimization
+EU_CORE/Mmux_n045572_REPLICA_15                        | Replication              | Fanout Optimization
+EU_CORE/carry<9>1_REPLICA_17                           | Replication              | Fanout Optimization
+EU_CORE/eu_rom_data<16>_REPLICA_10                     | Replication              | Fanout Optimization
+EU_CORE/eu_rom_data<17>_REPLICA_5                      | Replication              | Fanout Optimization
+EU_CORE/eu_rom_data<17>_REPLICA_6                      | Replication              | Fanout Optimization
+EU_CORE/eu_rom_data<17>_REPLICA_7                      | Replication              | Fanout Optimization
+EU_CORE/eu_rom_data<17>_REPLICA_8                      | Replication              | Fanout Optimization
+EU_CORE/eu_rom_data<17>_REPLICA_9                      | Replication              | Fanout Optimization
+EU_CORE/eu_rom_data<19>1_REPLICA_18                    | Replication              | Fanout Optimization
+EU_CORE/eu_rom_data<20>_REPLICA_0                      | Replication              | Fanout Optimization
+EU_CORE/eu_rom_data<20>_REPLICA_1                      | Replication              | Fanout Optimization
+EU_CORE/eu_rom_data<20>_REPLICA_2                      | Replication              | Fanout Optimization
+EU_CORE/eu_rom_data<20>_REPLICA_3                      | Replication              | Fanout Optimization
+EU_CORE/eu_rom_data<21>_REPLICA_4                      | Replication              | Fanout Optimization
+EU_CORE/eu_rom_data<22>_REPLICA_11                     | Replication              | Fanout Optimization
+EU_CORE/eu_rom_data<22>_REPLICA_12                     | Replication              | Fanout Optimization
+EU_CORE/eu_rom_data<22>_REPLICA_13                     | Replication              | Fanout Optimization
+
+   Flops added for Enable Generation                       
+-------------------------

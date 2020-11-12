@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT: This is an internal file that has been generated
+     by the Xilinx ISE software.  Any direct editing or
+     changes made to this file may result in unpredictable
+     behavior or data corruption.  It is strongly advised that
+     users do not edit the contents of this file. -->
+<messages>
+<msg type="warning" file="HDLCompiler" num="1127" delta="old" >"C:\MCL\MCL86\MCL86jr\MCL86jr\ipcore_dir\spartan6_pll.v" Line 111: Assignment to <arg fmt="%s" index="1">clk0</arg> ignored, since the identifier is never used
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="1127" delta="old" >"C:\MCL\MCL86\MCL86jr\MCL86jr\ipcore_dir\spartan6_pll.v" Line 126: Assignment to <arg fmt="%s" index="1">locked_int</arg> ignored, since the identifier is never used
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="1127" delta="old" >"C:\MCL\MCL86\MCL86jr\MCL86jr\ipcore_dir\spartan6_pll.v" Line 127: Assignment to <arg fmt="%s" index="1">status_int</arg> ignored, since the identifier is never used
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" Line 182: Result of <arg fmt="%d" index="1">32</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">1</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" Line 183: Result of <arg fmt="%d" index="1">32</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">1</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" Line 184: Result of <arg fmt="%d" index="1">32</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">1</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" Line 185: Result of <arg fmt="%d" index="1">32</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">1</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" Line 186: Result of <arg fmt="%d" index="1">32</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">1</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" Line 187: Result of <arg fmt="%d" index="1">32</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">1</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" Line 188: Result of <arg fmt="%d" index="1">32</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">1</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" Line 189: Result of <arg fmt="%d" index="1">32</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">1</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="1127" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v" Line 213: Assignment to <arg fmt="%s" index="1">t_eu_flag_i_d</arg> ignored, since the identifier is never used
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="1127" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\biu_min.v" Line 231: Assignment to <arg fmt="%s" index="1">eu_qs_out</arg> ignored, since the identifier is never used
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\biu_min.v" Line 477: Result of <arg fmt="%d" index="1">32</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">13</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\biu_min.v" Line 493: Result of <arg fmt="%d" index="1">17</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">16</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\biu_min.v" Line 503: Result of <arg fmt="%d" index="1">17</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">16</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\biu_min.v" Line 835: Result of <arg fmt="%d" index="1">17</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">16</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="1127" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\biu_min.v" Line 276: Assignment to <arg fmt="%s" index="1">ready_d3</arg> ignored, since the identifier is never used
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="1499" delta="old" >"C:\MCL\MCL86\MCL86jr\MCL86jr\ipcore_dir\EU4Kx32.v" Line 39: Empty module &lt;<arg fmt="%s" index="1">EU4Kx32</arg>&gt; remains a black box.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="1127" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 264: Assignment to <arg fmt="%s" index="1">eu_prefix_repnz</arg> ignored, since the identifier is never used
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="1127" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 265: Assignment to <arg fmt="%s" index="1">eu_prefix_rep</arg> ignored, since the identifier is never used
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="1127" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 268: Assignment to <arg fmt="%s" index="1">eu_flag_o</arg> ignored, since the identifier is never used
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="1127" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 269: Assignment to <arg fmt="%s" index="1">eu_flag_d</arg> ignored, since the identifier is never used
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="1127" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 272: Assignment to <arg fmt="%s" index="1">eu_flag_s</arg> ignored, since the identifier is never used
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="1127" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 273: Assignment to <arg fmt="%s" index="1">eu_flag_z</arg> ignored, since the identifier is never used
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="1127" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 275: Assignment to <arg fmt="%s" index="1">eu_flag_a</arg> ignored, since the identifier is never used
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="1127" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 276: Assignment to <arg fmt="%s" index="1">eu_nmi_pending</arg> ignored, since the identifier is never used
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="1127" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 277: Assignment to <arg fmt="%s" index="1">eu_flag_p</arg> ignored, since the identifier is never used
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="1127" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 278: Assignment to <arg fmt="%s" index="1">eu_flag_temp</arg> ignored, since the identifier is never used
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="1127" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 279: Assignment to <arg fmt="%s" index="1">eu_flag_c</arg> ignored, since the identifier is never used
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 298: Result of <arg fmt="%d" index="1">20</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">16</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="1127" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 338: Assignment to <arg fmt="%s" index="1">biu_done_d2</arg> ignored, since the identifier is never used
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="634" delta="old" >"C:\MCL\MCL86\MCL86jr\src4synth\eu.v" Line 147: Net &lt;<arg fmt="%s" index="1">system_signals[15]</arg>&gt; does not have a driver.
+</msg>
+
+<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v</arg>&quot; line <arg fmt="%s" index="2">269</arg>: Output port &lt;<arg fmt="%s" index="3">BIU_SEGMENT</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">BIU_CORE</arg>&gt; is unconnected or connected to loadless signal.
+</msg>
+
+<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">C:\MCL\MCL86\MCL86jr\src4synth\MCL86jr.v</arg>&quot; line <arg fmt="%s" index="2">322</arg>: Output port &lt;<arg fmt="%s" index="3">EU_FLAG_I</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">EU_CORE</arg>&gt; is unconnected or connected to loadless signal.
+</msg>
+
+<msg type="warning" file="Xst" num="647" delta="old" >Input &lt;<arg fmt="%s" index="1">EU_BIU_COMMAND&lt;3:2&gt;</arg>&gt; is never used. This port will be preserved and left unconnected if it belongs to a top-level block or it belongs to a sub-block and the hierarchy of this sub-block is preserved.
+</msg>
+
+<msg type="warning" file="Xst" num="647" delta="old" >Input &lt;<arg fmt="%s" index="1">EU_BIU_COMMAND&lt;15:15&gt;</arg>&gt; is never used. This port will be preserved and left unconnected if it belongs to a top-level block or it belongs to a sub-block and the hierarchy of this sub-block is preserved.
+</msg>
+
+<msg type="warning" file="Xst" num="647" delta="old" >Input &lt;<arg fmt="%s" index="1">EU_PREFIX_LOCK</arg>&gt; is never used. This port will be preserved and left unconnected if it belongs to a top-level block or it belongs to a sub-block and the hierarchy of this sub-block is preserved.
+</msg>
+
+<msg type="warning" file="Xst" num="653" delta="old" >Signal &lt;<arg fmt="%s" index="1">system_signals&lt;15:14&gt;</arg>&gt; is used but never assigned. This sourceless signal will be automatically connected to value <arg fmt="%s" index="2">GND</arg>.
+</msg>
+
+<msg type="warning" file="Xst" num="653" delta="old" >Signal &lt;<arg fmt="%s" index="1">system_signals&lt;10&gt;</arg>&gt; is used but never assigned. This sourceless signal will be automatically connected to value <arg fmt="%s" index="2">GND</arg>.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">mcl6_feature_2</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">BIU_CORE</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">mcl6_feature_3</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">BIU_CORE</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">mcl6_feature_4</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">BIU_CORE</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">mcl6_feature_5</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">BIU_CORE</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">mcl6_feature_6</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">BIU_CORE</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">mcl6_feature_7</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">BIU_CORE</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">mcl6_feature_2</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">biu_min</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">mcl6_feature_3</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">biu_min</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">mcl6_feature_4</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">biu_min</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">mcl6_feature_5</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">biu_min</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">mcl6_feature_6</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">biu_min</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">mcl6_feature_7</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">biu_min</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">prescaler_22</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">MCL86jr</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">prescaler_23</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">MCL86jr</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">prescaler_24</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">MCL86jr</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">prescaler_25</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">MCL86jr</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">prescaler_26</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">MCL86jr</arg>&gt;.
+</msg>
+
+<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">BIU_CORE/eu_biu_req_d1</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">MCL86jr</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;EU_CORE/eu_biu_req_d1&gt; </arg>
+</msg>
+
+<msg type="info" file="Xst" num="2169" delta="old" >HDL ADVISOR - Some clock signals were not automatically buffered by XST with BUFG/BUFR resources. Please use the buffer_type constraint in order to insert these buffers to the clock signals to help prevent skew problems.
+</msg>
+
+</messages>
+

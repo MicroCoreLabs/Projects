@@ -1,0 +1,49 @@
+#-----------------------------------------------------------
+# PlanAhead v14.7 (64-bit)
+# Build 321239 by xbuild on Fri Sep 27 19:29:51 MDT 2013
+# Start of session at: Sat Sep 26 22:54:19 2020
+# Process ID: 7676
+# Log file: C:/MCL/MCL86/MCL86jr/MCL86jr/planAhead_run_1/planAhead.log
+# Journal file: C:/MCL/MCL86/MCL86jr/MCL86jr/planAhead_run_1/planAhead.jou
+#-----------------------------------------------------------
+start_gui
+source C:/MCL/MCL86/MCL86jr/MCL86jr/pa.fromHdl.tcl
+update_compile_order -fileset sim_1
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[8]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[7]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[6]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[5]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[4]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[3]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[2]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[1]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[0]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed true [get_ports [list  {SRAM_A[9]}]]
+set_property is_loc_fixed false [get_ports [list  {SRAM_A[9]}]]

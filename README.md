@@ -5,6 +5,10 @@ My blog which has some details on these projects: www.MicroCoreLabs.Wordpress.co
 My YouTube Channel with some videos of the stuff in action: www.youtube.com/channel/UC9B3TaEUon-araO2j7tp9jg/videos
 
 
+Boards:
+
+	MCL86jr -  IBMPCjr Accelerator which performs 4X faster than an IBM PC 
+	
 Emulated Processors:
 
 	MCL68 - Motorola 68000 Emulator written in C

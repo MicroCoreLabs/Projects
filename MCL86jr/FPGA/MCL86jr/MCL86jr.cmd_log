@@ -1,0 +1,676 @@
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-2 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-2 -w -logic_opt off -ol high -t 1 -xt 0 -register_duplication off -r 4 -global_opt off -mt off -ir off -pr off -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-2 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-2 -w -logic_opt off -ol high -t 1 -xt 0 -register_duplication off -r 4 -global_opt off -mt off -ir off -pr off -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 2 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-2 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-2 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 2 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-2 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-2 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 2 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-2 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-2 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 2 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 
+xst -intstyle ise -ifn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.xst" -ofn "C:/MCL/MCL86/MCL86jr/MCL86jr/MCL86jr.syr" 
+ngdbuild -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc MCL86jr.ucf -p xc6slx9-tqg144-3 MCL86jr.ngc MCL86jr.ngd  
+map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -xe n -t 2 -xt 0 -register_duplication on -r 4 -global_opt off -mt off -ir off -pr b -lc off -power off -o MCL86jr_map.ncd MCL86jr.ngd MCL86jr.pcf 
+par -w -intstyle ise -ol high -xe n -mt off MCL86jr_map.ncd MCL86jr.ncd MCL86jr.pcf 
+trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml MCL86jr.twx MCL86jr.ncd -o MCL86jr.twr MCL86jr.pcf -ucf MCL86jr.ucf 
+bitgen -intstyle ise -f MCL86jr.ut MCL86jr.ncd 

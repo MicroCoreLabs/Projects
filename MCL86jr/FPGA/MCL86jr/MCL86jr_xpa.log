@@ -1,0 +1,65 @@
+Creating log file C:\MCL\MCL86\MCL86jr\MCL86jr\MCL86jr_xpa.log.
+Loading device for application Rf_Device from file '6slx9.nph' in environment
+C:\Xilinx\14.7\ISE_DS\ISE\.
+   "MCL86jr" is an NCD, version 3.2, device xc6slx9, package tqg144, speed -3
+
+INFO:Power:1693 - 
+   --------------------------------------------------------------
+                         The power estimate will be calculated using PRODUCTION
+   data.
+   --------------------------------------------------------------
+
+Design load 20% completeDesign load 25% completeDesign load 30% completeDesign load 60% completeDesign load 95% completeDesign load 100% completeRunning Vector-less Activity Propagation
+........
+Finished Running Vector-less Activity Propagation
+Finished Running Vector-less Activity Propagation 0 secs 
+
+Design 'MCL86jr.ncd' and constraints 'MCL86jr.pcf' opened successfully
+
+
+Updating power analysis...
+WARNING:Power:91 - Can't change frequency of net BIU_CORE/RESET_INT_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net BIU_CORE/_n0848_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net BIU_CORE/_n0852_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net BIU_CORE/_n0856_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net BIU_CORE/_n0860_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net BIU_CORE/_n0864_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net BIU_CORE/_n0866_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net BIU_CORE/_n0869_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net BIU_CORE/_n0873_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net BIU_CORE/_n0877_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net BIU_CORE/_n0881_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net BIU_CORE/_n0885_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net BIU_CORE/_n0888_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net BIU_CORE/_n0896_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net BIU_CORE/_n0904_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net BIU_CORE/_n0909_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net BIU_CORE/biu_state[7]_GND_10_o_equal_153_o to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net BIU_CORE/biu_state[7]_GND_10_o_equal_155_o to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net EU_CORE/_n1079_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net EU_CORE/_n1083_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net EU_CORE/_n1087_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net EU_CORE/_n1091_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net EU_CORE/_n1095_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net EU_CORE/_n1099_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net EU_CORE/_n1103_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net EU_CORE/_n1107_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net EU_CORE/_n1111_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net EU_CORE/_n1115_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net EU_CORE/_n1119_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net EU_CORE/_n1123_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net EU_CORE/_n1127_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net EU_CORE/_n1131_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net EU_CORE/_n1135_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net EU_CORE/_n1156<0>2 to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net EU_CORE/_n1156_inv to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net EU_CORE/eu_stall_pipeline_eu_opcode_type[2]_AND_112_o to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net EU_CORE/eu_stall_pipeline_eu_opcode_type[2]_AND_114_o to 1.00Mhz.
+WARNING:Power:91 - Can't change frequency of net X245_DIR_OBUF to 1.00Mhz.
+WARNING:Power:90 - Can't change activity rate of net t_reset_d4 to 1.0% of CORE_CLK_BUFGP.
+WARNING:Power:91 - Can't change frequency of net t_reset_d4/t_reset_d4_rstpot to 1.00Mhz.
+Running Vector-less Activity Propagation
+........
+Finished Running Vector-less Activity Propagation
+Finished Running Vector-less Activity Propagation 0 secs 
+Update Power Analysis is complete.
