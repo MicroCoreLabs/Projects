@@ -7,7 +7,7 @@ My YouTube Channel with some videos of the stuff in action: www.youtube.com/chan
 
 Boards:
 
-	MCL86jr -  IBMPCjr Accelerator which boosts performance by 7X
+	MCL86jr -  IBMPCjr Accelerator which boosts performance to IBM PC/AT speed
 	
 Emulated Processors:
 
