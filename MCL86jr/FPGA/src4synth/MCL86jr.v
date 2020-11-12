@@ -46,63 +46,63 @@
 
 module MCL86jr
   (  
-    input				CORE_CLK,
+    input               CORE_CLK,
 
-    input				CLK,
-    input				RESET,
+    input               CLK,
+    input               RESET,
 
-    input				READY,
-    input				INTR,
-    input				NMI,
+    input               READY,
+    input               INTR,
+    input               NMI,
 
-	
-    output        		A19,
-    output        		A18,
-    output        		A17,
-    output        		A16,
-    output        		A15,
-    output        		A14,
-    output        		A13,
-    output        		A12,
-    output        		A11,
-    output        		A10,
-    output        		A9,
-    output        		A8,
-    inout        		AD7,
-    inout        		AD6,
-    inout        		AD5,
-    inout        		AD4,
-    inout        		AD3,
-    inout        		AD2,
-    inout        		AD1,
-    inout        		AD0,
+    
+    output              A19,
+    output              A18,
+    output              A17,
+    output              A16,
+    output              A15,
+    output              A14,
+    output              A13,
+    output              A12,
+    output              A11,
+    output              A10,
+    output              A9,
+    output              A8,
+    inout               AD7,
+    inout               AD6,
+    inout               AD5,
+    inout               AD4,
+    inout               AD3,
+    inout               AD2,
+    inout               AD1,
+    inout               AD0,
 
-    output				ALE,
-    output				INTA_n,
-    output				RD_n,
-    output				WR_n,
-    output				IOM,
-    output				DTR,
-    output				DEN,
-    output				SSO_n,
-	
-    output [18:0]		SRAM_A,
-    inout  [7:0]		SRAM_D,
-    output				SRAM_CE_n,
-    output				SRAM_OE_n,
-    output				SRAM_WE_n,
+    output              ALE,
+    output              INTA_n,
+    output              RD_n,
+    output              WR_n,
+    output              IOM,
+    output              DTR,
+    output              DEN,
+    output              SSO_n,
+    
+    output [18:0]       SRAM_A,
+    inout  [7:0]        SRAM_D,
+    output              SRAM_CE_n,
+    output              SRAM_OE_n,
+    output              SRAM_WE_n,
 
-    output [7:0]		LED,
-	
-	output 		 		BUF1_OE_n,
-	output 		 		BUF2_OE_n,
-	output 		 		BUF2_DIR
-	
+    output [7:0]        LED,
+    
+    output              BUF1_OE_n,
+    output              BUF2_OE_n,
+    output              BUF2_DIR
+    
 
   );
 
 //------------------------------------------------------------------------
- 	  
+      
 
 // Internal Signals
 
@@ -150,12 +150,12 @@ wire [15:0] t_biu_register_reg;
 wire [15:0] t_biu_return_data;
 wire [7:0] t_sram_d_out;  
 
-	
+    
 
   spartan6_pll SPARTAN6PLL
   (
-    .CLK_IN1	(CORE_CLK), 
-    .CLK_OUT1	(core_clk_int) 
+    .CLK_IN1    (CORE_CLK), 
+    .CLK_OUT1   (core_clk_int) 
   ); 
   
 
@@ -207,12 +207,12 @@ assign LED[2] = ~led_int[2];
 assign LED[1] = ~led_int[1];
 assign LED[0] = ~led_int[0];
 
-	
+    
 //------------------------------------------------------------------------
 
 always @(posedge core_clk_int)
 begin : REGISTER_IOS
-	
+    
     t_biu_ad_oe_d1 <= t_biu_ad_oe;
     t_biu_ad_oe_d2 <= t_biu_ad_oe_d1;
   
@@ -225,37 +225,37 @@ begin : REGISTER_IOS
     t_reset_d1 <= RESET;
     t_reset_d2 <= t_reset_d1;
     t_reset_d3 <= t_reset_d2;
-	
-	// Use either the PCjr board reset or an internal timer for a reset 
-	if ( (t_reset_d3==1'b1 && t_reset_d2==1'b1) || (fpga_config_done==1'b0) )
-	  begin
-	    t_reset_d4 <= 1'b1;
-	    led_int <= 8'b10000000;
-      end	
-	else
-	  begin
-	    t_reset_d4 <= t_reset_d3;
+    
+    // Use either the PCjr board reset or an internal timer for a reset 
+    if ( (t_reset_d3==1'b1 && t_reset_d2==1'b1) || (fpga_config_done==1'b0) )
+      begin
+        t_reset_d4 <= 1'b1;
+        led_int <= 8'b10000000;
+      end   
+    else
+      begin
+        t_reset_d4 <= t_reset_d3;
       end
-	  
+      
   
     prescaler <= prescaler + 1'b1;
-	prescaler_d <= prescaler[21];
+    prescaler_d <= prescaler[21];
 
-	if (prescaler[26]==1'b1) fpga_config_done <= 1'b1;
+    if (prescaler[26]==1'b1) fpga_config_done <= 1'b1;
 
-	
-	// Blink the sweeping LEDs
-	if (prescaler_d==1'b0 && prescaler[21]==1'b1)
-	  begin	  
+    
+    // Blink the sweeping LEDs
+    if (prescaler_d==1'b0 && prescaler[21]==1'b1)
+      begin   
 
-  	    if (led_go_left==1'b0)
-		  led_int[7:0] <= {led_int[0] , led_int[7:1] };
-		else
-		  led_int[7:0] <= {led_int[6:0] , led_int[7] };
-		  
-	    if (led_int[6]==1'b1)  led_go_left <= 1'b0;
-	    if (led_int[1]==1'b1)  led_go_left <= 1'b1;
-		
+        if (led_go_left==1'b0)
+          led_int[7:0] <= {led_int[0] , led_int[7:1] };
+        else
+          led_int[7:0] <= {led_int[6:0] , led_int[7] };
+          
+        if (led_int[6]==1'b1)  led_go_left <= 1'b0;
+        if (led_int[1]==1'b1)  led_go_left <= 1'b1;
+        
       end
 
   
@@ -266,86 +266,86 @@ end
 // BIU Core 
 //------------------------------------------------------------------------
 
-biu_min						BIU_CORE
+biu_min                     BIU_CORE
   (
-	.CORE_CLK_INT			(core_clk_int),
-	.RESET_INT				(t_reset_d4),
-	.CLK					(CLK),
-	.READY_IN 				(READY),
-	.NMI					(NMI),
-	.INTR					(INTR),
-	.INTA_n					(INTA_n),
-	.ALE					(ALE),
-	.RD_n					(RD_n),
-	.WR_n					(WR_n),
-	.SSO_n					(SSO_n),
-	.IOM					(IOM),
-	.DTR					(DTR),
-	.DEN					(DEN),
-	.AD_OE					(t_biu_ad_oe),
-	.AD_OUT					(t_biu_ad_out),
-	.AD_IN					(t_biu_ad_in),
-	.EU_BIU_COMMAND			(t_eu_biu_command),
-	.EU_BIU_DATAOUT			(t_eu_biu_dataout),
-	.EU_REGISTER_R3			(t_eu_register_r3),
-	.EU_PREFIX_LOCK			(t_eu_prefix_lock),
-	.BIU_DONE				(t_biu_done),
-	.BIU_CLK_COUNTER_ZERO	(t_biu_clk_counter_zero), 
-	.BIU_SEGMENT			( ),	
-	.BIU_NMI_CAUGHT			(t_biu_nmi_caught),
-	.BIU_NMI_DEBOUNCE		(t_biu_nmi_debounce),
-	.BIU_INTR				(t_biu_intr),
-	.PFQ_TOP_BYTE			(t_pfq_top_byte),
-	.PFQ_EMPTY				(t_pfq_empty),
-	.PFQ_ADDR_OUT			(t_pfq_addr_out),
-	.BIU_REGISTER_ES		(t_biu_register_es),
-	.BIU_REGISTER_SS		(t_biu_register_ss),
-	.BIU_REGISTER_CS		(t_biu_register_cs),
-	.BIU_REGISTER_DS		(t_biu_register_ds),
-	.BIU_REGISTER_RM		(t_biu_register_rm),
-	.BIU_REGISTER_REG		(t_biu_register_reg),
-	.BIU_RETURN_DATA		(t_biu_return_data),
-	.SRAM_A					(SRAM_A),
-	.SRAM_D_OE				(t_sram_d_oe),
-	.SRAM_D_OUT				(t_sram_d_out),
-	.SRAM_D_IN				(SRAM_D),
-	.SRAM_OE_n				(SRAM_OE_n),
-	.SRAM_WE_n				(SRAM_WE_n)
+    .CORE_CLK_INT           (core_clk_int),
+    .RESET_INT              (t_reset_d4),
+    .CLK                    (CLK),
+    .READY_IN               (READY),
+    .NMI                    (NMI),
+    .INTR                   (INTR),
+    .INTA_n                 (INTA_n),
+    .ALE                    (ALE),
+    .RD_n                   (RD_n),
+    .WR_n                   (WR_n),
+    .SSO_n                  (SSO_n),
+    .IOM                    (IOM),
+    .DTR                    (DTR),
+    .DEN                    (DEN),
+    .AD_OE                  (t_biu_ad_oe),
+    .AD_OUT                 (t_biu_ad_out),
+    .AD_IN                  (t_biu_ad_in),
+    .EU_BIU_COMMAND         (t_eu_biu_command),
+    .EU_BIU_DATAOUT         (t_eu_biu_dataout),
+    .EU_REGISTER_R3         (t_eu_register_r3),
+    .EU_PREFIX_LOCK         (t_eu_prefix_lock),
+    .BIU_DONE               (t_biu_done),
+    .BIU_CLK_COUNTER_ZERO   (t_biu_clk_counter_zero), 
+    .BIU_SEGMENT            ( ),    
+    .BIU_NMI_CAUGHT         (t_biu_nmi_caught),
+    .BIU_NMI_DEBOUNCE       (t_biu_nmi_debounce),
+    .BIU_INTR               (t_biu_intr),
+    .PFQ_TOP_BYTE           (t_pfq_top_byte),
+    .PFQ_EMPTY              (t_pfq_empty),
+    .PFQ_ADDR_OUT           (t_pfq_addr_out),
+    .BIU_REGISTER_ES        (t_biu_register_es),
+    .BIU_REGISTER_SS        (t_biu_register_ss),
+    .BIU_REGISTER_CS        (t_biu_register_cs),
+    .BIU_REGISTER_DS        (t_biu_register_ds),
+    .BIU_REGISTER_RM        (t_biu_register_rm),
+    .BIU_REGISTER_REG       (t_biu_register_reg),
+    .BIU_RETURN_DATA        (t_biu_return_data),
+    .SRAM_A                 (SRAM_A),
+    .SRAM_D_OE              (t_sram_d_oe),
+    .SRAM_D_OUT             (t_sram_d_out),
+    .SRAM_D_IN              (SRAM_D),
+    .SRAM_OE_n              (SRAM_OE_n),
+    .SRAM_WE_n              (SRAM_WE_n)
 
-  );	
+  );    
 
 
 //------------------------------------------------------------------------
 // EU Core 
 //------------------------------------------------------------------------
 
-mcl86_eu_core				EU_CORE
+mcl86_eu_core               EU_CORE
   (
-	.CORE_CLK_INT			(core_clk_int),
-	.RESET_INT				(t_reset_d4),
-	.TEST_N_INT				(1'b1),
-	.EU_BIU_COMMAND			(t_eu_biu_command),
-	.EU_BIU_DATAOUT			(t_eu_biu_dataout),
-	.EU_REGISTER_R3			(t_eu_register_r3),
-	.EU_PREFIX_LOCK			(t_eu_prefix_lock),
-	.EU_FLAG_I				(t_eu_flag_i),
-	.BIU_DONE				(t_biu_done),
-	.BIU_CLK_COUNTER_ZERO	(t_biu_clk_counter_zero),
-	.BIU_NMI_CAUGHT			(t_biu_nmi_caught),
-	.BIU_NMI_DEBOUNCE		(t_biu_nmi_debounce),
-	.BIU_INTR				(t_biu_intr),
-	.PFQ_TOP_BYTE			(t_pfq_top_byte),
-	.PFQ_EMPTY				(t_pfq_empty),
-	.PFQ_ADDR_OUT			(t_pfq_addr_out),
-	.BIU_REGISTER_ES		(t_biu_register_es),
-	.BIU_REGISTER_SS		(t_biu_register_ss),
-	.BIU_REGISTER_CS		(t_biu_register_cs),
-	.BIU_REGISTER_DS		(t_biu_register_ds),
-	.BIU_REGISTER_RM		(t_biu_register_rm),
-	.BIU_REGISTER_REG		(t_biu_register_reg),
-	.BIU_RETURN_DATA		(t_biu_return_data)
-  );	
-	
+    .CORE_CLK_INT           (core_clk_int),
+    .RESET_INT              (t_reset_d4),
+    .TEST_N_INT             (1'b1),
+    .EU_BIU_COMMAND         (t_eu_biu_command),
+    .EU_BIU_DATAOUT         (t_eu_biu_dataout),
+    .EU_REGISTER_R3         (t_eu_register_r3),
+    .EU_PREFIX_LOCK         (t_eu_prefix_lock),
+    .EU_FLAG_I              (t_eu_flag_i),
+    .BIU_DONE               (t_biu_done),
+    .BIU_CLK_COUNTER_ZERO   (t_biu_clk_counter_zero),
+    .BIU_NMI_CAUGHT         (t_biu_nmi_caught),
+    .BIU_NMI_DEBOUNCE       (t_biu_nmi_debounce),
+    .BIU_INTR               (t_biu_intr),
+    .PFQ_TOP_BYTE           (t_pfq_top_byte),
+    .PFQ_EMPTY              (t_pfq_empty),
+    .PFQ_ADDR_OUT           (t_pfq_addr_out),
+    .BIU_REGISTER_ES        (t_biu_register_es),
+    .BIU_REGISTER_SS        (t_biu_register_ss),
+    .BIU_REGISTER_CS        (t_biu_register_cs),
+    .BIU_REGISTER_DS        (t_biu_register_ds),
+    .BIU_REGISTER_RM        (t_biu_register_rm),
+    .BIU_REGISTER_REG       (t_biu_register_reg),
+    .BIU_RETURN_DATA        (t_biu_return_data)
+  );    
+    
 
   
 endmodule
