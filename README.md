@@ -11,9 +11,10 @@ Boards:
 	
 Emulated Processors:
 
-	MCL68 - Motorola 68000 Emulator written in C
-    RISCV - Simple and compact RISC-V RS32I implementation written in C
-    MCL65 - MOS 6502  written in C
+	MCL68  - Motorola 68000 Emulator written in C
+    RISCV  - Simple and compact RISC-V RS32I implementation written in C
+    MCL65  - MOS 6502  written in C
+    MCL65+ - MOS 6502  emulator which runs on a Teensy 4.1 and can be used as a 6502 drop-in replacment
 
 Microsequencer-based processors: 
 
