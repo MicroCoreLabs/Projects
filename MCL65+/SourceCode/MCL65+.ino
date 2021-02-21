@@ -145,6 +145,17 @@ uint8_t   cartridge_RAM_6[0x2FFF];
 uint8_t   cartridge_RAM_2[0x2FFF];
 
 
+// Apple II+ ROMS
+//
+uint8_t AppleIIP_ROM_D0[0x0800];
+uint8_t AppleIIP_ROM_D8[0x0800];
+uint8_t AppleIIP_ROM_E0[0x0800];
+uint8_t AppleIIP_ROM_E8[0x0800];
+uint8_t AppleIIP_ROM_F0[0x0800];
+uint8_t AppleIIP_ROM_F8[0x0800];
+
+
+
 
 // ------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------
@@ -198,12 +209,20 @@ void setup() {
   pinMode(PIN_DATAOUT_OE_n,  OUTPUT); 
   
   
-
   // Copy VIC20 cartridge ROM arrays into the emlulator's main RAM array.
   //
-  for (int u=0; u<=0x1FFF ; u++) { internal_RAM[0x2000+u] = cartridge_RAM_2[u+2];   }
-  for (int u=0; u<=0x1FFF ; u++) { internal_RAM[0x6000+u] = cartridge_RAM_6[u+2];   }
-  for (int u=0; u<=0x1FFF ; u++) { internal_RAM[0xa000+u] = cartridge_RAM_A[u+2];   }
+  //for (int u=0; u<=0x1FFF ; u++) { internal_RAM[0x2000+u] = cartridge_RAM_2[u+2]; }
+  //for (int u=0; u<=0x1FFF ; u++) { internal_RAM[0x6000+u] = cartridge_RAM_6[u+2]; }
+  //for (int u=0; u<=0x1FFF ; u++) { internal_RAM[0xa000+u] = cartridge_RAM_A[u+2]; }
+  
+  //for (uint32_t u=0; u<=0x07FF ; u++) { internal_RAM[0xD000+u] = AppleIIP_ROM_D0[u]; }
+  //for (uint32_t u=0; u<=0x07FF ; u++) { internal_RAM[0xD800+u] = AppleIIP_ROM_D8[u]; }
+ 
+  //for (uint32_t u=0; u<=0x07FF ; u++) { internal_RAM[0xE000+u] = AppleIIP_ROM_E0[u]; }
+  //for (uint32_t u=0; u<=0x07FF ; u++) { internal_RAM[0xE800+u] = AppleIIP_ROM_E8[u]; }
+   
+  //for (uint32_t u=0; u<=0x07FF ; u++) { internal_RAM[0xF000+u] = AppleIIP_ROM_F0[u]; }
+  //for (uint32_t u=0; u<=0x07FF ; u++) { internal_RAM[0xF800+u] = AppleIIP_ROM_F8[u]; }
   
 
 }
@@ -225,9 +244,17 @@ void setup() {
 //          0x2 for internal memory accelerated
 // ----------------------------------------------------------
 inline uint8_t internal_address_check(uint16_t local_address) {
-  if ( (local_address>=0x2000) && (local_address<0x8000) ) return 0x2;    // VIC20 RAM Expansion
-  if ( (local_address>=0xA000) && (local_address<0xC000) ) return 0x2;    // VIC20 Cartridge ROM
-  //if ( (local_address>=0x0000) && (local_address<0x0100) ) return 0x0;    // 6502 ZeroPage and Stack ** BASIC and most applications cannot handle acceleration here
+  //if ( (local_address>=0x2000) && (local_address<0x8000) ) return 0x2;    // VIC20 RAM Expansion
+  //if ( (local_address>=0xA000) && (local_address<0xC000) ) return 0x2;    // VIC20 Cartridge ROM
+  
+  if ( (local_address>=0x0000) && (local_address <0x0400) ) return 0x0; // 6502 ZeroPage and Stack
+  if ( (local_address>=0x0400) && (local_address <0x07FF) ) return 0x0; // Apple II Text Page 1
+  if ( (local_address>=0x0800) && (local_address <0xC000) ) return 0x0; // Apple II RAM
+  // Skip Apple II I/O Range 0xC000
+  if ( (local_address>=0xD000) && (local_address <0xE000) ) return 0x0; // Apple II ROM D0/B8
+  if ( (local_address>=0xE000) && (local_address <0xF000) ) return 0x0; // Apple II ROM E0/E8
+  if ( (local_address>=0xF000) && (local_address<=0xFFFF) ) return 0x0; // Apple II ROM F0/F8
+  
   return 0x0;
 } 
 
@@ -239,9 +266,13 @@ inline void wait_for_CLK_rising_edge() {
     register uint32_t GPIO6_data=0;
     uint32_t   d10, d2, d3, d4, d5, d76;
 
-    while (((GPIO6_DR >> 12) & 0x1)!=0) {}            // Teensy 4.1 Pin-24  GPIO6_DR[12]     CLK
-    while (((GPIO6_DR >> 12) & 0x1)==0) {GPIO6_data=GPIO6_DR;}
-    
+    while (((GPIO6_DR >> 12) & 0x1)!=0) {} // Teensy 4.1 Pin-24 GPIO6_DR[12] CLK
+   
+    //while (((GPIO6_DR >> 12) & 0x1)==0) {GPIO6_data=GPIO6_DR;} // This method is ok for VIC-20 and Apple-II+ non-DRAM ranges
+   
+    do { GPIO6_data_d1=GPIO6_DR; } while (((GPIO6_data_d1 >> 12) & 0x1)==0); // This method needed to support Apple-II+ DRAM read data setup time
+    GPIO6_data=GPIO6_data_d1;
+  
     d10             = (GPIO6_data&0x000C0000) >> 18;  // Teensy 4.1 Pin-14  GPIO6_DR[19:18]  D1:D0
     d2              = (GPIO6_data&0x00800000) >> 21;  // Teensy 4.1 Pin-16  GPIO6_DR[23]     D2
     d3              = (GPIO6_data&0x00400000) >> 19;  // Teensy 4.1 Pin-17  GPIO6_DR[22]     D3
