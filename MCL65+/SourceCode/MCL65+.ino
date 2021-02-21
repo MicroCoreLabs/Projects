@@ -264,6 +264,7 @@ inline uint8_t internal_address_check(uint16_t local_address) {
 // -------------------------------------------------
 inline void wait_for_CLK_rising_edge() {
     register uint32_t GPIO6_data=0;
+    register uint32_t GPIO6_data_d1=0;
     uint32_t   d10, d2, d3, d4, d5, d76;
 
     while (((GPIO6_DR >> 12) & 0x1)!=0) {} // Teensy 4.1 Pin-24 GPIO6_DR[12] CLK
