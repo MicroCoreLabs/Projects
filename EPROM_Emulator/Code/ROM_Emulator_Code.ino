@@ -8,7 +8,7 @@
 //   Description:
 //   ============
 //   
-//  27Cxxx EPROM Emulator. When Teensy 4.1 run at 816Mhz the address to 
+//  27Cxxx EPROM Emulator. When Teensy 4.0 run at 816Mhz the address to 
 // data access time is less than 200ns.
 //
 //------------------------------------------------------------------------
@@ -16,7 +16,7 @@
 // Modification History:
 // =====================
 //
-// Revision 1 3/19/2021
+// Revision 1 3/20/2021
 // Initial revision
 //
 //
