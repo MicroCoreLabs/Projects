@@ -19,6 +19,9 @@
 // Revision 1.0 10/8/15 
 // Initial revision
 //
+// Revision 2.0 3/21/21 
+// Fixed overflow flag calculations
+//
 //
 //------------------------------------------------------------------------
 //
@@ -156,6 +159,11 @@ wire [15:0] eu_operand0;
 wire [15:0] eu_operand1;
 wire [31:0] eu_rom_data;
 
+wire  [15:0] adc_total;
+wire  [15:0] sbb_total;
+reg eu_overflow_fix;
+reg eu_add_overflow8_fixed;
+reg eu_add_overflow16_fixed;
 
 
 //------------------------------------------------------------------------
@@ -328,7 +336,11 @@ assign intr_asserted = BIU_INTR & intr_enable_delayed;
 
 assign new_instruction = (eu_rom_address[12:8]==5'h01) ? 1'b1 : 1'b0;   
 
-        
+
+assign adc_total = eu_register_r0 + eu_register_r1 + eu_flag_c;
+assign sbb_total = eu_register_r0 - eu_register_r1 - eu_flag_c;
+
+       
 //------------------------------------------------------------------------------------------  
 //
 // EU Microsequencer
@@ -412,6 +424,78 @@ else
       biu_done_caught <= 1'b0;
             
 
+// ADC - Byte
+//
+if (eu_rom_address == 16'h0A03)
+  begin
+    eu_overflow_fix <= 1'b1;
+         
+    if ( ( (eu_register_r0[7]==1'b0) && (eu_register_r1[7]==1'b0) && (adc_total[7]==1'b1) ) ||
+         ( (eu_register_r0[7]==1'b1) && (eu_register_r1[7]==1'b1) && (adc_total[7]==1'b0) ) )
+      begin
+        eu_add_overflow8_fixed <= 1'b1;
+      end
+    else
+      begin
+        eu_add_overflow8_fixed <= 1'b0;
+      end
+  end
+  
+  
+// SBB - Byte
+//
+if (eu_rom_address == 16'h0AAE)
+  begin
+    eu_overflow_fix <= 1'b1;
+    
+    if ( ( (eu_register_r0[7]==1'b0) && (eu_register_r1[7]==1'b1) && (sbb_total[7]==1'b1) ) ||
+         ( (eu_register_r0[7]==1'b1) && (eu_register_r1[7]==1'b0) && (sbb_total[7]==1'b0) ) )
+      begin
+        eu_add_overflow8_fixed <= 1'b1;
+      end
+    else
+      begin
+        eu_add_overflow8_fixed <= 1'b0;
+      end
+  end
+  
+// ADC - Word
+//
+if (eu_rom_address == 16'h0A12)
+  begin
+    eu_overflow_fix <= 1'b1;
+         
+    if ( ( (eu_register_r0[15]==1'b0) && (eu_register_r1[15]==1'b0) && (adc_total[15]==1'b1) ) ||
+         ( (eu_register_r0[15]==1'b1) && (eu_register_r1[15]==1'b1) && (adc_total[15]==1'b0) ) )
+      begin
+        eu_add_overflow16_fixed <= 1'b1;
+      end
+    else
+      begin
+        eu_add_overflow16_fixed <= 1'b0;
+      end
+  end
+  
+  
+// SBB - Word
+//
+if (eu_rom_address == 16'h0ABA)
+  begin
+    eu_overflow_fix <= 1'b1;
+    
+    if ( ( (eu_register_r0[15]==1'b0) && (eu_register_r1[15]==1'b1) && (sbb_total[15]==1'b1) ) ||
+         ( (eu_register_r0[15]==1'b1) && (eu_register_r1[15]==1'b0) && (sbb_total[15]==1'b0) ) )
+      begin
+        eu_add_overflow16_fixed <= 1'b1;
+      end
+    else
+      begin
+        eu_add_overflow16_fixed <= 1'b0;
+      end
+  end
+  
+if (eu_rom_address == 16'h0011) eu_overflow_fix <= 1'b0;
+  
             
     // Generate and store flags for addition
     if (eu_stall_pipeline==1'b0 && eu_opcode_type==3'h2)
@@ -419,11 +503,12 @@ else
         eu_add_carry       <= carry[16];
         eu_add_carry8      <= carry[8];
         eu_add_aux_carry   <= carry[4];
-        eu_add_overflow16  <= carry[16] ^ carry[15];
-        eu_add_overflow8   <= carry[8]  ^ carry[7];          
+        eu_add_overflow16  <= (eu_overflow_fix==1'b1) ? eu_add_overflow16_fixed : (carry[16] ^ carry[15]);
+        eu_add_overflow8   <= (eu_overflow_fix==1'b1) ? eu_add_overflow8_fixed  : (carry[8]  ^ carry[7]);         
       end
 
-    
+
+ 
     // Register writeback   
     if (eu_stall_pipeline==1'b0 && eu_opcode_type!=3'h0 && eu_opcode_type!=3'h1) 
       begin       
