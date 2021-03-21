@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name Teensy)(type KiCad)(uri Z:/Ted/projs/KiCAD_Library/Teensy)(options "")(descr ""))
+  (lib (name PCB_MCL65+)(type KiCad)(uri F:/Latest_1_9_2021/MCL65/PCB_MCL65+.pretty)(options "")(descr ""))
+)

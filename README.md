@@ -32,6 +32,7 @@ Misc:
     Wheelwriter  - FPGA based Printer Option for the IBM Wheelwriter 5
     Wheelwriter2 - Arduino Leonardo based Printer Option for the IBM Wheelwriter 5
 	Brother Typewriter - Arduino Leonardo converts Serial RX to a Brother Word Processor
+	EPROM Emulator - Small PCB which uses Teensy 4.0 to emulate up a 64KB 27C512 EPROM
     
         
 For questions email me at www.MicroCoreLabs.com
