@@ -1,0 +1,1241 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr B 17000 11000
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L teensy:Teensy4.1 U1
+U 1 1 604E31A7
+P 4000 4350
+F 0 "U1" H 4000 6915 50  0000 C CNN
+F 1 "Teensy 4.1" H 4000 6824 50  0000 C CNN
+F 2 "Teensy:Teensy41_Ted_Modified" H 3600 4750 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 3600 4750 50  0001 C CNN
+	1    4000 4350
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74LS04 U6
+U 1 1 604EF080
+P 9100 1900
+F 0 "U6" H 9100 2217 50  0000 C CNN
+F 1 "74LS04" H 9100 2126 50  0000 C CNN
+F 2 "Package_SO:SSOP-14_5.3x6.2mm_P0.65mm" H 9100 1900 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 9100 1900 50  0001 C CNN
+	1    9100 1900
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74LS04 U6
+U 2 1 604EFFCC
+P 9100 2500
+F 0 "U6" H 9100 2817 50  0000 C CNN
+F 1 "74LS04" H 9100 2726 50  0000 C CNN
+F 2 "Package_SO:SSOP-14_5.3x6.2mm_P0.65mm" H 9100 2500 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 9100 2500 50  0001 C CNN
+	2    9100 2500
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74LS04 U6
+U 3 1 604F0406
+P 9100 3100
+F 0 "U6" H 9100 3417 50  0000 C CNN
+F 1 "74LS04" H 9100 3326 50  0000 C CNN
+F 2 "Package_SO:SSOP-14_5.3x6.2mm_P0.65mm" H 9100 3100 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 9100 3100 50  0001 C CNN
+	3    9100 3100
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74LS04 U6
+U 4 1 604F086D
+P 9100 3700
+F 0 "U6" H 9100 4017 50  0000 C CNN
+F 1 "74LS04" H 9100 3926 50  0000 C CNN
+F 2 "Package_SO:SSOP-14_5.3x6.2mm_P0.65mm" H 9100 3700 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 9100 3700 50  0001 C CNN
+	4    9100 3700
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74LS04 U6
+U 5 1 604F0C2F
+P 9100 4300
+F 0 "U6" H 9100 4617 50  0000 C CNN
+F 1 "74LS04" H 9100 4526 50  0000 C CNN
+F 2 "Package_SO:SSOP-14_5.3x6.2mm_P0.65mm" H 9100 4300 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 9100 4300 50  0001 C CNN
+	5    9100 4300
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74LS04 U6
+U 6 1 604F1316
+P 9100 4900
+F 0 "U6" H 9100 5217 50  0000 C CNN
+F 1 "74LS04" H 9100 5126 50  0000 C CNN
+F 2 "Package_SO:SSOP-14_5.3x6.2mm_P0.65mm" H 9100 4900 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 9100 4900 50  0001 C CNN
+	6    9100 4900
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74LS04 U6
+U 7 1 604F1972
+P 9100 6050
+F 0 "U6" H 9330 6096 50  0000 L CNN
+F 1 "74LS04" H 9330 6005 50  0000 L CNN
+F 2 "Package_SO:SSOP-14_5.3x6.2mm_P0.65mm" H 9100 6050 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 9100 6050 50  0001 C CNN
+	7    9100 6050
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74LS244 U7
+U 1 1 604F92C3
+P 12000 7700
+F 0 "U7" H 11550 8550 50  0000 C CNN
+F 1 "74LS244" H 11650 8450 50  0000 C CNN
+F 2 "Package_SO:SSOP-20_5.3x7.2mm_P0.65mm" H 12000 7700 50  0001 C CNN
+F 3 "http://www.ti.com/lit/ds/symlink/sn74ls244.pdf" H 12000 7700 50  0001 C CNN
+	1    12000 7700
+	1    0    0    -1  
+$EndComp
+Text GLabel 14500 3100 2    50   Input ~ 0
+CPU_A8
+Wire Wire Line
+	14500 3100 14200 3100
+Text GLabel 14500 3200 2    50   Input ~ 0
+CPU_A9
+Wire Wire Line
+	14500 3200 14200 3200
+Text GLabel 14500 3300 2    50   Input ~ 0
+CPU_A10
+Wire Wire Line
+	14500 3300 14200 3300
+Text GLabel 14500 3400 2    50   Input ~ 0
+CPU_A11
+Wire Wire Line
+	14500 3400 14200 3400
+Text GLabel 14500 3500 2    50   Input ~ 0
+CPU_A12
+Wire Wire Line
+	14500 3500 14200 3500
+Text GLabel 14500 3600 2    50   Input ~ 0
+CPU_A13
+Wire Wire Line
+	14500 3600 14200 3600
+Text GLabel 14500 3700 2    50   Input ~ 0
+CPU_A14
+Wire Wire Line
+	14500 3700 14200 3700
+Text GLabel 14500 3800 2    50   Input ~ 0
+CPU_A15
+Wire Wire Line
+	14500 3800 14200 3800
+Wire Wire Line
+	14500 3000 14200 3000
+Text GLabel 14500 3000 2    50   Input ~ 0
+CPU_A7
+Wire Wire Line
+	14500 2900 14200 2900
+Text GLabel 14500 2900 2    50   Input ~ 0
+CPU_A6
+Wire Wire Line
+	14500 2800 14200 2800
+Text GLabel 14500 2800 2    50   Input ~ 0
+CPU_A5
+Wire Wire Line
+	14500 2700 14200 2700
+Text GLabel 14500 2700 2    50   Input ~ 0
+CPU_A4
+Wire Wire Line
+	14500 2600 14200 2600
+Text GLabel 14500 2600 2    50   Input ~ 0
+CPU_A3
+Wire Wire Line
+	14500 2500 14200 2500
+Text GLabel 14500 2500 2    50   Input ~ 0
+CPU_A2
+Wire Wire Line
+	14500 2400 14200 2400
+Text GLabel 14500 2400 2    50   Input ~ 0
+CPU_A1
+Wire Wire Line
+	14500 2300 14200 2300
+Text GLabel 14500 2300 2    50   Input ~ 0
+CPU_A0
+Wire Wire Line
+	14500 4700 14200 4700
+Text GLabel 14500 4700 2    50   Input ~ 0
+CPU_D7
+Wire Wire Line
+	14500 4600 14200 4600
+Text GLabel 14500 4600 2    50   Input ~ 0
+CPU_D6
+Wire Wire Line
+	14500 4500 14200 4500
+Text GLabel 14500 4500 2    50   Input ~ 0
+CPU_D5
+Wire Wire Line
+	14500 4400 14200 4400
+Wire Wire Line
+	14500 4300 14200 4300
+Text GLabel 14500 4300 2    50   Input ~ 0
+CPU_D3
+Wire Wire Line
+	14500 4200 14200 4200
+Text GLabel 14500 4200 2    50   Input ~ 0
+CPU_D2
+Wire Wire Line
+	14500 4100 14200 4100
+Text GLabel 14500 4100 2    50   Input ~ 0
+CPU_D1
+Wire Wire Line
+	14500 4000 14200 4000
+Text GLabel 14500 4000 2    50   Input ~ 0
+CPU_D0
+Text GLabel 14500 4400 2    50   Input ~ 0
+CPU_D4
+Wire Wire Line
+	14500 5100 14200 5100
+Text GLabel 14500 5100 2    50   Input ~ 0
+CPU_P2
+Wire Wire Line
+	14500 5000 14200 5000
+Text GLabel 14500 5000 2    50   Input ~ 0
+CPU_P1
+Wire Wire Line
+	14500 4900 14200 4900
+Text GLabel 14500 4900 2    50   Input ~ 0
+CPU_P0
+$Comp
+L power:GND #PWR0101
+U 1 1 604CAF62
+P 13600 6050
+F 0 "#PWR0101" H 13600 5800 50  0001 C CNN
+F 1 "GND" H 13605 5877 50  0000 C CNN
+F 2 "" H 13600 6050 50  0001 C CNN
+F 3 "" H 13600 6050 50  0001 C CNN
+	1    13600 6050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	13600 6050 13600 5950
+$Comp
+L 65xx:6510 U8
+U 1 1 604E276C
+P 13600 3950
+F 0 "U8" H 13200 6000 50  0000 C CNN
+F 1 "6510" H 13250 5900 50  0000 C CIB
+F 2 "Package_DIP:DIP-40_W15.24mm" H 13600 6400 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 13600 6300 50  0001 C CNN
+	1    13600 3950
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0102
+U 1 1 604CCE3A
+P 13600 1850
+F 0 "#PWR0102" H 13600 1700 50  0001 C CNN
+F 1 "+5V" H 13615 2023 50  0000 C CNN
+F 2 "" H 13600 1850 50  0001 C CNN
+F 3 "" H 13600 1850 50  0001 C CNN
+	1    13600 1850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	13600 1950 13600 1850
+Wire Wire Line
+	12700 2300 13000 2300
+Text GLabel 12700 2300 0    50   Input ~ 0
+CPU_RST_n
+Wire Wire Line
+	12700 2600 13000 2600
+Text GLabel 12700 2600 0    50   Input ~ 0
+CPU_CLKIN
+Wire Wire Line
+	12700 2800 13000 2800
+Text GLabel 12700 2800 0    50   Input ~ 0
+CPU_CLKOUT
+Wire Wire Line
+	12700 3100 13000 3100
+Text GLabel 12700 3100 0    50   Input ~ 0
+CPU_IRQ_n
+Wire Wire Line
+	12700 3200 13000 3200
+Text GLabel 12700 3200 0    50   Input ~ 0
+CPU_NMI_n
+Wire Wire Line
+	12700 3500 13000 3500
+Text GLabel 12700 3500 0    50   Input ~ 0
+CPU_WR_n
+Wire Wire Line
+	12700 3800 13000 3800
+Text GLabel 12700 3800 0    50   Input ~ 0
+CPU_READY
+Wire Wire Line
+	12700 3900 13000 3900
+Text GLabel 12700 3900 0    50   Input ~ 0
+CPU_AEC
+$Comp
+L power:+5V #PWR0103
+U 1 1 604D53E6
+P 5350 2050
+F 0 "#PWR0103" H 5350 1900 50  0001 C CNN
+F 1 "+5V" H 5365 2223 50  0000 C CNN
+F 2 "" H 5350 2050 50  0001 C CNN
+F 3 "" H 5350 2050 50  0001 C CNN
+	1    5350 2050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5100 2200 5350 2200
+$Comp
+L power:GND #PWR0104
+U 1 1 604D7478
+P 5550 2250
+F 0 "#PWR0104" H 5550 2000 50  0001 C CNN
+F 1 "GND" H 5555 2077 50  0000 C CNN
+F 2 "" H 5550 2250 50  0001 C CNN
+F 3 "" H 5550 2250 50  0001 C CNN
+	1    5550 2250
+	1    0    0    1   
+$EndComp
+Wire Wire Line
+	5100 2300 5550 2300
+Wire Wire Line
+	5550 2300 5550 2250
+$Comp
+L power:+3V3 #PWR0105
+U 1 1 604DC470
+P 5800 2300
+F 0 "#PWR0105" H 5800 2150 50  0001 C CNN
+F 1 "+3V3" H 5815 2473 50  0000 C CNN
+F 2 "" H 5800 2300 50  0001 C CNN
+F 3 "" H 5800 2300 50  0001 C CNN
+	1    5800 2300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5100 2400 5800 2400
+Wire Wire Line
+	5800 2400 5800 2300
+$Comp
+L power:GND #PWR0106
+U 1 1 604DE511
+P 6200 3650
+F 0 "#PWR0106" H 6200 3400 50  0001 C CNN
+F 1 "GND" H 6205 3477 50  0000 C CNN
+F 2 "" H 6200 3650 50  0001 C CNN
+F 3 "" H 6200 3650 50  0001 C CNN
+	1    6200 3650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5100 3600 6200 3600
+Wire Wire Line
+	6200 3600 6200 3650
+$Comp
+L power:+3V3 #PWR0107
+U 1 1 604E1C8D
+P 1650 3500
+F 0 "#PWR0107" H 1650 3350 50  0001 C CNN
+F 1 "+3V3" H 1665 3673 50  0000 C CNN
+F 2 "" H 1650 3500 50  0001 C CNN
+F 3 "" H 1650 3500 50  0001 C CNN
+	1    1650 3500
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	2900 3600 1650 3600
+Wire Wire Line
+	1650 3600 1650 3500
+$Comp
+L power:GND #PWR0108
+U 1 1 604E55E5
+P 1650 2250
+F 0 "#PWR0108" H 1650 2000 50  0001 C CNN
+F 1 "GND" H 1655 2077 50  0000 C CNN
+F 2 "" H 1650 2250 50  0001 C CNN
+F 3 "" H 1650 2250 50  0001 C CNN
+	1    1650 2250
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	2900 2200 1650 2200
+Wire Wire Line
+	1650 2200 1650 2250
+$Comp
+L power:+3V3 #PWR0109
+U 1 1 604E9EBC
+P 2600 6050
+F 0 "#PWR0109" H 2600 5900 50  0001 C CNN
+F 1 "+3V3" H 2615 6223 50  0000 C CNN
+F 2 "" H 2600 6050 50  0001 C CNN
+F 3 "" H 2600 6050 50  0001 C CNN
+	1    2600 6050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2600 6150 2600 6050
+$Comp
+L power:GND #PWR0110
+U 1 1 604EB6A3
+P 2600 7800
+F 0 "#PWR0110" H 2600 7550 50  0001 C CNN
+F 1 "GND" H 2605 7627 50  0000 C CNN
+F 2 "" H 2600 7800 50  0001 C CNN
+F 3 "" H 2600 7800 50  0001 C CNN
+	1    2600 7800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2600 7800 2600 7750
+Text GLabel 3400 8850 2    50   Input ~ 0
+CPU_A8
+Wire Wire Line
+	3400 8850 3100 8850
+Text GLabel 3400 8950 2    50   Input ~ 0
+CPU_A9
+Wire Wire Line
+	3400 8950 3100 8950
+Text GLabel 3400 9050 2    50   Input ~ 0
+CPU_A10
+Wire Wire Line
+	3400 9050 3100 9050
+Text GLabel 3400 9150 2    50   Input ~ 0
+CPU_A11
+Wire Wire Line
+	3400 9150 3100 9150
+Text GLabel 3400 9250 2    50   Input ~ 0
+CPU_A12
+Wire Wire Line
+	3400 9250 3100 9250
+Text GLabel 3400 9350 2    50   Input ~ 0
+CPU_A13
+Wire Wire Line
+	3400 9350 3100 9350
+Text GLabel 3400 9450 2    50   Input ~ 0
+CPU_A14
+Wire Wire Line
+	3400 9450 3100 9450
+Text GLabel 3400 9550 2    50   Input ~ 0
+CPU_A15
+Wire Wire Line
+	3400 9550 3100 9550
+Wire Wire Line
+	3400 7150 3100 7150
+Text GLabel 3400 7150 2    50   Input ~ 0
+CPU_A7
+Wire Wire Line
+	3400 7050 3100 7050
+Text GLabel 3400 7050 2    50   Input ~ 0
+CPU_A6
+Wire Wire Line
+	3400 6950 3100 6950
+Text GLabel 3400 6950 2    50   Input ~ 0
+CPU_A5
+Wire Wire Line
+	3400 6850 3100 6850
+Text GLabel 3400 6850 2    50   Input ~ 0
+CPU_A4
+Wire Wire Line
+	3400 6750 3100 6750
+Text GLabel 3400 6750 2    50   Input ~ 0
+CPU_A3
+Wire Wire Line
+	3400 6650 3100 6650
+Text GLabel 3400 6650 2    50   Input ~ 0
+CPU_A2
+Wire Wire Line
+	3400 6550 3100 6550
+Text GLabel 3400 6550 2    50   Input ~ 0
+CPU_A1
+Wire Wire Line
+	3400 6450 3100 6450
+Text GLabel 3400 6450 2    50   Input ~ 0
+CPU_A0
+$Comp
+L power:+3V3 #PWR0111
+U 1 1 60506B88
+P 2600 8450
+F 0 "#PWR0111" H 2600 8300 50  0001 C CNN
+F 1 "+3V3" H 2615 8623 50  0000 C CNN
+F 2 "" H 2600 8450 50  0001 C CNN
+F 3 "" H 2600 8450 50  0001 C CNN
+	1    2600 8450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2600 8550 2600 8450
+$Comp
+L power:GND #PWR0112
+U 1 1 60506B8F
+P 2600 10200
+F 0 "#PWR0112" H 2600 9950 50  0001 C CNN
+F 1 "GND" H 2605 10027 50  0000 C CNN
+F 2 "" H 2600 10200 50  0001 C CNN
+F 3 "" H 2600 10200 50  0001 C CNN
+	1    2600 10200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2600 10200 2600 10150
+$Comp
+L power:+3V3 #PWR0113
+U 1 1 60512691
+P 5550 6050
+F 0 "#PWR0113" H 5550 5900 50  0001 C CNN
+F 1 "+3V3" H 5565 6223 50  0000 C CNN
+F 2 "" H 5550 6050 50  0001 C CNN
+F 3 "" H 5550 6050 50  0001 C CNN
+	1    5550 6050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5550 6150 5550 6050
+$Comp
+L power:GND #PWR0114
+U 1 1 60512698
+P 5550 7800
+F 0 "#PWR0114" H 5550 7550 50  0001 C CNN
+F 1 "GND" H 5555 7627 50  0000 C CNN
+F 2 "" H 5550 7800 50  0001 C CNN
+F 3 "" H 5550 7800 50  0001 C CNN
+	1    5550 7800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5550 7800 5550 7750
+$Comp
+L power:+3V3 #PWR0115
+U 1 1 605126C5
+P 5550 8450
+F 0 "#PWR0115" H 5550 8300 50  0001 C CNN
+F 1 "+3V3" H 5565 8623 50  0000 C CNN
+F 2 "" H 5550 8450 50  0001 C CNN
+F 3 "" H 5550 8450 50  0001 C CNN
+	1    5550 8450
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	5550 8550 5550 8450
+$Comp
+L power:GND #PWR0116
+U 1 1 605126CC
+P 5550 10200
+F 0 "#PWR0116" H 5550 9950 50  0001 C CNN
+F 1 "GND" H 5555 10027 50  0000 C CNN
+F 2 "" H 5550 10200 50  0001 C CNN
+F 3 "" H 5550 10200 50  0001 C CNN
+	1    5550 10200
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	5550 10200 5550 10150
+Wire Wire Line
+	4750 7150 5050 7150
+Text GLabel 4750 7150 0    50   Input ~ 0
+CPU_D7
+Wire Wire Line
+	4750 7050 5050 7050
+Text GLabel 4750 7050 0    50   Input ~ 0
+CPU_D6
+Wire Wire Line
+	4750 6950 5050 6950
+Text GLabel 4750 6950 0    50   Input ~ 0
+CPU_D5
+Wire Wire Line
+	4750 6850 5050 6850
+Wire Wire Line
+	4750 6750 5050 6750
+Text GLabel 4750 6750 0    50   Input ~ 0
+CPU_D3
+Wire Wire Line
+	4750 6650 5050 6650
+Text GLabel 4750 6650 0    50   Input ~ 0
+CPU_D2
+Wire Wire Line
+	4750 6550 5050 6550
+Text GLabel 4750 6550 0    50   Input ~ 0
+CPU_D1
+Wire Wire Line
+	4750 6450 5050 6450
+Text GLabel 4750 6450 0    50   Input ~ 0
+CPU_D0
+Text GLabel 4750 6850 0    50   Input ~ 0
+CPU_D4
+Wire Wire Line
+	6350 6450 6050 6450
+Text GLabel 6350 6450 2    50   Input ~ 0
+TEENSY_IN_D0
+Wire Wire Line
+	6350 6550 6050 6550
+Text GLabel 6350 6550 2    50   Input ~ 0
+TEENSY_IN_D1
+Wire Wire Line
+	6350 6650 6050 6650
+Text GLabel 6350 6650 2    50   Input ~ 0
+TEENSY_IN_D2
+Wire Wire Line
+	6350 6750 6050 6750
+Text GLabel 6350 6750 2    50   Input ~ 0
+TEENSY_IN_D3
+Wire Wire Line
+	6350 6850 6050 6850
+Text GLabel 6350 6850 2    50   Input ~ 0
+TEENSY_IN_D4
+Wire Wire Line
+	6350 6950 6050 6950
+Text GLabel 6350 6950 2    50   Input ~ 0
+TEENSY_IN_D5
+Wire Wire Line
+	6350 7050 6050 7050
+Text GLabel 6350 7050 2    50   Input ~ 0
+TEENSY_IN_D6
+Wire Wire Line
+	6350 7150 6050 7150
+Text GLabel 6350 7150 2    50   Input ~ 0
+TEENSY_IN_D7
+Wire Wire Line
+	6350 8850 6050 8850
+Text GLabel 6350 8850 2    50   Input ~ 0
+TEENSY_OUT_D0
+Wire Wire Line
+	6350 8950 6050 8950
+Text GLabel 6350 8950 2    50   Input ~ 0
+TEENSY_OUT_D1
+Wire Wire Line
+	6350 9050 6050 9050
+Text GLabel 6350 9050 2    50   Input ~ 0
+TEENSY_OUT_D2
+Wire Wire Line
+	6350 9150 6050 9150
+Text GLabel 6350 9150 2    50   Input ~ 0
+TEENSY_OUT_D3
+Wire Wire Line
+	6350 9250 6050 9250
+Text GLabel 6350 9250 2    50   Input ~ 0
+TEENSY_OUT_D4
+Wire Wire Line
+	6350 9350 6050 9350
+Text GLabel 6350 9350 2    50   Input ~ 0
+TEENSY_OUT_D5
+Wire Wire Line
+	6350 9450 6050 9450
+Text GLabel 6350 9450 2    50   Input ~ 0
+TEENSY_OUT_D6
+Wire Wire Line
+	6350 9550 6050 9550
+Text GLabel 6350 9550 2    50   Input ~ 0
+TEENSY_OUT_D7
+Wire Wire Line
+	4750 9550 5050 9550
+Text GLabel 4750 9550 0    50   Input ~ 0
+CPU_D7
+Wire Wire Line
+	4750 9450 5050 9450
+Text GLabel 4750 9450 0    50   Input ~ 0
+CPU_D6
+Wire Wire Line
+	4750 9350 5050 9350
+Text GLabel 4750 9350 0    50   Input ~ 0
+CPU_D5
+Wire Wire Line
+	4750 9250 5050 9250
+Wire Wire Line
+	4750 9150 5050 9150
+Text GLabel 4750 9150 0    50   Input ~ 0
+CPU_D3
+Wire Wire Line
+	4750 9050 5050 9050
+Text GLabel 4750 9050 0    50   Input ~ 0
+CPU_D2
+Wire Wire Line
+	4750 8950 5050 8950
+Text GLabel 4750 8950 0    50   Input ~ 0
+CPU_D1
+Wire Wire Line
+	4750 8850 5050 8850
+Text GLabel 4750 8850 0    50   Input ~ 0
+CPU_D0
+Text GLabel 4750 9250 0    50   Input ~ 0
+CPU_D4
+Wire Wire Line
+	1800 6450 2100 6450
+Text GLabel 1800 6450 0    50   Input ~ 0
+TEENSY_A0
+Wire Wire Line
+	1800 6550 2100 6550
+Text GLabel 1800 6550 0    50   Input ~ 0
+TEENSY_A1
+Wire Wire Line
+	1800 6650 2100 6650
+Text GLabel 1800 6650 0    50   Input ~ 0
+TEENSY_A2
+Wire Wire Line
+	1800 6750 2100 6750
+Text GLabel 1800 6750 0    50   Input ~ 0
+TEENSY_A3
+Wire Wire Line
+	1800 6850 2100 6850
+Text GLabel 1800 6850 0    50   Input ~ 0
+TEENSY_A4
+Wire Wire Line
+	1800 6950 2100 6950
+Text GLabel 1800 6950 0    50   Input ~ 0
+TEENSY_A5
+Wire Wire Line
+	1800 7050 2100 7050
+Text GLabel 1800 7050 0    50   Input ~ 0
+TEENSY_A6
+Wire Wire Line
+	1800 7150 2100 7150
+Text GLabel 1800 7150 0    50   Input ~ 0
+TEENSY_A7
+Wire Wire Line
+	1800 8850 2100 8850
+Text GLabel 1800 8850 0    50   Input ~ 0
+TEENSY_A8
+Wire Wire Line
+	1800 8950 2100 8950
+Text GLabel 1800 8950 0    50   Input ~ 0
+TEENSY_A9
+Wire Wire Line
+	1800 9050 2100 9050
+Text GLabel 1800 9050 0    50   Input ~ 0
+TEENSY_A10
+Wire Wire Line
+	1800 9150 2100 9150
+Text GLabel 1800 9150 0    50   Input ~ 0
+TEENSY_A11
+Wire Wire Line
+	1800 9250 2100 9250
+Text GLabel 1800 9250 0    50   Input ~ 0
+TEENSY_A12
+Wire Wire Line
+	1800 9350 2100 9350
+Text GLabel 1800 9350 0    50   Input ~ 0
+TEENSY_A13
+Wire Wire Line
+	1800 9450 2100 9450
+Text GLabel 1800 9450 0    50   Input ~ 0
+TEENSY_A14
+Wire Wire Line
+	1800 9550 2100 9550
+Text GLabel 1800 9550 0    50   Input ~ 0
+TEENSY_A15
+$Comp
+L 74xx:74LS573 U4
+U 1 1 6058D2B5
+P 5550 6950
+F 0 "U4" H 5150 7750 50  0000 C CNN
+F 1 "74LS573" H 5250 7650 50  0000 C CNN
+F 2 "Package_SO:SSOP-20_5.3x7.2mm_P0.65mm" H 5550 6950 50  0001 C CNN
+F 3 "74xx/74hc573.pdf" H 5550 6950 50  0001 C CNN
+	1    5550 6950
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74LS573 U2
+U 1 1 605A5248
+P 2600 6950
+F 0 "U2" H 2200 7750 50  0000 C CNN
+F 1 "74LS573" H 2300 7650 50  0000 C CNN
+F 2 "Package_SO:SSOP-20_5.3x7.2mm_P0.65mm" H 2600 6950 50  0001 C CNN
+F 3 "74xx/74hc573.pdf" H 2600 6950 50  0001 C CNN
+	1    2600 6950
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74LS573 U3
+U 1 1 605D8A68
+P 2600 9350
+F 0 "U3" H 2200 10150 50  0000 C CNN
+F 1 "74LS573" H 2300 10050 50  0000 C CNN
+F 2 "Package_SO:SSOP-20_5.3x7.2mm_P0.65mm" H 2600 9350 50  0001 C CNN
+F 3 "74xx/74hc573.pdf" H 2600 9350 50  0001 C CNN
+	1    2600 9350
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74LS573 U5
+U 1 1 605FE39B
+P 5550 9350
+F 0 "U5" H 5150 10150 50  0000 C CNN
+F 1 "74LS573" H 5250 10050 50  0000 C CNN
+F 2 "Package_SO:SSOP-20_5.3x7.2mm_P0.65mm" H 5550 9350 50  0001 C CNN
+F 3 "74xx/74hc573.pdf" H 5550 9350 50  0001 C CNN
+	1    5550 9350
+	-1   0    0    -1  
+$EndComp
+$Comp
+L power:+3V3 #PWR0117
+U 1 1 60627001
+P 2000 9750
+F 0 "#PWR0117" H 2000 9600 50  0001 C CNN
+F 1 "+3V3" H 2015 9923 50  0000 C CNN
+F 2 "" H 2000 9750 50  0001 C CNN
+F 3 "" H 2000 9750 50  0001 C CNN
+	1    2000 9750
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	2100 9750 2000 9750
+$Comp
+L power:+3V3 #PWR0118
+U 1 1 6063620C
+P 2000 7350
+F 0 "#PWR0118" H 2000 7200 50  0001 C CNN
+F 1 "+3V3" H 2015 7523 50  0000 C CNN
+F 2 "" H 2000 7350 50  0001 C CNN
+F 3 "" H 2000 7350 50  0001 C CNN
+	1    2000 7350
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	2100 7350 2000 7350
+$Comp
+L power:+3V3 #PWR0119
+U 1 1 606451BE
+P 6150 9750
+F 0 "#PWR0119" H 6150 9600 50  0001 C CNN
+F 1 "+3V3" H 6165 9923 50  0000 C CNN
+F 2 "" H 6150 9750 50  0001 C CNN
+F 3 "" H 6150 9750 50  0001 C CNN
+	1    6150 9750
+	0    1    -1   0   
+$EndComp
+Wire Wire Line
+	6050 9750 6150 9750
+$Comp
+L power:GND #PWR0120
+U 1 1 60674D1C
+P 4950 7550
+F 0 "#PWR0120" H 4950 7300 50  0001 C CNN
+F 1 "GND" H 4955 7377 50  0000 C CNN
+F 2 "" H 4950 7550 50  0001 C CNN
+F 3 "" H 4950 7550 50  0001 C CNN
+	1    4950 7550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4950 7450 5050 7450
+Wire Wire Line
+	4950 7450 4950 7550
+Wire Wire Line
+	8500 1900 8800 1900
+Text GLabel 8500 1900 0    50   Input ~ 0
+CPU_AEC
+Wire Wire Line
+	9700 1900 9400 1900
+Text GLabel 9700 1900 2    50   Input ~ 0
+CPU_AEC_n
+Wire Wire Line
+	1800 7450 2100 7450
+Text GLabel 1800 7450 0    50   Input ~ 0
+CPU_AEC_n
+Wire Wire Line
+	1800 9850 2100 9850
+Text GLabel 1800 9850 0    50   Input ~ 0
+CPU_AEC_n
+Wire Wire Line
+	6350 9850 6050 9850
+Text GLabel 6350 9850 2    50   Input ~ 0
+TEENSY_DATA_OE_n
+Wire Wire Line
+	8500 2500 8800 2500
+Text GLabel 8500 2500 0    50   Input ~ 0
+CPU_READY
+Wire Wire Line
+	9700 2500 9400 2500
+Text GLabel 9700 2500 2    50   Input ~ 0
+TEENSY_READY_n
+Wire Wire Line
+	12800 7200 12500 7200
+Text GLabel 12800 7200 2    50   Input ~ 0
+CPU_WR_n
+Wire Wire Line
+	8500 3100 8800 3100
+Wire Wire Line
+	9700 3100 9400 3100
+Text GLabel 8500 3100 0    50   Input ~ 0
+CPU_IRQ_n
+Text GLabel 9700 3100 2    50   Input ~ 0
+TEENSY_IRQ
+Wire Wire Line
+	9700 3700 9400 3700
+Text GLabel 9700 3700 2    50   Input ~ 0
+TEENSY_NMI
+Wire Wire Line
+	8500 3700 8800 3700
+Text GLabel 8500 3700 0    50   Input ~ 0
+CPU_NMI_n
+Wire Wire Line
+	8500 4300 8800 4300
+Text GLabel 8500 4300 0    50   Input ~ 0
+CPU_RST_n
+Wire Wire Line
+	9700 4300 9400 4300
+Text GLabel 9700 4300 2    50   Input ~ 0
+TEENSY_RST
+Wire Wire Line
+	11200 7200 11500 7200
+Text GLabel 11200 7200 0    50   Input ~ 0
+TEENSY_WR_n
+Wire Wire Line
+	11200 8100 11500 8100
+Text GLabel 11200 8100 0    50   Input ~ 0
+CPU_AEC_n
+Wire Wire Line
+	12800 7900 12500 7900
+Text GLabel 12800 7900 2    50   Input ~ 0
+CPU_P2
+Wire Wire Line
+	12800 7800 12500 7800
+Text GLabel 12800 7800 2    50   Input ~ 0
+CPU_P1
+Wire Wire Line
+	12800 7700 12500 7700
+Text GLabel 12800 7700 2    50   Input ~ 0
+CPU_P0
+Wire Wire Line
+	11200 7900 11500 7900
+Text GLabel 11200 7900 0    50   Input ~ 0
+TEENSY_P2
+Wire Wire Line
+	11200 7800 11500 7800
+Text GLabel 11200 7800 0    50   Input ~ 0
+TEENSY_P1
+Wire Wire Line
+	11200 7700 11500 7700
+Text GLabel 11200 7700 0    50   Input ~ 0
+TEENSY_P0
+$Comp
+L power:GND #PWR0121
+U 1 1 607C436E
+P 12000 8650
+F 0 "#PWR0121" H 12000 8400 50  0001 C CNN
+F 1 "GND" H 12005 8477 50  0000 C CNN
+F 2 "" H 12000 8650 50  0001 C CNN
+F 3 "" H 12000 8650 50  0001 C CNN
+	1    12000 8650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	12000 8650 12000 8500
+$Comp
+L power:GND #PWR0122
+U 1 1 607D9476
+P 11400 8300
+F 0 "#PWR0122" H 11400 8050 50  0001 C CNN
+F 1 "GND" H 11405 8127 50  0000 C CNN
+F 2 "" H 11400 8300 50  0001 C CNN
+F 3 "" H 11400 8300 50  0001 C CNN
+	1    11400 8300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	11400 8200 11500 8200
+Wire Wire Line
+	11400 8200 11400 8300
+$Comp
+L power:+3V3 #PWR0123
+U 1 1 607EF92A
+P 12000 6800
+F 0 "#PWR0123" H 12000 6650 50  0001 C CNN
+F 1 "+3V3" H 12015 6973 50  0000 C CNN
+F 2 "" H 12000 6800 50  0001 C CNN
+F 3 "" H 12000 6800 50  0001 C CNN
+	1    12000 6800
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	12000 6900 12000 6800
+$Comp
+L power:+3V3 #PWR0124
+U 1 1 6080FD1D
+P 9100 5450
+F 0 "#PWR0124" H 9100 5300 50  0001 C CNN
+F 1 "+3V3" H 9115 5623 50  0000 C CNN
+F 2 "" H 9100 5450 50  0001 C CNN
+F 3 "" H 9100 5450 50  0001 C CNN
+	1    9100 5450
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	9100 5550 9100 5450
+$Comp
+L power:GND #PWR0125
+U 1 1 60824F26
+P 9100 6700
+F 0 "#PWR0125" H 9100 6450 50  0001 C CNN
+F 1 "GND" H 9105 6527 50  0000 C CNN
+F 2 "" H 9100 6700 50  0001 C CNN
+F 3 "" H 9100 6700 50  0001 C CNN
+	1    9100 6700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9100 6700 9100 6550
+Wire Wire Line
+	8500 4900 8800 4900
+Text GLabel 8500 4900 0    50   Input ~ 0
+CPU_CLKIN
+Wire Wire Line
+	9700 4900 9400 4900
+Text GLabel 9700 4900 2    50   Input ~ 0
+TEENSY_CLKIN
+Wire Wire Line
+	4750 7350 5050 7350
+Text GLabel 4750 7350 0    50   Input ~ 0
+CPU_CLKIN
+Wire Wire Line
+	11200 7600 11500 7600
+Text GLabel 11200 7600 0    50   Input ~ 0
+CPU_CLKIN
+Wire Wire Line
+	12800 7600 12500 7600
+Text GLabel 12800 7600 2    50   Input ~ 0
+CPU_CLKOUT
+Text Notes 1450 1350 0    276  ~ 55
+MicroCore Labs - MCL64
+Text Notes 12350 9800 0    79   ~ 16
+Ted Fried, MicroCore Labs\n
+Text Notes 12700 10400 0    79   ~ 16
+MCL64\n\n
+Wire Wire Line
+	2600 4000 2900 4000
+Text GLabel 2600 4000 0    50   Input ~ 0
+TEENSY_A0
+Wire Wire Line
+	5400 4000 5100 4000
+Text GLabel 5400 4000 2    50   Input ~ 0
+TEENSY_A1
+Wire Wire Line
+	2600 4100 2900 4100
+Text GLabel 2600 4100 0    50   Input ~ 0
+TEENSY_A2
+Wire Wire Line
+	5400 4100 5100 4100
+Text GLabel 5400 4100 2    50   Input ~ 0
+TEENSY_A3
+Wire Wire Line
+	2600 4200 2900 4200
+Text GLabel 2600 4200 0    50   Input ~ 0
+TEENSY_A4
+Wire Wire Line
+	5400 4200 5100 4200
+Text GLabel 5400 4200 2    50   Input ~ 0
+TEENSY_A5
+Wire Wire Line
+	2600 4300 2900 4300
+Text GLabel 2600 4300 0    50   Input ~ 0
+TEENSY_A6
+Wire Wire Line
+	5400 4300 5100 4300
+Text GLabel 5400 4300 2    50   Input ~ 0
+TEENSY_A7
+Wire Wire Line
+	5400 3400 5100 3400
+Text GLabel 5400 3400 2    50   Input ~ 0
+TEENSY_IN_D0
+Wire Wire Line
+	5400 3300 5100 3300
+Text GLabel 5400 3300 2    50   Input ~ 0
+TEENSY_IN_D1
+Wire Wire Line
+	5400 3200 5100 3200
+Text GLabel 5400 3200 2    50   Input ~ 0
+TEENSY_IN_D2
+Wire Wire Line
+	5400 3100 5100 3100
+Text GLabel 5400 3100 2    50   Input ~ 0
+TEENSY_IN_D3
+Wire Wire Line
+	5400 3000 5100 3000
+Text GLabel 5400 3000 2    50   Input ~ 0
+TEENSY_IN_D4
+Wire Wire Line
+	5400 2900 5100 2900
+Text GLabel 5400 2900 2    50   Input ~ 0
+TEENSY_IN_D5
+Wire Wire Line
+	5400 2800 5100 2800
+Text GLabel 5400 2800 2    50   Input ~ 0
+TEENSY_IN_D6
+Wire Wire Line
+	5400 2700 5100 2700
+Text GLabel 5400 2700 2    50   Input ~ 0
+TEENSY_IN_D7
+Wire Wire Line
+	2600 3400 2900 3400
+Text GLabel 2600 3400 0    50   Input ~ 0
+TEENSY_OUT_D0
+Wire Wire Line
+	2600 3300 2900 3300
+Text GLabel 2600 3300 0    50   Input ~ 0
+TEENSY_OUT_D1
+Wire Wire Line
+	2600 3200 2900 3200
+Text GLabel 2600 3200 0    50   Input ~ 0
+TEENSY_OUT_D2
+Wire Wire Line
+	2600 3100 2900 3100
+Text GLabel 2600 3100 0    50   Input ~ 0
+TEENSY_OUT_D3
+Wire Wire Line
+	2600 3000 2900 3000
+Text GLabel 2600 3000 0    50   Input ~ 0
+TEENSY_OUT_D4
+Wire Wire Line
+	2600 2900 2900 2900
+Text GLabel 2600 2900 0    50   Input ~ 0
+TEENSY_OUT_D5
+Wire Wire Line
+	2600 2800 2900 2800
+Text GLabel 2600 2800 0    50   Input ~ 0
+TEENSY_OUT_D6
+Wire Wire Line
+	2600 2700 2900 2700
+Text GLabel 2600 2700 0    50   Input ~ 0
+TEENSY_OUT_D7
+Wire Wire Line
+	2600 2600 2900 2600
+Text GLabel 2600 2600 0    50   Input ~ 0
+TEENSY_DATA_OE_n
+Wire Wire Line
+	2600 4400 2900 4400
+Text GLabel 2600 4400 0    50   Input ~ 0
+TEENSY_A8
+Wire Wire Line
+	5400 4400 5100 4400
+Text GLabel 5400 4400 2    50   Input ~ 0
+TEENSY_A9
+Wire Wire Line
+	2600 4500 2900 4500
+Text GLabel 2600 4500 0    50   Input ~ 0
+TEENSY_A10
+Wire Wire Line
+	5400 4500 5100 4500
+Text GLabel 5400 4500 2    50   Input ~ 0
+TEENSY_A11
+Wire Wire Line
+	2600 2400 2900 2400
+Text GLabel 2600 2400 0    50   Input ~ 0
+TEENSY_A12
+Wire Wire Line
+	2600 2300 2900 2300
+Text GLabel 2600 2300 0    50   Input ~ 0
+TEENSY_A13
+Wire Wire Line
+	2600 2500 2900 2500
+Text GLabel 2600 2500 0    50   Input ~ 0
+TEENSY_A14
+Wire Wire Line
+	5400 2500 5100 2500
+Text GLabel 5400 2500 2    50   Input ~ 0
+TEENSY_A15
+Wire Wire Line
+	5400 3900 5100 3900
+Text GLabel 5400 3900 2    50   Input ~ 0
+TEENSY_P2
+Wire Wire Line
+	5400 3500 5100 3500
+Text GLabel 5400 3500 2    50   Input ~ 0
+TEENSY_P1
+Wire Wire Line
+	5400 2600 5100 2600
+Text GLabel 5400 2600 2    50   Input ~ 0
+TEENSY_P0
+Wire Wire Line
+	2600 3500 2900 3500
+Text GLabel 2600 3500 0    50   Input ~ 0
+TEENSY_WR_n
+Wire Wire Line
+	2600 3900 2900 3900
+Text GLabel 2600 3900 0    50   Input ~ 0
+TEENSY_READY_n
+Wire Wire Line
+	2600 3800 2900 3800
+Text GLabel 2600 3800 0    50   Input ~ 0
+TEENSY_IRQ
+Wire Wire Line
+	5400 3700 5100 3700
+Text GLabel 5400 3700 2    50   Input ~ 0
+TEENSY_NMI
+Wire Wire Line
+	5400 3800 5100 3800
+Text GLabel 5400 3800 2    50   Input ~ 0
+TEENSY_RST
+Wire Wire Line
+	2600 3700 2900 3700
+Text GLabel 2600 3700 0    50   Input ~ 0
+TEENSY_CLKIN
+Wire Wire Line
+	5350 2200 5350 2050
+$Comp
+L power:GND #PWR0126
+U 1 1 605017D7
+P 14350 5550
+F 0 "#PWR0126" H 14350 5300 50  0001 C CNN
+F 1 "GND" H 14355 5377 50  0000 C CNN
+F 2 "" H 14350 5550 50  0001 C CNN
+F 3 "" H 14350 5550 50  0001 C CNN
+	1    14350 5550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	14350 5550 14350 5400
+Wire Wire Line
+	14350 5400 14200 5400
+$Comp
+L Device:CP1 C1
+U 1 1 60529805
+P 9000 9650
+F 0 "C1" H 9115 9696 50  0000 L CNN
+F 1 "10uF" H 9115 9605 50  0000 L CNN
+F 2 "Capacitor_THT:C_Disc_D7.0mm_W2.5mm_P5.00mm" H 9000 9650 50  0001 C CNN
+F 3 "~" H 9000 9650 50  0001 C CNN
+	1    9000 9650
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0127
+U 1 1 6052A3E4
+P 9000 9950
+F 0 "#PWR0127" H 9000 9700 50  0001 C CNN
+F 1 "GND" H 9005 9777 50  0000 C CNN
+F 2 "" H 9000 9950 50  0001 C CNN
+F 3 "" H 9000 9950 50  0001 C CNN
+	1    9000 9950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9000 9950 9000 9800
+$Comp
+L power:+3V3 #PWR0128
+U 1 1 6053E1A1
+P 9000 9400
+F 0 "#PWR0128" H 9000 9250 50  0001 C CNN
+F 1 "+3V3" H 9015 9573 50  0000 C CNN
+F 2 "" H 9000 9400 50  0001 C CNN
+F 3 "" H 9000 9400 50  0001 C CNN
+	1    9000 9400
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	9000 9500 9000 9400
+$EndSCHEMATC

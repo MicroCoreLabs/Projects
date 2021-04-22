@@ -1,0 +1,11 @@
+
+
+
+Bill of Material
+------------------
+
+ U2,U3,U4,U5 	 	Latches Tri-St Octal D-Type		$0.66	Mouser# 595-SN74LVC573ADBR	 	https://www.mouser.com/ProductDetail/Texas-Instruments/SN74LVC573ADBR?qs=w32V8uFkMxm30hcaiO0jWQ%3D%3D
+ U6 	 			Inverters Hex					$0.46	Mouser# 595-SN74LVC04ADBR		https://www.mouser.com/ProductDetail/Texas-Instruments/SN74LVC04ADBR?qs=L4Mc90zKIpizmvP8RiWNwQ%3D%3D	
+ U7 	 			Octal Buffer 					$0.41	Mouser# 595-SN74LVC244ADBR		https://www.mouser.com/ProductDetail/Texas-Instruments/SN74LVC244ADBR?qs=L5CvrNUdZirMdYFgxYlMrA%3D%3D
+ 
+ C1, U1, U8			** Dont-Stuff **

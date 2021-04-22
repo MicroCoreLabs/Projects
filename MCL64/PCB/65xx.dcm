@@ -1,0 +1,294 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP 6502
+D 6502 8-bit NMOS Microprocessor, 64K, DIP-40
+K 6502 CPU uP
+F http://www.6502.org/documents/datasheets/mos/mos_6500_mpu_mar_1980.pdf
+$ENDCMP
+#
+$CMP 6503
+D 6503 8-bit NMOS Microprocessor, 4K, DIP-28
+K 6502 6503 CPU uP
+F http://www.6502.org/documents/datasheets/mos/mos_6500_mpu_mar_1980.pdf
+$ENDCMP
+#
+$CMP 6504
+D 6504 8-bit NMOS Microprocessor, 8K, DIP-28
+K 6502 6504 CPU uP
+F http://www.6502.org/documents/datasheets/mos/mos_6500_mpu_mar_1980.pdf
+$ENDCMP
+#
+$CMP 6505
+D 6505 8-bit NMOS Microprocessor, 4K, DIP-28
+K 6502 6505 CPU uP
+F http://www.6502.org/documents/datasheets/mos/mos_6500_mpu_mar_1980.pdf
+$ENDCMP
+#
+$CMP 6506
+D 6506 8-bit NMOS Microprocessor, 4K, DIP-28
+K 6502 6506 CPU uP
+F http://www.6502.org/documents/datasheets/mos/mos_6500_mpu_mar_1980.pdf
+$ENDCMP
+#
+$CMP 6507
+D 6507 8-bit NMOS Microprocessor, 8K, DIP-28
+K 6502 6507 CPU uP
+F http://www.6502.org/documents/datasheets/mos/mos_6500_mpu_mar_1980.pdf
+$ENDCMP
+#
+$CMP 6508
+D 6508 8-bit NMOS Microprocessor, 64K, 8-bit I/O Port, 256 Byte RAM, DIP-40
+K 6502 6508 CPU uP
+F http://www.6502.org/documents/datasheets/mos/mos_6508_mpu.pdf
+$ENDCMP
+#
+$CMP 6509
+D 6509 8-bit NMOS Microprocessor, 16x64K, DIP-40
+K 6502 6509 CPU uP
+F http://www.6502.org/documents/datasheets/mos/mos_6509_mpu.pdf
+$ENDCMP
+#
+$CMP 6510
+D 6510 8-bit NMOS Microprocessor, 64K, 6-bit I/O Port, DIP-40
+K 6502 6510 CPU uP
+F http://www.6502.org/documents/datasheets/mos/mos_6510_mpu.pdf
+$ENDCMP
+#
+$CMP 6510-1
+D 6510-1 8-bit NMOS/HMOS Microprocessor, 64K, 8-bit I/O Port, 2ϕ Clock, DIP-40
+K 6502 6510-1 CPU uP
+F http://www.6502.org/documents/datasheets/mos/mos_6510_mpu.pdf
+$ENDCMP
+#
+$CMP 6510-2
+D 6510-2 8-bit NMOS/HMOS Microprocessor, 64K, 8-bit I/O Port, DIP-40
+K 6502 6510-2 CPU uP
+F http://www.6502.org/documents/datasheets/mos/mos_6510_mpu.pdf
+$ENDCMP
+#
+$CMP 6510T
+D 6510T 8-bit NMOS/HMOS Microprocessor, 64K, 8-bit I/O Port, DIP-40
+K 6502 6510T CPU uP
+F http://www.6502.org/documents/datasheets/mos/mos_6510_mpu.pdf
+$ENDCMP
+#
+$CMP 6512
+D 6512 8-bit NMOS Microprocessor, 64K, 2ϕ Clock, DIP-40
+K 6502 6512 CPU uP
+F http://www.6502.org/documents/datasheets/mos/mos_6500_mpu_mar_1980.pdf
+$ENDCMP
+#
+$CMP 6513
+D 6513 8-bit NMOS Microprocessor, 4K, 2ϕ Clock, DIP-28
+K 6502 6513 CPU uP
+F http://www.6502.org/documents/datasheets/mos/mos_6500_mpu_mar_1980.pdf
+$ENDCMP
+#
+$CMP 6514
+D 6514 8-bit NMOS Microprocessor, 8K, 2ϕ Clock, DIP-28
+K 6502 6514 CPU uP
+F http://www.6502.org/documents/datasheets/mos/mos_6500_mpu_mar_1980.pdf
+$ENDCMP
+#
+$CMP 6515
+D 6515 8-bit NMOS Microprocessor, 4K, 2ϕ Clock, DIP-28
+K 6502 6515 CPU uP
+F http://www.6502.org/documents/datasheets/mos/mos_6500_mpu_mar_1980.pdf
+$ENDCMP
+#
+$CMP 6520
+D 6520 NMOS Peripheral Interface Adapter (PIA), 20-pin I/O, DIP-40
+K 6502 6520 PIA I/O
+F http://www.6502.org/documents/datasheets/mos/mos_6520.pdf
+$ENDCMP
+#
+$CMP 6522
+D 6522 NMOS Versatile Interface Adapter (VIA), 20-pin I/O, 2 Timer/Counters, DIP-40
+K 6502 6522 VIA I/O
+F http://www.6502.org/documents/datasheets/mos/mos_6522_preliminary_nov_1977.pdf
+$ENDCMP
+#
+$CMP 6523
+D 6523 NMOS Tri-Port Interface (TPI), 24-pin I/O, DIP-40
+K 6502 6523 TPI I/O
+F http://www.6502.org/documents/datasheets/mos/mos_6523_tpi_preliminary_nov_1980.pdf
+$ENDCMP
+#
+$CMP 6525
+D 6525 NMOS Tri-Port Interface (TPI), 24-pin I/O, DIP-40
+K 6502 6525 TPI I/O
+F http://www.6502.org/documents/datasheets/mos/mos_6525_tpi_preliminary.pdf
+$ENDCMP
+#
+$CMP 6526
+D 6526 NMOS Complex Interface Adapter (CIA), 20-pin I/O, 2 Timer/Counters, RTC, DIP-40
+K 6502 6526 CIA I/O
+F http://www.6502.org/documents/datasheets/mos/mos_6526_cia_preliminary_nov_1981.pdf
+$ENDCMP
+#
+$CMP 6529
+D 6529 NMOS Single Port Interface (SPI), 8-pin I/O, DIP-20
+K 6502 6529 SPI I/O
+F http://www.6502.org/documents/datasheets/mos/mos_6529_spi.pdf
+$ENDCMP
+#
+$CMP 6532
+D 6532 NMOS Memory, I/O and Timer Array (RIOT), 16-pin I/O, 1 Timer/Counter, 128-byte SRAM, DIP-40
+K 6502 6532 RIOT I/O RAM
+F http://www.6502.org/documents/datasheets/mos/mos_6532_riot.pdf
+$ENDCMP
+#
+$CMP 6545
+D 6545 NMOS CRT Controller (CRTC), DIP-40
+K 6502 6545 CRTC Video
+F http://www.6502.org/documents/datasheets/mos/mos_6545-1_crtc.pdf
+$ENDCMP
+#
+$CMP 6551
+D 6551 NMOS Asynchronous Communication Interface Adapter (ACIA), Serial UART, DIP-28
+K 6502 6551 ACIA UART
+F http://www.6502.org/documents/datasheets/mos/mos_6551_acia.pdf
+$ENDCMP
+#
+$CMP 6581
+D 6581 NMOS Sound Interface Device (SID), 3-Voice Sound Synthesizer, DIP-28
+K 6502 6581 SID Sound
+F http://www.6502.org/documents/datasheets/mos/mos_6581_sid.pdf
+$ENDCMP
+#
+$CMP 6582
+D 6582 NMOS Sound Interface Device (SID), 3-Voice Sound Synthesizer, DIP-28
+K 6502 6582 SID Sound
+F http://www.6502.org/documents/datasheets/mos/mos_6582_sid.pdf
+$ENDCMP
+#
+$CMP 65CE02
+D 65CE02 8-bit CMOS Microprocessor, 64K, DIP-40
+K 6502 65CE02 CPU uP
+F http://www.6502.org/documents/datasheets/mos/mos_65ce02_mpu.pdf
+$ENDCMP
+#
+$CMP 8500
+D 8500 8-bit HMOS Microprocessor, 64K, 6-bit I/O Port, DIP-40
+K 6502 8500 CPU uP
+$ENDCMP
+#
+$CMP 8502
+D 8502 8-bit HMOS Microprocessor, 64K, 7-bit I/O Port, DIP-40
+K 6502 8502 CPU uP
+$ENDCMP
+#
+$CMP 8580
+D 8580 HMOS Sound Interface Device (SID), 3-Voice Sound Synthesizer, DIP-28
+K 6502 8580 SID Sound
+$ENDCMP
+#
+$CMP W65C02SxP
+D W65C02S 8-bit CMOS General Purpose Microprocessor, DIP-40
+K 6502 CPU uP
+F http://www.westerndesigncenter.com/wdc/documentation/w65c02s.pdf
+$ENDCMP
+#
+$CMP W65C02SxPL
+D W65C02S 8-bit CMOS General Purpose Microprocessor, PLCC-44
+K 6502 CPU uP
+F http://www.westerndesigncenter.com/wdc/documentation/w65c02s.pdf
+$ENDCMP
+#
+$CMP W65C02SxQ
+D W65C02S 8-bit CMOS General Purpose Microprocessor, PQFP-44
+K 6502 CPU uP
+F http://www.westerndesigncenter.com/wdc/documentation/w65c02s.pdf
+$ENDCMP
+#
+$CMP W65C21NxP
+D W65C21N CMOS Peripheral Interface Adapter (PIA), 20-pin I/O, NMOS-Compatible, DIP-40
+K 6502 6521 PIA I/O
+F http://www.westerndesigncenter.com/wdc/documentation/w65c21.pdf
+$ENDCMP
+#
+$CMP W65C21NxPL
+D W65C21N CMOS Peripheral Interface Adapter (PIA), 20-pin I/O, NMOS-Compatible, PLCC-44
+K 6502 6521 PIA I/O
+F http://www.westerndesigncenter.com/wdc/documentation/w65c21.pdf
+$ENDCMP
+#
+$CMP W65C21SxP
+D W65C21S CMOS Peripheral Interface Adapter (PIA), 20-pin I/O, DIP-40
+K 6502 6521 PIA I/O
+F http://www.westerndesigncenter.com/wdc/documentation/w65c21.pdf
+$ENDCMP
+#
+$CMP W65C21SxPL
+D W65C21S CMOS Peripheral Interface Adapter (PIA), 20-pin I/O, PLCC-44
+K 6502 6521 PIA I/O
+F http://www.westerndesigncenter.com/wdc/documentation/w65c21.pdf
+$ENDCMP
+#
+$CMP W65C22NxP
+D W65C22N CMOS Versatile Interface Adapter (VIA), 20-pin I/O, 2 Timer/Counters, NMOS-Compatible, DIP-40
+K 6502 6522 VIA I/O
+F http://www.westerndesigncenter.com/wdc/documentation/w65c22.pdf
+$ENDCMP
+#
+$CMP W65C22NxPL
+D W65C22N CMOS Versatile Interface Adapter (VIA), 20-pin I/O, 2 Timer/Counters, NMOS-Compatible, PLCC-44
+K 6502 6522 VIA I/O
+F http://www.westerndesigncenter.com/wdc/documentation/w65c22.pdf
+$ENDCMP
+#
+$CMP W65C22SxP
+D W65C22S CMOS Versatile Interface Adapter (VIA), 20-pin I/O, 2 Timer/Counters, DIP-40
+K 6502 6522 VIA I/O
+F http://www.westerndesigncenter.com/wdc/documentation/w65c22.pdf
+$ENDCMP
+#
+$CMP W65C22SxPL
+D W65C22S CMOS Versatile Interface Adapter (VIA), 20-pin I/O, 2 Timer/Counters, PLCC-44
+K 6502 6522 VIA I/O
+F http://www.westerndesigncenter.com/wdc/documentation/w65c22.pdf
+$ENDCMP
+#
+$CMP W65C22SxQ
+D W65C22S CMOS Versatile Interface Adapter (VIA), 20-pin I/O, 2 Timer/Counters, PQFP-44
+K 6502 6522 VIA I/O
+F http://www.westerndesigncenter.com/wdc/documentation/w65c22.pdf
+$ENDCMP
+#
+$CMP W65C51NxP
+D W65C51N CMOS Asynchronous Communication Interface Adapter (ACIA), Serial UART, DIP-28
+K 6502 6551 ACIA UART
+F http://www.westerndesigncenter.com/wdc/documentation/w65c51n.pdf
+$ENDCMP
+#
+$CMP W65C51NxPL
+D W65C51N CMOS Asynchronous Communication Interface Adapter (ACIA), Serial UART, PLCC-28
+K 6502 6551 ACIA UART
+F http://www.6502.org/documents/datasheets/mos/mos_6551_acia.pdf
+$ENDCMP
+#
+$CMP W65C51NxQ
+D W65C51N CMOS Asynchronous Communication Interface Adapter (ACIA), Serial UART, PQFP-32
+K 6502 6551 ACIA UART
+F http://www.westerndesigncenter.com/wdc/documentation/w65c51n.pdf
+$ENDCMP
+#
+$CMP W65C816SxP
+D W65C816S 8/16-bit CMOS General Purpose Microprocessor, DIP-40
+K 6502 65816 CPU uP
+F http://www.westerndesigncenter.com/wdc/documentation/w65c816s.pdf
+$ENDCMP
+#
+$CMP W65C816SxPL
+D W65C816S 8/16-bit CMOS General Purpose Microprocessor, PLCC-44
+K 6502 65816 CPU uP
+F http://www.westerndesigncenter.com/wdc/documentation/w65c816s.pdf
+$ENDCMP
+#
+$CMP W65C816SxQ
+D W65C02S 8/16-bit CMOS General Purpose Microprocessor, PQFP-44
+K 6502 65816 CPU uP
+F http://www.westerndesigncenter.com/wdc/documentation/w65c816s.pdf
+$ENDCMP
+#
+#End Doc Library
