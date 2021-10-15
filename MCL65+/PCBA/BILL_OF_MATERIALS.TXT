@@ -1,0 +1,12 @@
+
+MCL65+ Bill Of Materials
+--------------------------
+
+	
+U3, U4				Mouser #:	595-SN74LVC573AN		Mfr. #:	SN74LVC573AN		Desc.:	Latches Latches Tri-St Octal D-Type
+U2					Mouser #:	595-SN74AHCT14N 		Mfr. #:	SN74AHCT14N 		Desc.:	Inverters Inverters Hex Schmitt-Trigger
+C1 					Mouser #:	581-TAP106K016CRW		Mfr. #:	TAP106K016CRW		Desc.:	Tantalum Capacitors 16V 10uF 10% ESR=3.2 Ohm
+Teensy sockets:		Mouser #:	992-15FX1-254MM 		Mfr. #:	15Fx1-254mm 		Desc.:	Headers & Wire Housings Headers & Wire Housings 2.54MM 0.1" 15-PIN FEMALE HEADER
+
+DIP-40 socket: http://store.go4retro.com/ic-header/
+ 
