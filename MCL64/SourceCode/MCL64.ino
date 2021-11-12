@@ -136,6 +136,7 @@ uint8_t   direct_nmi=0;
 uint8_t   assert_sync=0;
 uint8_t   global_temp=0;
 uint8_t   last_access_internal_RAM=0;
+uint8_t	  mode=1;
 
 uint16_t  register_pc=0;
 uint16_t  current_address=0;
@@ -162,8 +163,8 @@ uint8_t   CART_LOW_ROM[0x2000];
 // When set to 1 it will remove the unnecessary 6502 bus fetches, reads, and writes
 // Set to 0 for cycle-accurate mode
 //
-#define SPEEDUP 1
-    
+// #define SPEEDUP 1 - changed to dynamic value
+
 // ------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------
 
@@ -242,15 +243,15 @@ void setup() {
 // ----------------------------------------------------------
 inline uint8_t internal_address_check(uint16_t local_address) {
 
-  if ( (local_address > 0x0001 ) && (local_address <= 0x03FF) ) return 0x1;  //   Zero-Page up to video 
+  if ( (local_address > 0x0001 ) && (local_address <= 0x03FF) ) return mode;  //   Zero-Page up to video
   if ( (local_address >= 0x0400) && (local_address <= 0x07FF) ) return 0x1;  //   C64 Video Memory 
-  if ( (local_address >= 0x0800) && (local_address <= 0x9FFF) ) return 0x1;  //   C64 RAM 
-  if ( (local_address >= 0xA000) && (local_address <= 0xBFFF) ) return 0x1;  //   C64 BASIC ROM
-  if ( (local_address >= 0xC000) && (local_address <= 0xCFFF) ) return 0x1;  //   C64 RAM
+  if ( (local_address >= 0x0800) && (local_address <= 0x9FFF) ) return mode;  //   C64 RAM
+  if ( (local_address >= 0xA000) && (local_address <= 0xBFFF) ) return mode;  //   C64 BASIC ROM
+  if ( (local_address >= 0xC000) && (local_address <= 0xCFFF) ) return mode;  //   C64 RAM
 //if ( (local_address >= 0xD000) && (local_address <= 0xDFFF) ) return 0x1;  //   C64 I/O
-  if ( (local_address >= 0xE000) && (local_address <= 0xE4FF) ) return 0x1;  //   C64 KERNAL ROM  
-  if ( (local_address >= 0xE500) && (local_address <= 0xFF7F) ) return 0x1;  //   C64 KERNAL ROM  
-  if ( (local_address >= 0xFF80) && (local_address <= 0xFFFF) ) return 0x1;  //   C64 KERNAL ROM 
+  if ( (local_address >= 0xE000) && (local_address <= 0xE4FF) ) return mode;  //   C64 KERNAL ROM
+  if ( (local_address >= 0xE500) && (local_address <= 0xFF7F) ) return mode;  //   C64 KERNAL ROM
+  if ( (local_address >= 0xFF80) && (local_address <= 0xFFFF) ) return mode;  //   C64 KERNAL ROM
 
   return 0x0;
 } 
@@ -476,6 +477,9 @@ inline void write_byte(uint16_t local_address , uint8_t local_write_data) {
        
        wait_for_CLK_rising_edge();
        digitalWriteFast(PIN_DATAOUT_OE_n,  0x1 );   
+  }
+  if ( internal_address_check(local_address) == 0xd030) {
+     mode = ( local_write_data & 0x03 );
   }            
    return;
 }
@@ -547,7 +551,7 @@ uint8_t Fetch_ZeroPage()  {
 uint8_t Fetch_ZeroPage_X()  {   
     uint16_t bal;
     bal = Fetch_Immediate();
-    if (SPEEDUP==0) read_byte(register_pc+1); 
+    if (mode==0) read_byte(register_pc+1);
     effective_address = (0x00FF & (bal + register_x));
     return read_byte(effective_address);
 }
@@ -555,7 +559,7 @@ uint8_t Fetch_ZeroPage_X()  {
 uint8_t Fetch_ZeroPage_Y()  {   
     uint16_t bal;
     bal = Fetch_Immediate();
-    if (SPEEDUP==0) read_byte(register_pc+1); 
+    if (mode==0) read_byte(register_pc+1);
     effective_address = (0x00FF & (bal + register_y)); 
     return read_byte(effective_address);
 }
@@ -587,7 +591,7 @@ uint8_t Fetch_Absolute_X(uint8_t page_cross_check)  {
     effective_address = bah + bal + register_x;
     local_data = read_byte(effective_address );
     
-    if (  (SPEEDUP==0) && page_cross_check==1 && (  (0xFF00&effective_address) != (0xFF00&bah) ) ) {  
+    if (  (mode==0) && page_cross_check==1 && (  (0xFF00&effective_address) != (0xFF00&bah) ) ) {
         local_data = read_byte(effective_address ); 
     }
     return local_data;
@@ -602,7 +606,7 @@ uint8_t Fetch_Absolute_Y(uint8_t page_cross_check)  {
     effective_address = bah + bal + register_y;
     local_data = read_byte(effective_address );
     
-    if ( (SPEEDUP==0)  && page_cross_check==1 && (  (0xFF00&effective_address) != (0xFF00&bah) ) ) {  
+    if ( (mode==0)  && page_cross_check==1 && (  (0xFF00&effective_address) != (0xFF00&bah) ) ) {
         local_data = read_byte(effective_address ); 
     } 
     return local_data;
@@ -633,7 +637,7 @@ uint8_t Fetch_Indexed_Indirect_Y(uint8_t page_cross_check)  {
     effective_address = bah + bal + register_y;
     local_data = read_byte(effective_address);
     
-    if ( (SPEEDUP==0) && page_cross_check==1 && ((0xFF00&effective_address) != (0xFF00&bah)) ) {  
+    if ( (mode==0) && page_cross_check==1 && ((0xFF00&effective_address) != (0xFF00&bah)) ) {
         local_data = read_byte(effective_address); 
     }
     return local_data;
@@ -655,14 +659,14 @@ void Write_Absolute(uint8_t local_data)  {
 
 void Write_ZeroPage_X(uint8_t local_data)  {
     effective_address = Fetch_Immediate();
-    if (SPEEDUP==0) read_byte(effective_address);
+    if (mode==0) read_byte(effective_address);
     write_byte( (0x00FF&(effective_address + register_x)) , local_data );
     return;
 }
 
 void Write_ZeroPage_Y(uint8_t local_data)  {
     effective_address = Fetch_Immediate();
-    if (SPEEDUP==0) read_byte(effective_address);
+    if (mode==0) read_byte(effective_address);
     write_byte( (0x00FF&(effective_address + register_y)) , local_data );
     return;
 }
@@ -673,7 +677,7 @@ void Write_Absolute_X(uint8_t local_data)  {
     bal = Fetch_Immediate();
     bah = Fetch_Immediate()<<8;
     effective_address = bal + bah + register_x; 
-    if (SPEEDUP==0) read_byte(effective_address);
+    if (mode==0) read_byte(effective_address);
     write_byte(effective_address , local_data );  
     return;
 }
@@ -686,7 +690,7 @@ void Write_Absolute_Y(uint8_t local_data)  {
     effective_address = bal + bah + register_y;
     read_byte(effective_address);
 
-    if (SPEEDUP==0) {
+    if (mode==0) {
         if ( (0xFF00&effective_address) != (0xFF00&bah) ) { 
         read_byte(effective_address);
         }
@@ -716,14 +720,14 @@ void Write_Indexed_Indirect_Y(uint8_t local_data)  {
     bal = read_byte(ial);
     bah = read_byte(ial+1)<<8;
     effective_address = bah + bal + register_y;
-    if (SPEEDUP==0) read_byte(effective_address);
+    if (mode==0) read_byte(effective_address);
     write_byte(effective_address , local_data );
     return;
 }
 
 void Double_WriteBack(uint8_t local_data)  {  
     write_byte(effective_address , local_data);
-    if (SPEEDUP==0)  write_byte(effective_address , local_data);
+    if (mode==0)  write_byte(effective_address , local_data);
     return;
 }
 
@@ -1401,7 +1405,7 @@ void Branch_Taken()  {
     effective_address = Sign_Extend16(Fetch_Immediate()); 
     effective_address = (register_pc+1) + effective_address;
 
-    if (SPEEDUP==0) {
+    if (mode==0) {
     if ( (0xFF00&register_pc) == (0xFF00&effective_address) )  {  Fetch_Immediate();                     }  // Page boundary not crossed
     else                                                       {  Fetch_Immediate(); Fetch_Immediate();  }  // Page boundary crossed
     }
@@ -1490,7 +1494,7 @@ void opcode_0x60()  {
     pcl = pop();
     pch = pop()<<8;
     register_pc = pch+pcl+1;  
-    if (SPEEDUP==0) read_byte(register_pc);
+    if (mode==0) read_byte(register_pc);
     assert_sync=1;
     start_read(register_pc);
     return ;
