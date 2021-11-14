@@ -435,7 +435,7 @@ inline void write_byte(uint16_t local_address , uint8_t local_write_data) {
   
   // Internal RAM
   //
-    if (internal_address_check(local_address)>0x2)  {
+  if (internal_address_check(local_address)>0x1)  {
     last_access_internal_RAM=1;
     internal_RAM[local_address] = local_write_data;
       //if ( (Page_128_159==0x1)  && ( (EXROM==1 && GAME==0) || ( EXROM==0 && ((bank_mode&0x3)==0x3) ) )) {  } else internal_RAM[local_address] = local_write_data; 
