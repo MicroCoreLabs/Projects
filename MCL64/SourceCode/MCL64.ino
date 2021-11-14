@@ -155,6 +155,10 @@ uint8_t   KERNAL_ROM[0x2000]={ 0x85,0x56,0x20,0xf,0xbc,0xa5,0x61,0xc9,0x88,0x90,
 
 #define EXROM  1
 #define GAME   1
+#define VIC_IO			0x04;
+#define KERNAL_ROM_ENABLED	0x02;
+#define BASIC_ROM_ENABLED	0x01;
+
 // First few bytes of Copyrighted ROMs
 uint8_t   CART_HIGH_ROM[0x4000]={ 0x78,0xa2,0xff,0x9a,0xd8,0xa9,0xe7,0x85,0x1,0xa9,0x37,0x85,0x0,0x4c,0x83,0xe1,0xa9 } ;
 uint8_t   CART_LOW_ROM[0x2000];
@@ -478,9 +482,12 @@ inline void write_byte(uint16_t local_address , uint8_t local_write_data) {
        wait_for_CLK_rising_edge();
        digitalWriteFast(PIN_DATAOUT_OE_n,  0x1 );   
   }
-  if ( internal_address_check(local_address) == 0xd030) {
-     mode = ( local_write_data & 0x03 );
-  }            
+  if ((current_p & VIC_IO) &&					        // IO enabled and
+       (current_p & (KERNAL_ROM_ENABLED | BASIC_ROM_ENABLED) != 0 )) && // BASIC and KERNAL not both unmapped
+       (internal_address_check(local_address) == 0xd030) )              // and addr = d030
+  {
+    mode = ( local_write_data & 0x03 );
+  }
    return;
 }
 
