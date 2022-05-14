@@ -7,6 +7,7 @@ My YouTube Channel with some videos of the stuff in action: www.youtube.com/chan
 
 Boards:
 
+	MCLZ8   -  Zilog Z80 emulator which runs on a Teensy 4.1 and can be used as a drop-in replacment 
 	MCL86+  -  Intel 8088 emulator which runs on a Teensy 4.1 and can be used as a drop-in replacment 
 	MCL86jr -  IBMPCjr Accelerator which boosts performance to IBM PC/AT speed
     MCL65+  -  MOS 6502 emulator which runs on a Teensy 4.1 and can be used as a 6502 drop-in replacment
