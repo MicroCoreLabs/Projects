@@ -973,7 +973,7 @@ void opcode_0x07()  {  clock_counter=clock_counter+8;  register_es=Pop();       
 void opcode_0x0F()  {  clock_counter=clock_counter+8;  register_cs=Pop();              pause_interrupts=1;   return;  }   // 0x0F - POP CS - Set prefix so no interrupt on next instruction 
 void opcode_0x17()  {  clock_counter=clock_counter+8;  register_ss=Pop();              pause_interrupts=1;   return;  }   // 0x17 - POP SS - Set prefix so no interrupt on next instruction 
 void opcode_0x1F()  {  clock_counter=clock_counter+8;  register_ds=Pop();              pause_interrupts=1;   return;  }   // 0x1F - POP DS - Set prefix so no interrupt on next instruction 
-void opcode_0x9D()  {  clock_counter=clock_counter+8;  register_flags=(0x0FD5&Pop());  pause_interrupts=1;   return;  }   // 0x9D - POPF - POP Flags 
+void opcode_0x9D()  {  clock_counter=clock_counter+8;  register_flags=0xF000|(0x0FD5&Pop());  pause_interrupts=1;   return;  }   // 0x9D - POPF - POP Flags 
 
 void opcode_0x58()  {  clock_counter=clock_counter+8;  register_ax=Pop();                                     return;  }  // 0x58 - POP AX  
 void opcode_0x59()  {  clock_counter=clock_counter+8;  register_cx=Pop();                                     return;  }  // 0x59 - POP CX  
