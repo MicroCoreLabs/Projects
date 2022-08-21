@@ -6607,7 +6607,7 @@ p 01 00000 00001 0750
 # Debounce the BIU Command fields - Set the segment to ES=00  (Can *NOT* be overridden)
 p 00 00000 00001 05FF
 p 01 00000 00001 4DDF
-p 01 00000 00001 0000
+p 01 00000 00001 0003
 #
 # r3 = DI
 p 00 00000 00001 0600
@@ -6780,7 +6780,7 @@ p 01 00000 00001 0750
 # Debounce the BIU Command fields - Set the segment to ES=00  (Can *NOT* be overridden)
 p 00 00000 00001 0623
 p 01 00000 00001 4DDF
-p 01 00000 00001 0000
+p 01 00000 00001 0003
 #
 # r3 = DI
 p 00 00000 00001 0624
@@ -6958,7 +6958,7 @@ p 01 00000 00001 0750
 # Debounce the BIU Command fields - Set the segment to ES=00  (Can *NOT* be overridden)
 p 00 00000 00001 0647
 p 01 00000 00001 4DDF
-p 01 00000 00001 0000
+p 01 00000 00001 0003
 #
 # r3 = DI
 p 00 00000 00001 0648
@@ -7151,7 +7151,7 @@ p 01 00000 00001 0750
 # Debounce the BIU Command fields - Set the segment to ES=00  (Can *NOT* be overridden)
 p 00 00000 00001 0670
 p 01 00000 00001 4DDF
-p 01 00000 00001 0000
+p 01 00000 00001 0003
 #
 # r3 = DI
 p 00 00000 00001 0671
@@ -7319,7 +7319,7 @@ p 01 00000 00001 03F2
 # Debounce the BIU Command fields - Set the segment to ES=00  (Can *NOT* be overridden)
 p 00 00000 00001 0691
 p 01 00000 00001 4DDF
-p 01 00000 00001 0000
+p 01 00000 00001 0003
 #
 # r3 = DI
 p 00 00000 00001 0692
@@ -7477,7 +7477,7 @@ p 01 00000 00001 03F2
 # Debounce the BIU Command fields - Set the segment to ES=00  (Can *NOT* be overridden)
 p 00 00000 00001 06B3
 p 01 00000 00001 4DDF
-p 01 00000 00001 0000
+p 01 00000 00001 0003
 #
 # r3 = DI
 p 00 00000 00001 06B4
@@ -7916,7 +7916,7 @@ p 01 00000 00001 0000
 # Debounce the BIU Command fields - Set the segment to ES=00  (Can *NOT* be overridden)
 p 00 00000 00001 070C
 p 01 00000 00001 4DDF
-p 01 00000 00001 0000
+p 01 00000 00001 0003
 #
 # r3 = DI
 p 00 00000 00001 070D
@@ -8064,7 +8064,7 @@ p 01 00000 00001 0000
 # Debounce the BIU Command fields - Set the segment to ES=00  (Can *NOT* be overridden)
 p 00 00000 00001 072C
 p 01 00000 00001 4DDF
-p 01 00000 00001 0000
+p 01 00000 00001 0003
 #
 # r3 = DI
 p 00 00000 00001 072D
