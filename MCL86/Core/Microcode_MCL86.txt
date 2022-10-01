@@ -19,6 +19,9 @@
 // Revision 1.0 1/25/2020
 // Initial revision
 //
+// Revision 2.0 8/20/2022
+// Fixed accidental clearing of prefix override for all string opcodes
+//
 //
 //------------------------------------------------------------------------
 //
