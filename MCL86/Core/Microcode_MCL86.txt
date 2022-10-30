@@ -22,6 +22,10 @@
 // Revision 2.0 8/20/2022
 // Fixed accidental clearing of prefix override for all string opcodes
 //
+// Revision 3.0 10/30/2022
+// For 0xF6 opcodes CF/OV flags were always being cleared which is incorrect for NOT
+// Moved these flag clears to IDIV and DIV which need them cleared
+//
 //
 //------------------------------------------------------------------------
 //
@@ -184,6 +188,8 @@
 # 
 #                                                           
 #                                                           
+#
+#
 #
 # Stop CPU
 p 00 00000 00010 0001
@@ -16837,10 +16843,10 @@ p 01 00000 00001 0DF4
 #
 # -----------------------------------------------------
 #
-# Clear the CF, and OF Flags
+# NOP
 p 00 00000 00001 0E12
-p 01 00000 00001 488F
-p 01 00000 00001 F7FE
+p 01 00000 00001 0000
+p 01 00000 00001 0000
 #
 # CALL CALC_EA_BYTE
 p 00 00000 00001 0E13
@@ -16904,7 +16910,7 @@ p 01 00000 00001 0E30
 # DIV REG8/MEM8
 p 00 00000 00001 0E1E
 p 01 00000 00001 1000
-p 01 00000 00001 0E63
+p 01 00000 00001 0E52
 #
 # IDIV REG8/MEM8
 p 00 00000 00001 0E1F
@@ -17172,7 +17178,16 @@ p 01 00000 00001 1000
 p 01 00000 00001 0F70
 #
 #
-
+# Clear the CF, and OF Flags
+p 00 00000 00001 0E52
+p 01 00000 00001 488F
+p 01 00000 00001 F7FE
+#
+#
+# Jump unconditional to DIV opcode:
+p 00 00000 00001 0E53
+p 01 00000 00001 1000
+p 01 00000 00001 0E63
 #
 #
 # -----------------------------------------------------
@@ -17182,10 +17197,10 @@ p 01 00000 00001 0F70
 # -----------------------------------------------------
 #
 #
-# NOP
+# Clear the CF, and OF Flags
 p 00 00000 00001 0E54
-p 01 00000 00001 0000
-p 01 00000 00001 0000
+p 01 00000 00001 488F
+p 01 00000 00001 F7FE
 #
 # Kick off clock cycle counter here. Check for it to be zero at the end of the routine.
 # Write clock count=106 to the BIU Dataout register. - Minimum of 106 clocks for IDIV8
