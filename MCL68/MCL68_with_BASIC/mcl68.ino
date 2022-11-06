@@ -20,6 +20,9 @@
 // Revision 1 7/14/2020
 // Initial revision
 //
+// Revision 2 11/5/2022
+// Swapped incorrect stacking order for exception handler and RTE opcode
+//
 //
 //------------------------------------------------------------------------
 //
@@ -628,9 +631,9 @@ void Exception_Handler(unsigned int vector_number)
       vector_number = BIU_IACK();                                                       // Fetch the vector from the BIU IACK Cycle
     }
        
-  Push(mc68k_flags_copy);                                                               // Stack the Original copy of the Flags
   Push(mc68k_pc&0xFFFF);                                                                // Stack the lower PC
   Push(mc68k_pc>>16);                                                                   // Stack the upper PC
+  Push(mc68k_flags_copy);                                                               // Stack the Original copy of the Flags
        
   exception_address = BIU_Read_32(vector_number<<2);                                    // Fetch the 32-bit exception address
 
@@ -1208,9 +1211,9 @@ void op_RTE()
   if (mc68k_flag_S==0x0) { Exception_Handler(8); }                                              // Verify that supervisor privilege is set
   else     
   {         
+    Update_System_Flags(Pop());                                                                 // Pop the SR Flags
     mc68k_pc    = Pop()<<16;                                                                    // Pop the upper PC
     mc68k_pc    = mc68k_pc | Pop();                                                             // Pop the lower PC
-    Update_System_Flags(Pop());                                                                 // Pop the SR Flags
     BIU_Jump(mc68k_pc);                                                                         // Jump to the new PC
   }     
   return;       
