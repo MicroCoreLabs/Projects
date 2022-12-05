@@ -18,6 +18,9 @@
 // Revision 1 1/28/2022
 // Initial revision
 //
+// Revision 2 12/5/2022
+// Updated MUL and IMUL opcodes
+// LAHF Set AH undocumented bits
 //
 //------------------------------------------------------------------------
 //
@@ -669,7 +672,7 @@ void opcode_0xFD()  { clock_counter=2;  register_flags=(register_flags | 0x0400)
 void opcode_0xFA()  { clock_counter=2;  register_flags=(register_flags & 0xFDFF);  return;  }  // 0xFA - CLI - Clear Interrupt Flag  
 void opcode_0xFB()  { clock_counter=2;  register_flags=(register_flags | 0x0200);  last_instruction_set_a_prefix=1; pause_interrupts=1; return;  }  // 0xFB - STI - Set Interrupt Flag 
  
-void opcode_0x9F()  { clock_counter=4;  register_ax=((register_flags<<8)|(register_ax&0x00FF));              return;  }  // 0x9F - LAHF - Load 8080 Flags into AH Register 
+void opcode_0x9F()  { clock_counter=4;  register_ax=((register_flags<<8)|(register_ax&0x00FF));  register_ax=register_ax|0x0200;            return;  }  // 0x9F - LAHF - Load 8080 Flags into AH Register 
 void opcode_0x9E()  { clock_counter=4;  register_flags=((register_flags&0xFF00)|((register_ax&0xD500)>>8));  return;  }  // 0x9E - SAHF - Store AH Register into 8080 Flags 
 
 
@@ -2255,6 +2258,7 @@ void opcode_0xF6()  {
     int8_t  signed_local_divr;
     int8_t  signed_local_quo;
     int8_t  signed_local_rem;
+    int16_t  temp_ax;
     
     Calculate_EA();
     switch (REG_field)  {
@@ -2267,15 +2271,18 @@ void opcode_0xF6()  {
                   register_ax = Fetch_EA() * (register_ax&0x00FF);
                   if ( (register_ax&0xFF00) != 0)  {  register_flags=(register_flags|0x0801);  }  // Set O,C flags
                   else                             {  register_flags=(register_flags&0xF7FE);  }  // Clear O,C flags
-                  Set_Flags_Word_SZP(register_ax);
+                  register_flags=(register_flags&0xFFBF); // Clear zero bit to appear like an 8086
                   break;        
+                  
         case 0x5: if (ea_is_a_register==1) clock_counter=clock_counter+79;  else  clock_counter=clock_counter+85;           // # 0xF6 REG[5] - IMUL  REG8/MEM8
                   register_ax = (int8_t)Fetch_EA() * (int8_t)(register_ax&0x00FF);
-                  if      ( ((register_ax&0xFF00)==0xFF00) && ((register_ax&0x0080)==0x0)) {  register_flags=(register_flags|0x0801);  }  // Set O,C flags
-                  else if ( ((register_ax&0xFF00)==0x0000) && ((register_ax&0x0080)!=0x0)) {  register_flags=(register_flags|0x0801);  }  // Set O,C flags
-                  else                             {  register_flags=(register_flags&0xF7FE);  }  // Clear O,C flags
-                  Set_Flags_Word_SZP(register_ax);
+                  temp_ax = (int16_t)register_ax;
+                  if (temp_ax>255)         {  register_flags=(register_flags|0x0801);  }  // Set O,C flags
+                  else if (temp_ax<=-256)  {  register_flags=(register_flags|0x0801);  }  // Set O,C flags
+                  else                     {  register_flags=(register_flags&0xF7FE);  }  // Clear O,C flags
+                  register_flags=(register_flags&0xFFBF); // Clear zero bit to appear like an 8086
                   break;  
+                  
         case 0x6: if (ea_is_a_register==1) clock_counter=clock_counter+75;  else  clock_counter=clock_counter+81;           // # 0xF6 REG[6] - DIV  REG8/MEM8
                   local_divr=Fetch_EA();
                   if (local_divr==0) DIV0_Handler();
@@ -2325,16 +2332,29 @@ void opcode_0xF7()  {
                   register_ax = (local_data&0x0000FFFF);    
                   if (register_dx != 0)  {  register_flags=(register_flags|0x0801);  }  // Set O,C flags
                   else                   {  register_flags=(register_flags&0xF7FE);  }  // Clear O,C flags
-                  Set_Flags_Word_SZP(register_ax);
-                  break;    
+                  //Set_Flags_Word_SZP(register_ax);
+                  register_flags=(register_flags&0xFFBF); // temp clear zero bit
+                  break; 
+  
         case 0x5: if (ea_is_a_register==1) clock_counter=clock_counter+131;  else  clock_counter=clock_counter+137;         // # 0xF7 REG[5] - IMUL  REG16/MEM16
-                  local_data = (int16_t)Fetch_EA() * (int16_t)register_ax;
+                  uint16_t local_fetch_ea;
+                  uint32_t local_data;
+                  uint32_t fetch_ea_positive;
+                  uint32_t fetch_ax_positive;
+                  uint32_t positive_result;
+ 
+                  local_fetch_ea = Fetch_EA();
+                  if (0x8000& local_fetch_ea)   fetch_ea_positive = (local_fetch_ea ^ 0xffff)+1;      else  fetch_ea_positive = local_fetch_ea;
+                  if (0x8000& register_ax)      fetch_ax_positive = (register_ax ^ 0xffff)+1;         else  fetch_ax_positive = register_ax;
+                  positive_result = fetch_ea_positive * fetch_ax_positive;
+                  if (positive_result > 0xFFFF) register_flags=(register_flags|0x0801);    // Set O,C flags
+                  else                          register_flags=(register_flags&0xF7FE);    // Clear O,C flags
+            
+                  local_data = (int16_t)local_fetch_ea * (int16_t)register_ax;
                   register_dx = (local_data >> 16);  
-                  register_ax = (local_data&0x0000FFFF);    
-                  if      ( (register_dx==0xFFFF) && ((register_ax&0x8000)==0x0)) {  register_flags=(register_flags|0x0801);  }  // Set O,C flags
-                  else if ( (register_dx==0x0000) && ((register_ax&0x8000)!=0x0)) {  register_flags=(register_flags|0x0801);  }  // Set O,C flags
-                  else                             {  register_flags=(register_flags&0xF7FE);  }  // Clear O,C flags
-                  Set_Flags_Word_SZP(register_ax);
+                  register_ax = (local_data&0x0000FFFF);   
+
+                  register_flags=(register_flags&0xFFBF); // temp clear zero bit
                   break;    
         case 0x6: if (ea_is_a_register==1) clock_counter=clock_counter+143;  else  clock_counter=clock_counter+157;         // # 0xF7 REG[6] - DIV  REG16/MEM16
                   local_numr = (register_dx<<16) | register_ax;
