@@ -155,7 +155,7 @@ uint8_t   assert_sync=0;
 uint8_t   global_temp=0;
 uint8_t   last_access_internal_RAM=0;
 uint8_t   ea_data=0;
-uint8_t   mode=1;
+uint8_t   mode=0;
 
 uint16_t  register_pc=0;
 uint16_t  current_address=0;

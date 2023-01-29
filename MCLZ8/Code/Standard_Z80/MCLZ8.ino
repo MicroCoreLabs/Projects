@@ -18,6 +18,10 @@
 // Revision 1 4/20/2022
 // Initial revision
 //
+// Revision 2 1/28/2023
+// Updated to only use M1 cycles for opcode fetches and not for subsequent bytes.
+// Also fixed M1 signal which never was asserted low.
+//
 //
 //------------------------------------------------------------------------
 //
@@ -405,6 +409,7 @@ inline uint8_t BIU_Bus_Cycle(uint8_t biu_operation, uint16_t local_address , uin
     wait_for_CLK_rising_edge();    GPIO7_DR        = writeback_data7 | gpio7_out;                               // T1 Rising 
                                    GPIO8_DR        = writeback_data8 | gpio8_out;
                                    GPIO9_DR        = writeback_data9 | gpio9_out | 0x80000010; // disable PIN_RFSH and PIN_DATA_OE_n
+								   if ( (biu_operation==OPCODE_READ_M1) || (biu_operation==INTERRUPT_ACK) )  digitalWriteFast(PIN_M1,0x0);
 
 
 
@@ -639,6 +644,19 @@ uint8_t Fetch_opcode()  {
     return local_byte;
 }
 
+// ------------------------------------------------------
+// Fetch a subsequent byte 
+// ------------------------------------------------------
+uint8_t Fetch_byte()  {    
+    uint8_t local_byte;
+    
+    local_byte = BIU_Bus_Cycle(MEM_READ_BYTE , register_pc , 0x00 );
+    
+    register_pc++;
+	
+    return local_byte;
+}
+
 
 // ------------------------------------------------------
 // Read and Write data from BIU
@@ -799,26 +817,26 @@ void opcode_0xE3()  {  if (prefix_dd==1) { temp8=Read_byte(register_sp);    Writ
 // Jumps, Calls, Returns
 // ------------------------------------------------------
 void Jump_Not_Taken8()  {
-    Fetch_opcode();
+    Fetch_byte();
     return;
 }
 void Jump_Not_Taken16()  {
-    Fetch_opcode();
-    Fetch_opcode();
+    Fetch_byte();
+    Fetch_byte();
     return;
 }
 void Jump_Taken8()  {   
     uint16_t local_displacement;
     
-    local_displacement = Sign_Extend(Fetch_opcode());
+    local_displacement = Sign_Extend(Fetch_byte());
     register_pc = (register_pc) + local_displacement;
     return;
 }
 void Jump_Taken16()  {  
     uint16_t local_displacement;
         
-    local_displacement = Fetch_opcode();                                        
-    register_pc = (Fetch_opcode()<<8) | local_displacement; 
+    local_displacement = Fetch_byte();                                        
+    register_pc = (Fetch_byte()<<8) | local_displacement; 
     return;
 }
 void opcode_0x18()  {                                            clock_counter=clock_counter+5; Jump_Taken8();                                              return;  }  // jr *    - Disp8
@@ -875,22 +893,22 @@ void opcode_0xFF()  {    Push(register_pc); register_pc = 0x38;                 
 // ------------------------------------------------------
 // Loads
 // ------------------------------------------------------
-void opcode_0x01 () {  register_c = Fetch_opcode();  register_b = Fetch_opcode();       return;  }
-void opcode_0x11 () {  register_e = Fetch_opcode();  register_d = Fetch_opcode();       return;  }
+void opcode_0x01 () {  register_c = Fetch_byte();  register_b = Fetch_byte();       return;  }
+void opcode_0x11 () {  register_e = Fetch_byte();  register_d = Fetch_byte();       return;  }
 void opcode_0x0A () {  register_a = Read_byte(REGISTER_BC);                             return;  }
-void opcode_0x0E () {  register_c = Fetch_opcode();                                     return;  }
-void opcode_0x1E () {  register_e = Fetch_opcode();                                     return;  }
+void opcode_0x0E () {  register_c = Fetch_byte();                                     return;  }
+void opcode_0x1E () {  register_e = Fetch_byte();                                     return;  }
 void opcode_0x1A () {  register_a = Read_byte(REGISTER_DE);                             return;  }  
 
-void opcode_0x21 () {  if (prefix_dd==1) { register_ixl = Fetch_opcode(); register_ixh = Fetch_opcode();  }   else
-                       if (prefix_fd==1) { register_iyl = Fetch_opcode(); register_iyh = Fetch_opcode();  }   else
-                                         { register_l   = Fetch_opcode(); register_h   = Fetch_opcode();  }   return;  }
+void opcode_0x21 () {  if (prefix_dd==1) { register_ixl = Fetch_byte(); register_ixh = Fetch_byte();  }   else
+                       if (prefix_fd==1) { register_iyl = Fetch_byte(); register_iyh = Fetch_byte();  }   else
+                                         { register_l   = Fetch_byte(); register_h   = Fetch_byte();  }   return;  }
                     
 void opcode_0x22 () {  
     uint16_t local_address;
     
-    local_address = Fetch_opcode();
-    local_address = (Fetch_opcode()<<8) | local_address;
+    local_address = Fetch_byte();
+    local_address = (Fetch_byte()<<8) | local_address;
 
     if (prefix_dd==1) { Write_byte(local_address , register_ixl); Write_byte( local_address+1 , register_ixh); }   else
     if (prefix_fd==1) { Write_byte(local_address , register_iyl); Write_byte( local_address+1 , register_iyh); }   else
@@ -900,46 +918,46 @@ return;  }
 void opcode_0x2A () {  
     uint16_t local_address;
     
-    local_address = Fetch_opcode();
-    local_address = (Fetch_opcode()<<8) | local_address; 
+    local_address = Fetch_byte();
+    local_address = (Fetch_byte()<<8) | local_address; 
     
     if (prefix_dd==1) { register_ixl = Read_byte(local_address); register_ixh = Read_byte(local_address+1);  }   else
     if (prefix_fd==1) { register_iyl = Read_byte(local_address); register_iyh = Read_byte(local_address+1);  }   else
                       { register_l   = Read_byte(local_address); register_h   = Read_byte(local_address+1);  }   
 return;  }
     
-void opcode_0x06 () { register_b = Fetch_opcode();   return;  }
-void opcode_0x16 () { register_d = Fetch_opcode();   return;  }
-void opcode_0x26 () { if (prefix_dd==1) { register_ixh = Fetch_opcode(); }   else if (prefix_fd==1) { register_iyh = Fetch_opcode(); }   else  register_h = Fetch_opcode();   return;  }
-void opcode_0x2E () { if (prefix_dd==1) { register_ixl = Fetch_opcode(); }   else if (prefix_fd==1) { register_iyl = Fetch_opcode(); }   else  register_l = Fetch_opcode();   return;  }
+void opcode_0x06 () { register_b = Fetch_byte();   return;  }
+void opcode_0x16 () { register_d = Fetch_byte();   return;  }
+void opcode_0x26 () { if (prefix_dd==1) { register_ixh = Fetch_byte(); }   else if (prefix_fd==1) { register_iyh = Fetch_byte(); }   else  register_h = Fetch_byte();   return;  }
+void opcode_0x2E () { if (prefix_dd==1) { register_ixl = Fetch_byte(); }   else if (prefix_fd==1) { register_iyl = Fetch_byte(); }   else  register_l = Fetch_byte();   return;  }
 
 
 
 
 void opcode_0x31 () {  
     uint16_t local_address;
-   local_address = Fetch_opcode();
-    local_address = (Fetch_opcode()<<8) | local_address;
+   local_address = Fetch_byte();
+    local_address = (Fetch_byte()<<8) | local_address;
 
     register_sp = local_address;  return;  }
     
 void opcode_0x32 () {  
     uint16_t local_address;
     
-    local_address = Fetch_opcode();
-    local_address = (Fetch_opcode()<<8) | local_address;
+    local_address = Fetch_byte();
+    local_address = (Fetch_byte()<<8) | local_address;
 
     Write_byte(local_address , register_a);        
 return;  }  
 
-void opcode_0x36 () {  if (prefix_dd==1) Write_byte(REGISTER_IX + Sign_Extend(Fetch_opcode()) , Fetch_opcode() );  else
-                       if (prefix_fd==1) Write_byte(REGISTER_IY + Sign_Extend(Fetch_opcode()) , Fetch_opcode() );  else
-                                         Write_byte(REGISTER_HL                               , Fetch_opcode() );  return;  }
+void opcode_0x36 () {  if (prefix_dd==1) Write_byte(REGISTER_IX + Sign_Extend(Fetch_byte()) , Fetch_byte() );  else
+                       if (prefix_fd==1) Write_byte(REGISTER_IY + Sign_Extend(Fetch_byte()) , Fetch_byte() );  else
+                                         Write_byte(REGISTER_HL                               , Fetch_byte() );  return;  }
 
 
     
-void opcode_0x3A () {   register_a = Read_byte((Fetch_opcode()|(Fetch_opcode()<<8)));  return;  }
-void opcode_0x3E () {   register_a = Fetch_opcode();   return;  }
+void opcode_0x3A () {   register_a = Read_byte((Fetch_byte()|(Fetch_byte()<<8)));  return;  }
+void opcode_0x3E () {   register_a = Fetch_byte();   return;  }
     
 void opcode_0x40 () {  register_b = register_b;  return;  }
 void opcode_0x41 () {  register_b = register_c;  return;  }
@@ -947,8 +965,8 @@ void opcode_0x42 () {  register_b = register_d;  return;  }
 void opcode_0x43 () {  register_b = register_e;  return;  }
 void opcode_0x44 () {  if (prefix_dd==1) register_b = register_ixh;  else if (prefix_fd==1) register_b = register_iyh;   else  register_b = register_h; return;  }
 void opcode_0x45 () {  if (prefix_dd==1) register_b = register_ixl;  else if (prefix_fd==1) register_b = register_iyl;   else  register_b = register_l; return;  }
-void opcode_0x46 () {  if (prefix_dd==1) register_b = Read_byte(REGISTER_IX + Sign_Extend(Fetch_opcode()) );  else
-                       if (prefix_fd==1) register_b = Read_byte(REGISTER_IY + Sign_Extend(Fetch_opcode()) );  else
+void opcode_0x46 () {  if (prefix_dd==1) register_b = Read_byte(REGISTER_IX + Sign_Extend(Fetch_byte()) );  else
+                       if (prefix_fd==1) register_b = Read_byte(REGISTER_IY + Sign_Extend(Fetch_byte()) );  else
                                          register_b = Read_byte(REGISTER_HL);                           return;  }
 void opcode_0x47 () {  register_b = register_a;  return;  }
 void opcode_0x48 () {  register_c = register_b;  return;  }
@@ -957,8 +975,8 @@ void opcode_0x4A () {  register_c = register_d;  return;  }
 void opcode_0x4B () {  register_c = register_e;  return;  }
 void opcode_0x4C () {  if (prefix_dd==1) register_c = register_ixh;  else if (prefix_fd==1) register_c = register_iyh;   else  register_c = register_h; return;  }
 void opcode_0x4D () {  if (prefix_dd==1) register_c = register_ixl;  else if (prefix_fd==1) register_c = register_iyl;   else  register_c = register_l; return;  }
-void opcode_0x4E () {  if (prefix_dd==1) register_c = Read_byte(REGISTER_IX + Sign_Extend(Fetch_opcode()) );  else
-                       if (prefix_fd==1) register_c = Read_byte(REGISTER_IY + Sign_Extend(Fetch_opcode()) );  else
+void opcode_0x4E () {  if (prefix_dd==1) register_c = Read_byte(REGISTER_IX + Sign_Extend(Fetch_byte()) );  else
+                       if (prefix_fd==1) register_c = Read_byte(REGISTER_IY + Sign_Extend(Fetch_byte()) );  else
                                          register_c = Read_byte(REGISTER_HL);                           return;  }
 void opcode_0x4F () {  register_c = register_a;  return;  }
 
@@ -970,8 +988,8 @@ void opcode_0x52 () {  register_d = register_d;  return;  }
 void opcode_0x53 () {  register_d = register_e;  return;  }
 void opcode_0x54 () {  if (prefix_dd==1) register_d = register_ixh;  else if (prefix_fd==1) register_d = register_iyh;   else  register_d = register_h; return;  }
 void opcode_0x55 () {  if (prefix_dd==1) register_d = register_ixl;  else if (prefix_fd==1) register_d = register_iyl;   else  register_d = register_l; return;  }
-void opcode_0x56 () {  if (prefix_dd==1) register_d = Read_byte(REGISTER_IX + Sign_Extend(Fetch_opcode()) );  else
-                       if (prefix_fd==1) register_d = Read_byte(REGISTER_IY + Sign_Extend(Fetch_opcode()) );  else
+void opcode_0x56 () {  if (prefix_dd==1) register_d = Read_byte(REGISTER_IX + Sign_Extend(Fetch_byte()) );  else
+                       if (prefix_fd==1) register_d = Read_byte(REGISTER_IY + Sign_Extend(Fetch_byte()) );  else
                                          register_d = Read_byte(REGISTER_HL);                           return;  }
 void opcode_0x57 () {  register_d = register_a;  return;  }
 void opcode_0x58 () {  register_e = register_b;  return;  }
@@ -980,8 +998,8 @@ void opcode_0x5A () {  register_e = register_d;  return;  }
 void opcode_0x5B () {  register_e = register_e;  return;  }
 void opcode_0x5C () {  if (prefix_dd==1) register_e = register_ixh;  else if (prefix_fd==1) register_e = register_iyh;   else  register_e = register_h; return;  }
 void opcode_0x5D () {  if (prefix_dd==1) register_e = register_ixl;  else if (prefix_fd==1) register_e = register_iyl;   else  register_e = register_l; return;  }
-void opcode_0x5E () {  if (prefix_dd==1) register_e = Read_byte(REGISTER_IX + Sign_Extend(Fetch_opcode()) );  else
-                       if (prefix_fd==1) register_e = Read_byte(REGISTER_IY + Sign_Extend(Fetch_opcode()) );  else
+void opcode_0x5E () {  if (prefix_dd==1) register_e = Read_byte(REGISTER_IX + Sign_Extend(Fetch_byte()) );  else
+                       if (prefix_fd==1) register_e = Read_byte(REGISTER_IY + Sign_Extend(Fetch_byte()) );  else
                                          register_e = Read_byte(REGISTER_HL);                           return;  }
 void opcode_0x5F () {  register_e = register_a;  return;  }
 
@@ -993,8 +1011,8 @@ void opcode_0x62 () {  if (prefix_dd==1) register_ixh = register_d;    else if (
 void opcode_0x63 () {  if (prefix_dd==1) register_ixh = register_e;    else if (prefix_fd==1) register_iyh = register_e;     else  register_h = register_e; return;  }
 void opcode_0x64 () {  if (prefix_dd==1) register_ixh = register_ixh;  else if (prefix_fd==1) register_iyh = register_iyh;   else  register_h = register_h; return;  }
 void opcode_0x65 () {  if (prefix_dd==1) register_ixh = register_ixl;  else if (prefix_fd==1) register_iyh = register_iyl;   else  register_h = register_l; return;  }
-void opcode_0x66 () {  if (prefix_dd==1) register_h = Read_byte(REGISTER_IX + Sign_Extend(Fetch_opcode()) );  else
-                       if (prefix_fd==1) register_h = Read_byte(REGISTER_IY + Sign_Extend(Fetch_opcode()) );  else
+void opcode_0x66 () {  if (prefix_dd==1) register_h = Read_byte(REGISTER_IX + Sign_Extend(Fetch_byte()) );  else
+                       if (prefix_fd==1) register_h = Read_byte(REGISTER_IY + Sign_Extend(Fetch_byte()) );  else
                                          register_h = Read_byte(REGISTER_HL);                           return;  }
 void opcode_0x67 () {  if (prefix_dd==1) register_ixh = register_a;    else if (prefix_fd==1) register_iyh = register_a;     else  register_h = register_a; return;  }
 void opcode_0x68 () {  if (prefix_dd==1) register_ixl = register_b;    else if (prefix_fd==1) register_iyl = register_b;     else  register_l = register_b; return;  }
@@ -1003,8 +1021,8 @@ void opcode_0x6A () {  if (prefix_dd==1) register_ixl = register_d;    else if (
 void opcode_0x6B () {  if (prefix_dd==1) register_ixl = register_e;    else if (prefix_fd==1) register_iyl = register_e;     else  register_l = register_e; return;  }
 void opcode_0x6C () {  if (prefix_dd==1) register_ixl = register_ixh;  else if (prefix_fd==1) register_iyl = register_iyh;   else  register_l = register_h; return;  }
 void opcode_0x6D () {  if (prefix_dd==1) register_ixl = register_ixl;  else if (prefix_fd==1) register_iyl = register_iyl;   else  register_l = register_l; return;  }
-void opcode_0x6E () {  if (prefix_dd==1) register_l = Read_byte(REGISTER_IX + Sign_Extend(Fetch_opcode()) );  else
-                       if (prefix_fd==1) register_l = Read_byte(REGISTER_IY + Sign_Extend(Fetch_opcode()) );  else
+void opcode_0x6E () {  if (prefix_dd==1) register_l = Read_byte(REGISTER_IX + Sign_Extend(Fetch_byte()) );  else
+                       if (prefix_fd==1) register_l = Read_byte(REGISTER_IY + Sign_Extend(Fetch_byte()) );  else
                                          register_l = Read_byte(REGISTER_HL);                           return;  }
 void opcode_0x6F () {  if (prefix_dd==1) register_ixl = register_a;    else if (prefix_fd==1) register_iyl = register_a;     else  register_l = register_a; return;  }
 
@@ -1014,32 +1032,32 @@ void opcode_0x02 () {  Write_byte(REGISTER_BC , register_a);   return;  }  // ld
 void opcode_0x12 () {  Write_byte(REGISTER_DE , register_a);   return;  }  // ld (de),a
 
 
-void opcode_0x70 () {  if (prefix_dd==1) Write_byte( (REGISTER_IX+Sign_Extend(Fetch_opcode())) , register_b);  else
-                       if (prefix_fd==1) Write_byte( (REGISTER_IY+Sign_Extend(Fetch_opcode())) , register_b);  else
+void opcode_0x70 () {  if (prefix_dd==1) Write_byte( (REGISTER_IX+Sign_Extend(Fetch_byte())) , register_b);  else
+                       if (prefix_fd==1) Write_byte( (REGISTER_IY+Sign_Extend(Fetch_byte())) , register_b);  else
                                          Write_byte( REGISTER_HL                               , register_b );    return;  }
                     
-void opcode_0x71 () {  if (prefix_dd==1) Write_byte( (REGISTER_IX+Sign_Extend(Fetch_opcode())) , register_c);  else
-                       if (prefix_fd==1) Write_byte( (REGISTER_IY+Sign_Extend(Fetch_opcode())) , register_c);  else
+void opcode_0x71 () {  if (prefix_dd==1) Write_byte( (REGISTER_IX+Sign_Extend(Fetch_byte())) , register_c);  else
+                       if (prefix_fd==1) Write_byte( (REGISTER_IY+Sign_Extend(Fetch_byte())) , register_c);  else
                                          Write_byte( REGISTER_HL                               , register_c );    return;  }
 
-void opcode_0x72 () {  if (prefix_dd==1) Write_byte( (REGISTER_IX+Sign_Extend(Fetch_opcode())) , register_d);  else
-                       if (prefix_fd==1) Write_byte( (REGISTER_IY+Sign_Extend(Fetch_opcode())) , register_d);  else
+void opcode_0x72 () {  if (prefix_dd==1) Write_byte( (REGISTER_IX+Sign_Extend(Fetch_byte())) , register_d);  else
+                       if (prefix_fd==1) Write_byte( (REGISTER_IY+Sign_Extend(Fetch_byte())) , register_d);  else
                                          Write_byte( REGISTER_HL                               , register_d );    return;  }
                     
-void opcode_0x73 () {  if (prefix_dd==1) Write_byte( (REGISTER_IX+Sign_Extend(Fetch_opcode())) , register_e);  else
-                       if (prefix_fd==1) Write_byte( (REGISTER_IY+Sign_Extend(Fetch_opcode())) , register_e);  else
+void opcode_0x73 () {  if (prefix_dd==1) Write_byte( (REGISTER_IX+Sign_Extend(Fetch_byte())) , register_e);  else
+                       if (prefix_fd==1) Write_byte( (REGISTER_IY+Sign_Extend(Fetch_byte())) , register_e);  else
                                          Write_byte( REGISTER_HL                               , register_e );    return;  }
 
-void opcode_0x74 () {  if (prefix_dd==1) Write_byte( (REGISTER_IX+Sign_Extend(Fetch_opcode())) , register_h);  else
-                       if (prefix_fd==1) Write_byte( (REGISTER_IY+Sign_Extend(Fetch_opcode())) , register_h);  else
+void opcode_0x74 () {  if (prefix_dd==1) Write_byte( (REGISTER_IX+Sign_Extend(Fetch_byte())) , register_h);  else
+                       if (prefix_fd==1) Write_byte( (REGISTER_IY+Sign_Extend(Fetch_byte())) , register_h);  else
                                          Write_byte( REGISTER_HL                               , register_h );    return;  }
                     
-void opcode_0x75 () {  if (prefix_dd==1) Write_byte( (REGISTER_IX+Sign_Extend(Fetch_opcode())) , register_l);  else
-                       if (prefix_fd==1) Write_byte( (REGISTER_IY+Sign_Extend(Fetch_opcode())) , register_l);  else
+void opcode_0x75 () {  if (prefix_dd==1) Write_byte( (REGISTER_IX+Sign_Extend(Fetch_byte())) , register_l);  else
+                       if (prefix_fd==1) Write_byte( (REGISTER_IY+Sign_Extend(Fetch_byte())) , register_l);  else
                                          Write_byte( REGISTER_HL                               , register_l );    return;  }
                     
-void opcode_0x77 () {  if (prefix_dd==1) Write_byte( (REGISTER_IX+Sign_Extend(Fetch_opcode())) , register_a);  else
-                       if (prefix_fd==1) Write_byte( (REGISTER_IY+Sign_Extend(Fetch_opcode())) , register_a);  else
+void opcode_0x77 () {  if (prefix_dd==1) Write_byte( (REGISTER_IX+Sign_Extend(Fetch_byte())) , register_a);  else
+                       if (prefix_fd==1) Write_byte( (REGISTER_IY+Sign_Extend(Fetch_byte())) , register_a);  else
                                          Write_byte( REGISTER_HL                               , register_a );    return;  }
 void opcode_0x78 () {  register_a = register_b; return;  }
 void opcode_0x79 () {  register_a = register_c; return;  }
@@ -1047,8 +1065,8 @@ void opcode_0x7A () {  register_a = register_d; return;  }
 void opcode_0x7B () {  register_a = register_e; return;  }
 void opcode_0x7C () {  if (prefix_dd==1) register_a = register_ixh;    else if (prefix_fd==1) register_a = register_iyh;     else  register_a = register_h; return;  }
 void opcode_0x7D () {  if (prefix_dd==1) register_a = register_ixl;    else if (prefix_fd==1) register_a = register_iyl;     else  register_a = register_l; return;  }
-void opcode_0x7E () {  if (prefix_dd==1) register_a = Read_byte(REGISTER_IX + Sign_Extend(Fetch_opcode()) );  else
-                       if (prefix_fd==1) register_a = Read_byte(REGISTER_IY + Sign_Extend(Fetch_opcode()) );  else
+void opcode_0x7E () {  if (prefix_dd==1) register_a = Read_byte(REGISTER_IX + Sign_Extend(Fetch_byte()) );  else
+                       if (prefix_fd==1) register_a = Read_byte(REGISTER_IY + Sign_Extend(Fetch_byte()) );  else
                                          register_a = Read_byte(REGISTER_HL);    return;  }
 void opcode_0x7F () {  register_a = register_a; return;  }
 
@@ -1063,7 +1081,7 @@ void opcode_0xF9 () {  if (prefix_dd==1) register_sp = ((register_ixh<<8) | regi
 void opcode_0xED43 () {  
     uint16_t local_address;
     
-    local_address = (Fetch_opcode() | (Fetch_opcode()<<8));
+    local_address = (Fetch_byte() | (Fetch_byte()<<8));
 
     Write_byte(local_address , register_c);   Write_byte( local_address+1 , register_b);      
 return;  }
@@ -1072,7 +1090,7 @@ return;  }
 void opcode_0xED53 () {  
     uint16_t local_address;
     
-    local_address = (Fetch_opcode() | (Fetch_opcode()<<8));
+    local_address = (Fetch_byte() | (Fetch_byte()<<8));
 
     Write_byte(local_address , register_e);   Write_byte( local_address+1 , register_d);      
 return;  }
@@ -1081,7 +1099,7 @@ return;  }
 void opcode_0xED63 () {  
     uint16_t local_address;
     
-    local_address = (Fetch_opcode() | (Fetch_opcode()<<8));
+    local_address = (Fetch_byte() | (Fetch_byte()<<8));
 
     Write_byte(local_address , register_l);   Write_byte( local_address+1 , register_h);      
 return;  }
@@ -1090,7 +1108,7 @@ return;  }
 void opcode_0xED73 () {  
     uint16_t local_address;
     
-    local_address = (Fetch_opcode() | (Fetch_opcode()<<8));
+    local_address = (Fetch_byte() | (Fetch_byte()<<8));
 
     Write_word(local_address , register_sp);  
 return;  }
@@ -1100,7 +1118,7 @@ return;  }
 void opcode_0xED4B () {  
     uint16_t local_address;
     
-    local_address = (Fetch_opcode() | (Fetch_opcode()<<8));
+    local_address = (Fetch_byte() | (Fetch_byte()<<8));
 
     register_c   = Read_byte(local_address);
     register_b   = Read_byte(local_address+1);
@@ -1111,7 +1129,7 @@ return;  }
 void opcode_0xED5B () {  
     uint16_t local_address;
     
-    local_address = (Fetch_opcode() | (Fetch_opcode()<<8));
+    local_address = (Fetch_byte() | (Fetch_byte()<<8));
 
     register_e   = Read_byte(local_address);
     register_d   = Read_byte(local_address+1);
@@ -1121,7 +1139,7 @@ return;  }
 void opcode_0xED6B () {  
     uint16_t local_address;
     
-    local_address = (Fetch_opcode() | (Fetch_opcode()<<8));
+    local_address = (Fetch_byte() | (Fetch_byte()<<8));
 
     register_l   = Read_byte(local_address);
     register_h   = Read_byte(local_address+1);
@@ -1131,7 +1149,7 @@ return;  }
 void opcode_0xED7B () {  
     uint16_t local_address;
     
-    local_address = (Fetch_opcode() | (Fetch_opcode()<<8));
+    local_address = (Fetch_byte() | (Fetch_byte()<<8));
 
     register_sp   = Read_word(local_address);
     
@@ -1186,12 +1204,12 @@ void opcode_0xA5 () {  if (prefix_dd==1) register_a=(register_a & register_ixl);
                        if (prefix_fd==1) register_a=(register_a & register_iyl);  else              
                                          register_a=(register_a & register_l); 
                        and_opcode=1; Flags_Boolean();  return;  }  
-void opcode_0xA6 () {  if (prefix_dd==1) register_a=(register_a & Read_byte(REGISTER_IX + Sign_Extend(Fetch_opcode()) ));  else      // and (hl) , ix+*, iy+*            
-                       if (prefix_fd==1) register_a=(register_a & Read_byte(REGISTER_IY + Sign_Extend(Fetch_opcode()) ));  else             
+void opcode_0xA6 () {  if (prefix_dd==1) register_a=(register_a & Read_byte(REGISTER_IX + Sign_Extend(Fetch_byte()) ));  else      // and (hl) , ix+*, iy+*            
+                       if (prefix_fd==1) register_a=(register_a & Read_byte(REGISTER_IY + Sign_Extend(Fetch_byte()) ));  else             
                                          register_a=(register_a & Read_byte(REGISTER_HL)); 
                        and_opcode=1; Flags_Boolean();  return;  }                        
 void opcode_0xA7 () {  register_a=(register_a & register_a);       and_opcode=1; Flags_Boolean();  return;  }  // and a
-void opcode_0xE6 () {  register_a=(register_a & Fetch_opcode());     and_opcode=1;        Flags_Boolean();  return;  }  // and *
+void opcode_0xE6 () {  register_a=(register_a & Fetch_byte());     and_opcode=1;        Flags_Boolean();  return;  }  // and *
         
 // ----
         
@@ -1207,12 +1225,12 @@ void opcode_0xAD () {  if (prefix_dd==1) register_a=(register_a ^ register_ixl);
                        if (prefix_fd==1) register_a=(register_a ^ register_iyl);  else              
                                          register_a=(register_a ^ register_l); 
                        Flags_Boolean();  return;  }  
-void opcode_0xAE () {  if (prefix_dd==1) register_a=(register_a ^ Read_byte(REGISTER_IX + Sign_Extend(Fetch_opcode()) ));  else      // xor (hl) , ix+*, iy+*            
-                       if (prefix_fd==1) register_a=(register_a ^ Read_byte(REGISTER_IY + Sign_Extend(Fetch_opcode()) ));  else             
+void opcode_0xAE () {  if (prefix_dd==1) register_a=(register_a ^ Read_byte(REGISTER_IX + Sign_Extend(Fetch_byte()) ));  else      // xor (hl) , ix+*, iy+*            
+                       if (prefix_fd==1) register_a=(register_a ^ Read_byte(REGISTER_IY + Sign_Extend(Fetch_byte()) ));  else             
                                          register_a=(register_a ^ Read_byte(REGISTER_HL)); 
                        Flags_Boolean();  return;  }  
 void opcode_0xAF () {  register_a=(register_a ^ register_a);                Flags_Boolean();  return;  }  // xor a
-void opcode_0xEE () {  register_a=(register_a ^ Fetch_opcode());            Flags_Boolean();  return;  }  // xor *
+void opcode_0xEE () {  register_a=(register_a ^ Fetch_byte());            Flags_Boolean();  return;  }  // xor *
         
 // ----
     
@@ -1228,12 +1246,12 @@ void opcode_0xB5 () {  if (prefix_dd==1) register_a=(register_a | register_ixl);
                        if (prefix_fd==1) register_a=(register_a | register_iyl);  else              
                                          register_a=(register_a | register_l); 
                        Flags_Boolean();  return;  }  
-void opcode_0xB6 () {  if (prefix_dd==1) register_a=(register_a | Read_byte(REGISTER_IX + Sign_Extend(Fetch_opcode()) ));  else      // or (hl) , ix+*, iy+*            
-                       if (prefix_fd==1) register_a=(register_a | Read_byte(REGISTER_IY + Sign_Extend(Fetch_opcode()) ));  else             
+void opcode_0xB6 () {  if (prefix_dd==1) register_a=(register_a | Read_byte(REGISTER_IX + Sign_Extend(Fetch_byte()) ));  else      // or (hl) , ix+*, iy+*            
+                       if (prefix_fd==1) register_a=(register_a | Read_byte(REGISTER_IY + Sign_Extend(Fetch_byte()) ));  else             
                                          register_a=(register_a | Read_byte(REGISTER_HL)); 
                        Flags_Boolean();  return;  }  
 void opcode_0xB7 () {  register_a=(register_a | register_a);                Flags_Boolean();  return;  }  // or a
-void opcode_0xF6 () {  register_a=(register_a | Fetch_opcode());            Flags_Boolean();  return;  }  // or *
+void opcode_0xF6 () {  register_a=(register_a | Fetch_byte());            Flags_Boolean();  return;  }  // or *
 
 
 // ------------------------------------------------------
@@ -1459,7 +1477,7 @@ void opcode_0x39 () {  if (prefix_dd==1)  Writeback_Reg16(REG_IX , ADD_Words(REG
                                          
                                          
 
-void opcode_0xC6 () {  register_a = ADD_Bytes(register_a , Fetch_opcode() );                     return; }   // add a,*
+void opcode_0xC6 () {  register_a = ADD_Bytes(register_a , Fetch_byte() );                     return; }   // add a,*
 void opcode_0x87 () {  register_a = ADD_Bytes(register_a , register_a);                          return; }   // add a,a
 void opcode_0x80 () {  register_a = ADD_Bytes(register_a , register_b);                          return; }   // add a,b
 void opcode_0x81 () {  register_a = ADD_Bytes(register_a , register_c);                          return; }   // add a,c
@@ -1474,8 +1492,8 @@ void opcode_0x85 () {  if (prefix_dd==1) { register_a = ADD_Bytes(register_a , r
                        if (prefix_fd==1) { register_a = ADD_Bytes(register_a , register_iyl); }  else
                                          { register_a = ADD_Bytes(register_a , register_l);   }  return; }        
 
-void opcode_0x86 () {  if (prefix_dd==1) { register_a = ADD_Bytes(register_a , Read_byte(REGISTER_IX + Sign_Extend(Fetch_opcode()))); }  else     // add a, (hl)/(ix+*)/(iy+*)
-                       if (prefix_fd==1) { register_a = ADD_Bytes(register_a , Read_byte(REGISTER_IY + Sign_Extend(Fetch_opcode()))); }  else
+void opcode_0x86 () {  if (prefix_dd==1) { register_a = ADD_Bytes(register_a , Read_byte(REGISTER_IX + Sign_Extend(Fetch_byte()))); }  else     // add a, (hl)/(ix+*)/(iy+*)
+                       if (prefix_fd==1) { register_a = ADD_Bytes(register_a , Read_byte(REGISTER_IY + Sign_Extend(Fetch_byte()))); }  else
                                          { register_a = ADD_Bytes(register_a , Read_byte(REGISTER_HL));   }  return; }        
 
 
@@ -1484,7 +1502,7 @@ void opcode_0xED5A() { with_carry=1; Writeback_Reg16(REG_HL , ADD_Words2(REGISTE
 void opcode_0xED6A() { with_carry=1; Writeback_Reg16(REG_HL , ADD_Words2(REGISTER_HL , REGISTER_HL) );          return; }   // adc hl,hl
 void opcode_0xED7A() { with_carry=1; Writeback_Reg16(REG_HL , ADD_Words2(REGISTER_HL , register_sp) );          return; }   // adc hl,sp
 
-void opcode_0xCE () {  with_carry=1; register_a = ADD_Bytes(register_a , Fetch_opcode() );                     return; }   // adc *
+void opcode_0xCE () {  with_carry=1; register_a = ADD_Bytes(register_a , Fetch_byte() );                     return; }   // adc *
 void opcode_0x8F () {  with_carry=1; register_a = ADD_Bytes(register_a , register_a);                          return; }   // adc a,a
 void opcode_0x88 () {  with_carry=1; register_a = ADD_Bytes(register_a , register_b);                          return; }   // adc a,b
 void opcode_0x89 () {  with_carry=1; register_a = ADD_Bytes(register_a , register_c);                          return; }   // adc a,c
@@ -1499,13 +1517,13 @@ void opcode_0x8D () {  if (prefix_dd==1) { with_carry=1; register_a = ADD_Bytes(
                        if (prefix_fd==1) { with_carry=1; register_a = ADD_Bytes(register_a , register_iyl); }  else
                                          { with_carry=1; register_a = ADD_Bytes(register_a , register_l);   }  return; }        
 
-void opcode_0x8E () {  if (prefix_dd==1) { with_carry=1; register_a = ADD_Bytes(register_a , Read_byte(REGISTER_IX + Sign_Extend(Fetch_opcode()))); }  else     // adc a, (hl)/(ix+*)/(iy+*)
-                       if (prefix_fd==1) { with_carry=1; register_a = ADD_Bytes(register_a , Read_byte(REGISTER_IY + Sign_Extend(Fetch_opcode()))); }  else
+void opcode_0x8E () {  if (prefix_dd==1) { with_carry=1; register_a = ADD_Bytes(register_a , Read_byte(REGISTER_IX + Sign_Extend(Fetch_byte()))); }  else     // adc a, (hl)/(ix+*)/(iy+*)
+                       if (prefix_fd==1) { with_carry=1; register_a = ADD_Bytes(register_a , Read_byte(REGISTER_IY + Sign_Extend(Fetch_byte()))); }  else
                                          { with_carry=1; register_a = ADD_Bytes(register_a , Read_byte(REGISTER_HL));   }  return; }        
 
 
 void opcode_0xED44(){  register_a = SUB_Bytes(0 , register_a);                                   return; }    // neg a
-void opcode_0xD6 () {  register_a = SUB_Bytes(register_a , Fetch_opcode() );                     return; }    // sub a,*
+void opcode_0xD6 () {  register_a = SUB_Bytes(register_a , Fetch_byte() );                     return; }    // sub a,*
 void opcode_0x97 () {  register_a = SUB_Bytes(register_a , register_a);                          return; }    // sub a,a
 void opcode_0x90 () {  register_a = SUB_Bytes(register_a , register_b);                          return; }    // sub a,b
 void opcode_0x91 () {  register_a = SUB_Bytes(register_a , register_c);                          return; }    // sub a,c
@@ -1520,8 +1538,8 @@ void opcode_0x95 () {  if (prefix_dd==1) { register_a = SUB_Bytes(register_a , r
                        if (prefix_fd==1) { register_a = SUB_Bytes(register_a , register_iyl); }  else
                                          { register_a = SUB_Bytes(register_a , register_l);   }  return; }        
 
-void opcode_0x96 () {  if (prefix_dd==1) { register_a = SUB_Bytes(register_a , Read_byte(REGISTER_IX + Sign_Extend(Fetch_opcode()))); }  else     // sub a, (hl)/(ix+*)/(iy+*)
-                       if (prefix_fd==1) { register_a = SUB_Bytes(register_a , Read_byte(REGISTER_IY + Sign_Extend(Fetch_opcode()))); }  else
+void opcode_0x96 () {  if (prefix_dd==1) { register_a = SUB_Bytes(register_a , Read_byte(REGISTER_IX + Sign_Extend(Fetch_byte()))); }  else     // sub a, (hl)/(ix+*)/(iy+*)
+                       if (prefix_fd==1) { register_a = SUB_Bytes(register_a , Read_byte(REGISTER_IY + Sign_Extend(Fetch_byte()))); }  else
                                          { register_a = SUB_Bytes(register_a , Read_byte(REGISTER_HL));   }  return; }        
 
 
@@ -1531,7 +1549,7 @@ void opcode_0xED52() { with_carry=1; Writeback_Reg16(REG_HL , SUB_Words(REGISTER
 void opcode_0xED62() { with_carry=1; Writeback_Reg16(REG_HL , SUB_Words(REGISTER_HL , REGISTER_HL) );          return; }   // sbc hl,hl
 void opcode_0xED72() { with_carry=1; Writeback_Reg16(REG_HL , SUB_Words(REGISTER_HL , register_sp) );          return; }   // sbc hl,sp
 
-void opcode_0xDE () {  with_carry=1; register_a = SUB_Bytes(register_a , Fetch_opcode() );                     return; }    // sbc a,*
+void opcode_0xDE () {  with_carry=1; register_a = SUB_Bytes(register_a , Fetch_byte() );                     return; }    // sbc a,*
 void opcode_0x9F () {  with_carry=1; register_a = SUB_Bytes(register_a , register_a);                          return; }    // sbc a,a
 void opcode_0x98 () {  with_carry=1; register_a = SUB_Bytes(register_a , register_b);                          return; }    // sbc a,b
 void opcode_0x99 () {  with_carry=1; register_a = SUB_Bytes(register_a , register_c);                          return; }    // sbc a,c
@@ -1546,12 +1564,12 @@ void opcode_0x9D () {  if (prefix_dd==1) { with_carry=1; register_a = SUB_Bytes(
                        if (prefix_fd==1) { with_carry=1; register_a = SUB_Bytes(register_a , register_iyl); }  else
                                          { with_carry=1; register_a = SUB_Bytes(register_a , register_l);   }  return; }        
 
-void opcode_0x9E () {  if (prefix_dd==1) { with_carry=1; register_a = SUB_Bytes(register_a , Read_byte(REGISTER_IX + Sign_Extend(Fetch_opcode()))); }  else     // sbc a, (hl)/(ix+*)/(iy+*)
-                       if (prefix_fd==1) { with_carry=1; register_a = SUB_Bytes(register_a , Read_byte(REGISTER_IY + Sign_Extend(Fetch_opcode()))); }  else
+void opcode_0x9E () {  if (prefix_dd==1) { with_carry=1; register_a = SUB_Bytes(register_a , Read_byte(REGISTER_IX + Sign_Extend(Fetch_byte()))); }  else     // sbc a, (hl)/(ix+*)/(iy+*)
+                       if (prefix_fd==1) { with_carry=1; register_a = SUB_Bytes(register_a , Read_byte(REGISTER_IY + Sign_Extend(Fetch_byte()))); }  else
                                          { with_carry=1; register_a = SUB_Bytes(register_a , Read_byte(REGISTER_HL));   }  return; }        
 
 
-void opcode_0xFE () {  cp_opcode=1; SUB_Bytes(register_a , Fetch_opcode() );                     return; }    // cp * 
+void opcode_0xFE () {  cp_opcode=1; SUB_Bytes(register_a , Fetch_byte() );                     return; }    // cp * 
 void opcode_0xBF () {  cp_opcode=1; SUB_Bytes(register_a , register_a);                          return; }    // cp a,a
 void opcode_0xB8 () {  cp_opcode=1; SUB_Bytes(register_a , register_b);                          return; }    // cp a,b
 void opcode_0xB9 () {  cp_opcode=1; SUB_Bytes(register_a , register_c);                          return; }    // cp a,c
@@ -1566,8 +1584,8 @@ void opcode_0xBD () {  if (prefix_dd==1) { cp_opcode=1; SUB_Bytes(register_a , r
                        if (prefix_fd==1) { cp_opcode=1; SUB_Bytes(register_a , register_iyl); }  else
                                          { cp_opcode=1; SUB_Bytes(register_a , register_l);   }  return; }        
      
-void opcode_0xBE () {  if (prefix_dd==1) { cp_opcode=1; SUB_Bytes(register_a , Read_byte(REGISTER_IX + Sign_Extend(Fetch_opcode()))); }  else     // cp a, (hl)/(ix+*)/(iy+*)
-                       if (prefix_fd==1) { cp_opcode=1; SUB_Bytes(register_a , Read_byte(REGISTER_IY + Sign_Extend(Fetch_opcode()))); }  else
+void opcode_0xBE () {  if (prefix_dd==1) { cp_opcode=1; SUB_Bytes(register_a , Read_byte(REGISTER_IX + Sign_Extend(Fetch_byte()))); }  else     // cp a, (hl)/(ix+*)/(iy+*)
+                       if (prefix_fd==1) { cp_opcode=1; SUB_Bytes(register_a , Read_byte(REGISTER_IY + Sign_Extend(Fetch_byte()))); }  else
                                          { cp_opcode=1; SUB_Bytes(register_a , Read_byte(REGISTER_HL));   }  return; }        
 
 void opcode_0x33 () {  register_sp++;                                                        return;  }  // inc sp
@@ -1592,8 +1610,8 @@ void opcode_0x2C () {  inc_dec=1; if (prefix_dd==1) { register_ixl=ADD_Bytes(reg
                                   if (prefix_fd==1) { register_iyl=ADD_Bytes(register_iyl , 0x1);  }   else  
                                                     { register_l=ADD_Bytes(register_l   , 0x1);  }   return;    }
                                                     
-void opcode_0x34 () {  inc_dec=1; if (prefix_dd==1) { temp16=REGISTER_IX + Sign_Extend(Fetch_opcode()); Write_byte(temp16 , ADD_Bytes(Read_byte(temp16),0x1));  }   else        // inc ix+*, iy+*, (hl)
-                                  if (prefix_fd==1) { temp16=REGISTER_IY + Sign_Extend(Fetch_opcode()); Write_byte(temp16 , ADD_Bytes(Read_byte(temp16),0x1));  }   else  
+void opcode_0x34 () {  inc_dec=1; if (prefix_dd==1) { temp16=REGISTER_IX + Sign_Extend(Fetch_byte()); Write_byte(temp16 , ADD_Bytes(Read_byte(temp16),0x1));  }   else        // inc ix+*, iy+*, (hl)
+                                  if (prefix_fd==1) { temp16=REGISTER_IY + Sign_Extend(Fetch_byte()); Write_byte(temp16 , ADD_Bytes(Read_byte(temp16),0x1));  }   else  
                                                     { Write_byte(REGISTER_HL , ADD_Bytes(Read_byte(REGISTER_HL),0x1) );  }   return;    }
                                                     
 
@@ -1622,8 +1640,8 @@ void opcode_0x2D () {  inc_dec=1; if (prefix_dd==1) { register_ixl=SUB_Bytes(reg
                                   if (prefix_fd==1) { register_iyl=SUB_Bytes(register_iyl , 0x1);  }   else  
                                                     { register_l=SUB_Bytes(register_l   , 0x1);  }   return;    }
                                                     
-void opcode_0x35 () {  inc_dec=1; if (prefix_dd==1) { temp16=REGISTER_IX + Sign_Extend(Fetch_opcode()); Write_byte(temp16 , SUB_Bytes(Read_byte(temp16),0x1));  }   else        // dec ix+*, iy+*, (hl)
-                                  if (prefix_fd==1) { temp16=REGISTER_IY + Sign_Extend(Fetch_opcode()); Write_byte(temp16 , SUB_Bytes(Read_byte(temp16),0x1));  }   else  
+void opcode_0x35 () {  inc_dec=1; if (prefix_dd==1) { temp16=REGISTER_IX + Sign_Extend(Fetch_byte()); Write_byte(temp16 , SUB_Bytes(Read_byte(temp16),0x1));  }   else        // dec ix+*, iy+*, (hl)
+                                  if (prefix_fd==1) { temp16=REGISTER_IY + Sign_Extend(Fetch_byte()); Write_byte(temp16 , SUB_Bytes(Read_byte(temp16),0x1));  }   else  
                                                     { Write_byte(REGISTER_HL , SUB_Bytes(Read_byte(REGISTER_HL),0x1) );  }   return;    }
                                                     
 
@@ -1641,7 +1659,7 @@ void Flags_IO(uint8_t local_data) {
     if (local_data==0)  register_f = register_f | 0x40;     // Set Z flag
     return;
 }
-void opcode_0xDB()   {  register_a = BIU_Bus_Cycle(IO_READ_BYTE , Fetch_opcode()  , 0x00 );                        return;    }     // in a,(*)
+void opcode_0xDB()   {  register_a = BIU_Bus_Cycle(IO_READ_BYTE , Fetch_byte()  , 0x00 );                        return;    }     // in a,(*)
 void opcode_0xED78() {  register_a = BIU_Bus_Cycle(IO_READ_BYTE , register_c      , 0x00 ); Flags_IO(register_a);  return;    }     // in a,(c)
 void opcode_0xED40() {  register_b = BIU_Bus_Cycle(IO_READ_BYTE , register_c      , 0x00 ); Flags_IO(register_b);  return;    }     // in b,(c)
 void opcode_0xED48() {  register_c = BIU_Bus_Cycle(IO_READ_BYTE , register_c      , 0x00 ); Flags_IO(register_c);  return;    }     // in c,(c)
@@ -1652,7 +1670,7 @@ void opcode_0xED68() {  register_l = BIU_Bus_Cycle(IO_READ_BYTE , register_c    
 void opcode_0xED70() {  temp8      = BIU_Bus_Cycle(IO_READ_BYTE , register_c      , 0x00 ); Flags_IO(temp8);       return;    }     // in(c)
 
 
-void opcode_0xD3()     {  BIU_Bus_Cycle(IO_WRITE_BYTE , Fetch_opcode() ,            register_a );   return;    }     // out (*),a
+void opcode_0xD3()     {  BIU_Bus_Cycle(IO_WRITE_BYTE , Fetch_byte() ,            register_a );   return;    }     // out (*),a
 void opcode_0xED79()   {  BIU_Bus_Cycle(IO_WRITE_BYTE , register_c ,                register_a );   return;    }     // out (c),a
 void opcode_0xED41()   {  BIU_Bus_Cycle(IO_WRITE_BYTE , register_c ,                register_b );   return;    }     // out (c),b
 void opcode_0xED49()   {  BIU_Bus_Cycle(IO_WRITE_BYTE , register_c ,                register_c );   return;    }     // out (c),c
@@ -1760,82 +1778,82 @@ uint8_t SRL(uint8_t local_data) {
 
 
 void opcode_0x07()   {register_a = RLC(register_a);   return;    }     // rlc
-void opcode_0xCB00() {if (prefix_dd==1) {register_b = RLC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_b = RLC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_b=RLC(register_b); }return;    }    
-void opcode_0xCB01() {if (prefix_dd==1) {register_c = RLC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_c = RLC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_c=RLC(register_c); }return;    }     
-void opcode_0xCB02() {if (prefix_dd==1) {register_d = RLC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_d = RLC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_d=RLC(register_d); }return;    }     
-void opcode_0xCB03() {if (prefix_dd==1) {register_e = RLC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_e = RLC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_e=RLC(register_e); }return;    }     
-void opcode_0xCB04() {if (prefix_dd==1) {register_h = RLC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_h = RLC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_h=RLC(register_h); }return;    }     
-void opcode_0xCB05() {if (prefix_dd==1) {register_l = RLC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_l = RLC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_l=RLC(register_l); }return;    }     
+void opcode_0xCB00() {if (prefix_dd==1) {register_b = RLC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_b = RLC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_b=RLC(register_b); }return;    }    
+void opcode_0xCB01() {if (prefix_dd==1) {register_c = RLC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_c = RLC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_c=RLC(register_c); }return;    }     
+void opcode_0xCB02() {if (prefix_dd==1) {register_d = RLC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_d = RLC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_d=RLC(register_d); }return;    }     
+void opcode_0xCB03() {if (prefix_dd==1) {register_e = RLC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_e = RLC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_e=RLC(register_e); }return;    }     
+void opcode_0xCB04() {if (prefix_dd==1) {register_h = RLC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_h = RLC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_h=RLC(register_h); }return;    }     
+void opcode_0xCB05() {if (prefix_dd==1) {register_l = RLC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_l = RLC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_l=RLC(register_l); }return;    }     
 void opcode_0xCB07() {if (prefix_dd==1) {register_a = RLC(Read_byte(REGISTER_IX+Sign_Extend(cb_prefix_offset)));}  else if (prefix_fd==1) {register_a = RLC(Read_byte(REGISTER_IY+Sign_Extend(cb_prefix_offset)));} else {register_a=RLC(register_a); }return;    }     
 void opcode_0xCB06() {if (prefix_dd==1) {temp16=REGISTER_IX+Sign_Extend(cb_prefix_offset); Write_byte(temp16,RLC(Read_byte(temp16)));}  else if (prefix_fd==1){temp16=REGISTER_IY+Sign_Extend(cb_prefix_offset); Write_byte(temp16,RLC(Read_byte(temp16)));} else Write_byte( (REGISTER_HL) , RLC(Read_byte(REGISTER_HL)) );return;    }  
 
 void opcode_0x0F()   {register_a = RRC(register_a);   return;    }     // rrc
-void opcode_0xCB08() {if (prefix_dd==1) {register_b = RRC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_b = RRC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_b=RRC(register_b); }return;    }    
-void opcode_0xCB09() {if (prefix_dd==1) {register_c = RRC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_c = RRC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_c=RRC(register_c); }return;    }     
-void opcode_0xCB0A() {if (prefix_dd==1) {register_d = RRC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_d = RRC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_d=RRC(register_d); }return;    }     
-void opcode_0xCB0B() {if (prefix_dd==1) {register_e = RRC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_e = RRC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_e=RRC(register_e); }return;    }     
-void opcode_0xCB0C() {if (prefix_dd==1) {register_h = RRC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_h = RRC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_h=RRC(register_h); }return;    }     
-void opcode_0xCB0D() {if (prefix_dd==1) {register_l = RRC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_l = RRC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_l=RRC(register_l); }return;    }     
-void opcode_0xCB0F() {if (prefix_dd==1) {register_a = RRC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_a = RRC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_a=RRC(register_a); }return;    }     
+void opcode_0xCB08() {if (prefix_dd==1) {register_b = RRC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_b = RRC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_b=RRC(register_b); }return;    }    
+void opcode_0xCB09() {if (prefix_dd==1) {register_c = RRC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_c = RRC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_c=RRC(register_c); }return;    }     
+void opcode_0xCB0A() {if (prefix_dd==1) {register_d = RRC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_d = RRC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_d=RRC(register_d); }return;    }     
+void opcode_0xCB0B() {if (prefix_dd==1) {register_e = RRC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_e = RRC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_e=RRC(register_e); }return;    }     
+void opcode_0xCB0C() {if (prefix_dd==1) {register_h = RRC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_h = RRC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_h=RRC(register_h); }return;    }     
+void opcode_0xCB0D() {if (prefix_dd==1) {register_l = RRC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_l = RRC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_l=RRC(register_l); }return;    }     
+void opcode_0xCB0F() {if (prefix_dd==1) {register_a = RRC(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_a = RRC(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_a=RRC(register_a); }return;    }     
 void opcode_0xCB0E() {if (prefix_dd==1) {temp16=REGISTER_IX+Sign_Extend(cb_prefix_offset); Write_byte(temp16,RRC(Read_byte(temp16)));}  else if (prefix_fd==1){temp16=REGISTER_IY+Sign_Extend(cb_prefix_offset); Write_byte(temp16,RRC(Read_byte(temp16)));} else Write_byte( (REGISTER_HL) , RRC(Read_byte(REGISTER_HL)) );return;    }  
 
 void opcode_0x17()   {register_a = RL(register_a);   return;    }     // rl
-void opcode_0xCB10() {if (prefix_dd==1) {register_b = RL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_b = RL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_b=RL(register_b); }return;    }    
-void opcode_0xCB11() {if (prefix_dd==1) {register_c = RL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_c = RL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_c=RL(register_c); }return;    }     
-void opcode_0xCB12() {if (prefix_dd==1) {register_d = RL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_d = RL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_d=RL(register_d); }return;    }     
-void opcode_0xCB13() {if (prefix_dd==1) {register_e = RL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_e = RL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_e=RL(register_e); }return;    }     
-void opcode_0xCB14() {if (prefix_dd==1) {register_h = RL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_h = RL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_h=RL(register_h); }return;    }     
-void opcode_0xCB15() {if (prefix_dd==1) {register_l = RL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_l = RL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_l=RL(register_l); }return;    }     
-void opcode_0xCB17() {if (prefix_dd==1) {register_a = RL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_a = RL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_a=RL(register_a); }return;    }     
+void opcode_0xCB10() {if (prefix_dd==1) {register_b = RL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_b = RL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_b=RL(register_b); }return;    }    
+void opcode_0xCB11() {if (prefix_dd==1) {register_c = RL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_c = RL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_c=RL(register_c); }return;    }     
+void opcode_0xCB12() {if (prefix_dd==1) {register_d = RL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_d = RL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_d=RL(register_d); }return;    }     
+void opcode_0xCB13() {if (prefix_dd==1) {register_e = RL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_e = RL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_e=RL(register_e); }return;    }     
+void opcode_0xCB14() {if (prefix_dd==1) {register_h = RL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_h = RL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_h=RL(register_h); }return;    }     
+void opcode_0xCB15() {if (prefix_dd==1) {register_l = RL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_l = RL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_l=RL(register_l); }return;    }     
+void opcode_0xCB17() {if (prefix_dd==1) {register_a = RL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_a = RL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_a=RL(register_a); }return;    }     
 void opcode_0xCB16() {if (prefix_dd==1) {temp16=REGISTER_IX+Sign_Extend(cb_prefix_offset); Write_byte(temp16,RL(Read_byte(temp16)));}  else if (prefix_fd==1){temp16=REGISTER_IY+Sign_Extend(cb_prefix_offset); Write_byte(temp16,RL(Read_byte(temp16)));} else Write_byte( (REGISTER_HL) , RL(Read_byte(REGISTER_HL)) );return;    }  
 
 void opcode_0x1F()   {register_a = RR(register_a);   return;    }     // rr
-void opcode_0xCB18() {if (prefix_dd==1) {register_b = RR(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_b = RR(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_b=RR(register_b); }return;    }    
-void opcode_0xCB19() {if (prefix_dd==1) {register_c = RR(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_c = RR(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_c=RR(register_c); }return;    }     
-void opcode_0xCB1A() {if (prefix_dd==1) {register_d = RR(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_d = RR(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_d=RR(register_d); }return;    }     
-void opcode_0xCB1B() {if (prefix_dd==1) {register_e = RR(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_e = RR(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_e=RR(register_e); }return;    }     
-void opcode_0xCB1C() {if (prefix_dd==1) {register_h = RR(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_h = RR(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_h=RR(register_h); }return;    }     
-void opcode_0xCB1D() {if (prefix_dd==1) {register_l = RR(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_l = RR(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_l=RR(register_l); }return;    }     
-void opcode_0xCB1F() {if (prefix_dd==1) {register_a = RR(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_a = RR(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_a=RR(register_a); }return;    }     
+void opcode_0xCB18() {if (prefix_dd==1) {register_b = RR(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_b = RR(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_b=RR(register_b); }return;    }    
+void opcode_0xCB19() {if (prefix_dd==1) {register_c = RR(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_c = RR(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_c=RR(register_c); }return;    }     
+void opcode_0xCB1A() {if (prefix_dd==1) {register_d = RR(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_d = RR(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_d=RR(register_d); }return;    }     
+void opcode_0xCB1B() {if (prefix_dd==1) {register_e = RR(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_e = RR(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_e=RR(register_e); }return;    }     
+void opcode_0xCB1C() {if (prefix_dd==1) {register_h = RR(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_h = RR(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_h=RR(register_h); }return;    }     
+void opcode_0xCB1D() {if (prefix_dd==1) {register_l = RR(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_l = RR(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_l=RR(register_l); }return;    }     
+void opcode_0xCB1F() {if (prefix_dd==1) {register_a = RR(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_a = RR(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_a=RR(register_a); }return;    }     
 void opcode_0xCB1E() {if (prefix_dd==1) {temp16=REGISTER_IX+Sign_Extend(cb_prefix_offset); Write_byte(temp16,RR(Read_byte(temp16)));}  else if (prefix_fd==1){temp16=REGISTER_IY+Sign_Extend(cb_prefix_offset); Write_byte(temp16,RR(Read_byte(temp16)));} else Write_byte( (REGISTER_HL) , RR(Read_byte(REGISTER_HL)) );return;    }  
 
 // ----
 
 
-void opcode_0xCB20() {if (prefix_dd==1) {register_b = SLA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_b = SLA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_b=SLA(register_b); }return;    }    
-void opcode_0xCB21() {if (prefix_dd==1) {register_c = SLA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_c = SLA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_c=SLA(register_c); }return;    }     
-void opcode_0xCB22() {if (prefix_dd==1) {register_d = SLA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_d = SLA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_d=SLA(register_d); }return;    }     
-void opcode_0xCB23() {if (prefix_dd==1) {register_e = SLA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_e = SLA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_e=SLA(register_e); }return;    }     
-void opcode_0xCB24() {if (prefix_dd==1) {register_h = SLA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_h = SLA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_h=SLA(register_h); }return;    }     
-void opcode_0xCB25() {if (prefix_dd==1) {register_l = SLA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_l = SLA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_l=SLA(register_l); }return;    }     
-void opcode_0xCB27() {if (prefix_dd==1) {register_a = SLA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_a = SLA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_a=SLA(register_a); }return;    }     
+void opcode_0xCB20() {if (prefix_dd==1) {register_b = SLA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_b = SLA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_b=SLA(register_b); }return;    }    
+void opcode_0xCB21() {if (prefix_dd==1) {register_c = SLA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_c = SLA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_c=SLA(register_c); }return;    }     
+void opcode_0xCB22() {if (prefix_dd==1) {register_d = SLA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_d = SLA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_d=SLA(register_d); }return;    }     
+void opcode_0xCB23() {if (prefix_dd==1) {register_e = SLA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_e = SLA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_e=SLA(register_e); }return;    }     
+void opcode_0xCB24() {if (prefix_dd==1) {register_h = SLA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_h = SLA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_h=SLA(register_h); }return;    }     
+void opcode_0xCB25() {if (prefix_dd==1) {register_l = SLA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_l = SLA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_l=SLA(register_l); }return;    }     
+void opcode_0xCB27() {if (prefix_dd==1) {register_a = SLA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_a = SLA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_a=SLA(register_a); }return;    }     
 void opcode_0xCB26() {if (prefix_dd==1) {temp16=REGISTER_IX+Sign_Extend(cb_prefix_offset); Write_byte(temp16,SLA(Read_byte(temp16)));}  else if (prefix_fd==1){temp16=REGISTER_IY+Sign_Extend(cb_prefix_offset); Write_byte(temp16,SLA(Read_byte(temp16)));} else Write_byte( (REGISTER_HL) , SLA(Read_byte(REGISTER_HL)) );return;    }  
 
-void opcode_0xCB28() {if (prefix_dd==1) {register_b = SRA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_b = SRA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_b=SRA(register_b); }return;    }    
-void opcode_0xCB29() {if (prefix_dd==1) {register_c = SRA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_c = SRA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_c=SRA(register_c); }return;    }     
-void opcode_0xCB2A() {if (prefix_dd==1) {register_d = SRA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_d = SRA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_d=SRA(register_d); }return;    }     
-void opcode_0xCB2B() {if (prefix_dd==1) {register_e = SRA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_e = SRA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_e=SRA(register_e); }return;    }     
-void opcode_0xCB2C() {if (prefix_dd==1) {register_h = SRA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_h = SRA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_h=SRA(register_h); }return;    }     
-void opcode_0xCB2D() {if (prefix_dd==1) {register_l = SRA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_l = SRA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_l=SRA(register_l); }return;    }     
-void opcode_0xCB2F() {if (prefix_dd==1) {register_a = SRA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_a = SRA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_a=SRA(register_a); }return;    }     
+void opcode_0xCB28() {if (prefix_dd==1) {register_b = SRA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_b = SRA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_b=SRA(register_b); }return;    }    
+void opcode_0xCB29() {if (prefix_dd==1) {register_c = SRA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_c = SRA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_c=SRA(register_c); }return;    }     
+void opcode_0xCB2A() {if (prefix_dd==1) {register_d = SRA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_d = SRA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_d=SRA(register_d); }return;    }     
+void opcode_0xCB2B() {if (prefix_dd==1) {register_e = SRA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_e = SRA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_e=SRA(register_e); }return;    }     
+void opcode_0xCB2C() {if (prefix_dd==1) {register_h = SRA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_h = SRA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_h=SRA(register_h); }return;    }     
+void opcode_0xCB2D() {if (prefix_dd==1) {register_l = SRA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_l = SRA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_l=SRA(register_l); }return;    }     
+void opcode_0xCB2F() {if (prefix_dd==1) {register_a = SRA(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_a = SRA(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_a=SRA(register_a); }return;    }     
 void opcode_0xCB2E() {if (prefix_dd==1) {temp16=REGISTER_IX+Sign_Extend(cb_prefix_offset); Write_byte(temp16,SRA(Read_byte(temp16)));}  else if (prefix_fd==1){temp16=REGISTER_IY+Sign_Extend(cb_prefix_offset); Write_byte(temp16,SRA(Read_byte(temp16)));} else Write_byte( (REGISTER_HL) , SRA(Read_byte(REGISTER_HL)) );return;    }  
 
-void opcode_0xCB30() {if (prefix_dd==1) {register_b = SLL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_b = SLL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_b=SLL(register_b); }return;    }    
-void opcode_0xCB31() {if (prefix_dd==1) {register_c = SLL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_c = SLL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_c=SLL(register_c); }return;    }     
-void opcode_0xCB32() {if (prefix_dd==1) {register_d = SLL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_d = SLL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_d=SLL(register_d); }return;    }     
-void opcode_0xCB33() {if (prefix_dd==1) {register_e = SLL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_e = SLL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_e=SLL(register_e); }return;    }     
-void opcode_0xCB34() {if (prefix_dd==1) {register_h = SLL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_h = SLL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_h=SLL(register_h); }return;    }     
-void opcode_0xCB35() {if (prefix_dd==1) {register_l = SLL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_l = SLL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_l=SLL(register_l); }return;    }     
-void opcode_0xCB37() {if (prefix_dd==1) {register_a = SLL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_a = SLL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_a=SLL(register_a); }return;    }     
+void opcode_0xCB30() {if (prefix_dd==1) {register_b = SLL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_b = SLL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_b=SLL(register_b); }return;    }    
+void opcode_0xCB31() {if (prefix_dd==1) {register_c = SLL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_c = SLL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_c=SLL(register_c); }return;    }     
+void opcode_0xCB32() {if (prefix_dd==1) {register_d = SLL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_d = SLL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_d=SLL(register_d); }return;    }     
+void opcode_0xCB33() {if (prefix_dd==1) {register_e = SLL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_e = SLL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_e=SLL(register_e); }return;    }     
+void opcode_0xCB34() {if (prefix_dd==1) {register_h = SLL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_h = SLL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_h=SLL(register_h); }return;    }     
+void opcode_0xCB35() {if (prefix_dd==1) {register_l = SLL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_l = SLL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_l=SLL(register_l); }return;    }     
+void opcode_0xCB37() {if (prefix_dd==1) {register_a = SLL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_a = SLL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_a=SLL(register_a); }return;    }     
 void opcode_0xCB36() {if (prefix_dd==1) {temp16=REGISTER_IX+Sign_Extend(cb_prefix_offset); Write_byte(temp16,SLL(Read_byte(temp16)));}  else if (prefix_fd==1){temp16=REGISTER_IY+Sign_Extend(cb_prefix_offset); Write_byte(temp16,SLL(Read_byte(temp16)));} else Write_byte( (REGISTER_HL) , SLL(Read_byte(REGISTER_HL)) );return;    }  
 
-void opcode_0xCB38() {if (prefix_dd==1) {register_b = SRL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_b = SRL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_b=SRL(register_b); }return;    }    
-void opcode_0xCB39() {if (prefix_dd==1) {register_c = SRL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_c = SRL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_c=SRL(register_c); }return;    }     
-void opcode_0xCB3A() {if (prefix_dd==1) {register_d = SRL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_d = SRL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_d=SRL(register_d); }return;    }     
-void opcode_0xCB3B() {if (prefix_dd==1) {register_e = SRL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_e = SRL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_e=SRL(register_e); }return;    }     
-void opcode_0xCB3C() {if (prefix_dd==1) {register_h = SRL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_h = SRL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_h=SRL(register_h); }return;    }     
-void opcode_0xCB3D() {if (prefix_dd==1) {register_l = SRL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_l = SRL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_l=SRL(register_l); }return;    }     
-void opcode_0xCB3F() {if (prefix_dd==1) {register_a = SRL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {register_a = SRL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_a=SRL(register_a); }return;    }     
+void opcode_0xCB38() {if (prefix_dd==1) {register_b = SRL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_b = SRL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_b=SRL(register_b); }return;    }    
+void opcode_0xCB39() {if (prefix_dd==1) {register_c = SRL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_c = SRL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_c=SRL(register_c); }return;    }     
+void opcode_0xCB3A() {if (prefix_dd==1) {register_d = SRL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_d = SRL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_d=SRL(register_d); }return;    }     
+void opcode_0xCB3B() {if (prefix_dd==1) {register_e = SRL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_e = SRL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_e=SRL(register_e); }return;    }     
+void opcode_0xCB3C() {if (prefix_dd==1) {register_h = SRL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_h = SRL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_h=SRL(register_h); }return;    }     
+void opcode_0xCB3D() {if (prefix_dd==1) {register_l = SRL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_l = SRL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_l=SRL(register_l); }return;    }     
+void opcode_0xCB3F() {if (prefix_dd==1) {register_a = SRL(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {register_a = SRL(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_a=SRL(register_a); }return;    }     
 void opcode_0xCB3E() {if (prefix_dd==1) {temp16=REGISTER_IX+Sign_Extend(cb_prefix_offset); Write_byte(temp16,SRL(Read_byte(temp16)));}  else if (prefix_fd==1){temp16=REGISTER_IY+Sign_Extend(cb_prefix_offset); Write_byte(temp16,SRL(Read_byte(temp16)));} else Write_byte( (REGISTER_HL) , SRL(Read_byte(REGISTER_HL)) );return;    }  
 
 
@@ -1874,13 +1892,13 @@ void BIT(uint8_t local_data) {
                         special=0;
                         return;    }     // bit
 
-void opcode_0xCB_Bit_b()  {if (prefix_dd==1) {BIT(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {BIT(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {BIT(register_b); }return;    }    
-void opcode_0xCB_Bit_c()  {if (prefix_dd==1) {BIT(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {BIT(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {BIT(register_c); }return;    }    
-void opcode_0xCB_Bit_d()  {if (prefix_dd==1) {BIT(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {BIT(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {BIT(register_d); }return;    }    
-void opcode_0xCB_Bit_e()  {if (prefix_dd==1) {BIT(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {BIT(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {BIT(register_e); }return;    }    
-void opcode_0xCB_Bit_h()  {if (prefix_dd==1) {BIT(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {BIT(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {BIT(register_h); }return;    }    
-void opcode_0xCB_Bit_l()  {if (prefix_dd==1) {BIT(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {BIT(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {BIT(register_l); }return;    }    
-void opcode_0xCB_Bit_a()  {if (prefix_dd==1) {BIT(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {BIT(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {BIT(register_a); }return;    }    
+void opcode_0xCB_Bit_b()  {if (prefix_dd==1) {BIT(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {BIT(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {BIT(register_b); }return;    }    
+void opcode_0xCB_Bit_c()  {if (prefix_dd==1) {BIT(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {BIT(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {BIT(register_c); }return;    }    
+void opcode_0xCB_Bit_d()  {if (prefix_dd==1) {BIT(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {BIT(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {BIT(register_d); }return;    }    
+void opcode_0xCB_Bit_e()  {if (prefix_dd==1) {BIT(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {BIT(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {BIT(register_e); }return;    }    
+void opcode_0xCB_Bit_h()  {if (prefix_dd==1) {BIT(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {BIT(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {BIT(register_h); }return;    }    
+void opcode_0xCB_Bit_l()  {if (prefix_dd==1) {BIT(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {BIT(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {BIT(register_l); }return;    }    
+void opcode_0xCB_Bit_a()  {if (prefix_dd==1) {BIT(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {BIT(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {BIT(register_a); }return;    }    
 void opcode_0xCB_Bit_hl() {if (prefix_dd==1) {special=2; temp16=REGISTER_IX+Sign_Extend(cb_prefix_offset); BIT(Read_byte(temp16));}  else if (prefix_fd==1) {special=2; temp16=REGISTER_IY+Sign_Extend(cb_prefix_offset); BIT(Read_byte(temp16));} else {special=1; BIT(Read_byte(REGISTER_HL)); }return;    }    
 
 
@@ -1900,13 +1918,13 @@ uint8_t RES(uint8_t local_data) {
                         }
                         return local_data;    }     // res
 
-void opcode_0xCB_Res_b()  {if (prefix_dd==1) {RES(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {RES(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_b=RES(register_b); }return;    }    
-void opcode_0xCB_Res_c()  {if (prefix_dd==1) {RES(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {RES(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_c=RES(register_c); }return;    }    
-void opcode_0xCB_Res_d()  {if (prefix_dd==1) {RES(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {RES(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_d=RES(register_d); }return;    }    
-void opcode_0xCB_Res_e()  {if (prefix_dd==1) {RES(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {RES(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_e=RES(register_e); }return;    }    
-void opcode_0xCB_Res_h()  {if (prefix_dd==1) {RES(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {RES(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_h=RES(register_h); }return;    }    
-void opcode_0xCB_Res_l()  {if (prefix_dd==1) {RES(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {RES(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_l=RES(register_l); }return;    }    
-void opcode_0xCB_Res_a()  {if (prefix_dd==1) {RES(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {RES(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_a=RES(register_a); }return;    }    
+void opcode_0xCB_Res_b()  {if (prefix_dd==1) {RES(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {RES(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_b=RES(register_b); }return;    }    
+void opcode_0xCB_Res_c()  {if (prefix_dd==1) {RES(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {RES(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_c=RES(register_c); }return;    }    
+void opcode_0xCB_Res_d()  {if (prefix_dd==1) {RES(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {RES(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_d=RES(register_d); }return;    }    
+void opcode_0xCB_Res_e()  {if (prefix_dd==1) {RES(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {RES(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_e=RES(register_e); }return;    }    
+void opcode_0xCB_Res_h()  {if (prefix_dd==1) {RES(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {RES(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_h=RES(register_h); }return;    }    
+void opcode_0xCB_Res_l()  {if (prefix_dd==1) {RES(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {RES(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_l=RES(register_l); }return;    }    
+void opcode_0xCB_Res_a()  {if (prefix_dd==1) {RES(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {RES(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_a=RES(register_a); }return;    }    
 void opcode_0xCB_Res_hl() {if (prefix_dd==1) {temp16=REGISTER_IX+Sign_Extend(cb_prefix_offset); Write_byte(temp16,RES(Read_byte(temp16)));}  else if (prefix_fd==1){temp16=REGISTER_IY+Sign_Extend(cb_prefix_offset); Write_byte(temp16,RES(Read_byte(temp16)));} else Write_byte( (REGISTER_HL) , RES(Read_byte(REGISTER_HL)) );return;    }  
 
 
@@ -1927,13 +1945,13 @@ uint8_t SET(uint8_t local_data) {
                         }
                         return local_data;    }     // set
 
-void opcode_0xCB_Set_b()  {if (prefix_dd==1) {SET(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {SET(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_b=SET(register_b); }return;    }    
-void opcode_0xCB_Set_c()  {if (prefix_dd==1) {SET(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {SET(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_c=SET(register_c); }return;    }    
-void opcode_0xCB_Set_d()  {if (prefix_dd==1) {SET(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {SET(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_d=SET(register_d); }return;    }    
-void opcode_0xCB_Set_e()  {if (prefix_dd==1) {SET(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {SET(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_e=SET(register_e); }return;    }    
-void opcode_0xCB_Set_h()  {if (prefix_dd==1) {SET(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {SET(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_h=SET(register_h); }return;    }    
-void opcode_0xCB_Set_l()  {if (prefix_dd==1) {SET(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {SET(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_l=SET(register_l); }return;    }    
-void opcode_0xCB_Set_a()  {if (prefix_dd==1) {SET(Read_byte(REGISTER_IX+Sign_Extend(Fetch_opcode())));}  else if (prefix_fd==1) {SET(Read_byte(REGISTER_IY+Sign_Extend(Fetch_opcode())));} else {register_a=SET(register_a); }return;    }    
+void opcode_0xCB_Set_b()  {if (prefix_dd==1) {SET(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {SET(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_b=SET(register_b); }return;    }    
+void opcode_0xCB_Set_c()  {if (prefix_dd==1) {SET(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {SET(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_c=SET(register_c); }return;    }    
+void opcode_0xCB_Set_d()  {if (prefix_dd==1) {SET(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {SET(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_d=SET(register_d); }return;    }    
+void opcode_0xCB_Set_e()  {if (prefix_dd==1) {SET(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {SET(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_e=SET(register_e); }return;    }    
+void opcode_0xCB_Set_h()  {if (prefix_dd==1) {SET(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {SET(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_h=SET(register_h); }return;    }    
+void opcode_0xCB_Set_l()  {if (prefix_dd==1) {SET(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {SET(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_l=SET(register_l); }return;    }    
+void opcode_0xCB_Set_a()  {if (prefix_dd==1) {SET(Read_byte(REGISTER_IX+Sign_Extend(Fetch_byte())));}  else if (prefix_fd==1) {SET(Read_byte(REGISTER_IY+Sign_Extend(Fetch_byte())));} else {register_a=SET(register_a); }return;    }    
 void opcode_0xCB_Set_hl() {if (prefix_dd==1) {temp16=REGISTER_IX+Sign_Extend(cb_prefix_offset); Write_byte(temp16,SET(Read_byte(temp16)));}  else if (prefix_fd==1){temp16=REGISTER_IY+Sign_Extend(cb_prefix_offset); Write_byte(temp16,SET(Read_byte(temp16)));} else Write_byte( (REGISTER_HL) , SET(Read_byte(REGISTER_HL)) );return;    }  
 
 
