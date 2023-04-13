@@ -42,6 +42,7 @@ Misc:
 	MCLZ8 TRS-80 Emulator - Emulates a TRS-80 Model 1 inside of a Teensy microcontroller board
 	MCL_TRS_NABU - Emulates a TRS-80 Model 1 using the MCLZ8 which runs inside of a NABU Personal Computer
 	Turbo NABU - Uses the MCLZ8 to run simple C code on the Teensy to control the motherboard resources of the NABU Computer
+	MDA Video - Project which uses an Arty Z7-20 SOC FPGA board to diaplay BMP images to an MDA display
     
         
 For questions email me at www.MicroCoreLabs.com
