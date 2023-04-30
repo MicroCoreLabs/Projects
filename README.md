@@ -43,6 +43,6 @@ Misc:
 	MCL_TRS_NABU - Emulates a TRS-80 Model 1 using the MCLZ8 which runs inside of a NABU Personal Computer
 	Turbo NABU - Uses the MCLZ8 to run simple C code on the Teensy to control the motherboard resources of the NABU Computer
 	MDA Video - Project which uses an Arty Z7-20 SOC FPGA board to diaplay BMP images to an MDA display
-    
+    IBMPC_68000 - Uses the MCL86+ board to emulate a Motorola 68000 which runs inside of an IBM PC as-if they selected this processor in 1981
         
 For questions email me at www.MicroCoreLabs.com
