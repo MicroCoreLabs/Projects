@@ -1,0 +1,13 @@
+
+
+BOM 
+------
+
+
+Qty/board		References      Description									URL
+---------       -----------     ------------								-------------
+3				U2, U4, U5   	Bus Transceivers 3 St 3.3V ABT Octal		Mouser#:595-SN74LVT245BDBR	https://www.mouser.com/ProductDetail/Texas-Instruments/SN74LVT245BDBR/?qs=FM6NhYOeeBVRIGHSKl2GVg%3D%3D
+
+1				U1				ICHEADER28_600								http://store.go4retro.com/ic-header/
+
+2				U3				2.54MM 0.1" 15-PIN FEMALE HEADER			https://www.mouser.com/ProductDetail/Gravitech/15Fx1-254mm/?qs=Vxac6xGyzPnMG7UJxd5xkg%3D%3D

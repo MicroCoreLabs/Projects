@@ -1,0 +1,9 @@
+### Module positions - created on 02/05/21 23:50:10 ###
+### Printed by Pcbnew version kicad (5.1.8)-1
+## Unit = mm, Angle = deg.
+## Side : top
+# Ref     Val       Package                         PosX       PosY       Rot  Side
+U2        74LS245   SSOP-20_5.3x7.2mm_P0.65mm    10.9728     7.0358    0.0000  top
+U4        74LS245   SSOP-20_5.3x7.2mm_P0.65mm    11.0236    18.6690    0.0000  top
+U5        74LS245   SSOP-20_5.3x7.2mm_P0.65mm    10.8966    31.2674    0.0000  top
+## End
