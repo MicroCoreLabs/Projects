@@ -23,6 +23,9 @@
 // Revision 2 11/5/2022
 // Swapped incorrect stacking order for exception handler and RTE opcode
 //
+// Revision 3 7/12/2023
+// Updated RTE opcode and A-Line,F-Line traps per David Rumball
+//
 //
 //------------------------------------------------------------------------
 //
@@ -630,7 +633,11 @@ void Exception_Handler(unsigned int vector_number)
       Update_System_Flags(temp | BIU_IRQ_LEVEL());                                      // Set the Interrupt Flags to the current IRQ from the BIU
       vector_number = BIU_IACK();                                                       // Fetch the vector from the BIU IACK Cycle
     }
-       
+	
+  if ( (vector_number == 10) || (vector_number == 11) { 								// for the Line-A and Line-F trap the PC is 2 less
+      mc68k_pc -=2 ;
+  }
+
   Push(mc68k_pc&0xFFFF);                                                                // Stack the lower PC
   Push(mc68k_pc>>16);                                                                   // Stack the upper PC
   Push(mc68k_flags_copy);                                                               // Stack the Original copy of the Flags
@@ -1207,14 +1214,22 @@ void op_UNLK()
 
 // ----------------------------------------------------------------------
 void op_RTE()
-{                   
+{     
+  uint16_t temp_flags;    
+  
   if (mc68k_flag_S==0x0) { Exception_Handler(8); }                                              // Verify that supervisor privilege is set
   else     
   {         
-    Update_System_Flags(Pop());                                                                 // Pop the SR Flags
-    mc68k_pc    = Pop()<<16;                                                                    // Pop the upper PC
-    mc68k_pc    = mc68k_pc | Pop();                                                             // Pop the lower PC
-    BIU_Jump(mc68k_pc);                                                                         // Jump to the new PC
+    //Update_System_Flags(Pop());                                                                 // Pop the SR Flags
+    //mc68k_pc    = Pop()<<16;                                                                    // Pop the upper PC
+    //mc68k_pc    = mc68k_pc | Pop();                                                             // Pop the lower PC
+    //BIU_Jump(mc68k_pc);                                                                         // Jump to the new PC
+	
+	temp_flags = Pop(); 
+    mc68k_pc = Pop()<<16; 
+    mc68k_pc = mc68k_pc | Pop(); 
+    Update_System_Flags(temp_flags); 
+    BIU_Jump(mc68k_pc); 
   }     
   return;       
 }       
