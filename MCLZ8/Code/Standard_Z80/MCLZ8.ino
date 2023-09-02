@@ -22,6 +22,8 @@
 // Updated to only use M1 cycles for opcode fetches and not for subsequent bytes.
 // Also fixed M1 signal which never was asserted low.
 //
+// Revision 2 1/28/2023
+// Updated decode_table_0xCB to fetch_byte rather than fetch_opcode so R does not increase
 //
 //------------------------------------------------------------------------
 //
@@ -2198,7 +2200,8 @@ void decode_table_0xCB()  {
 
     
     if ( (prefix_dd==1) || (prefix_fd==1)  )  { 
-        cb_prefix_offset = Fetch_opcode();
+        //cb_prefix_offset = Fetch_opcode();
+        cb_prefix_offset = Fetch_byte();
         opcode_byte      = Fetch_opcode();
         CB_opcode = opcode_byte;
     }

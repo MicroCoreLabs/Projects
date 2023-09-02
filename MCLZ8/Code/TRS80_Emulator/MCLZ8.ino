@@ -18,6 +18,8 @@
 // Revision 1 5/25/2022
 // Initial revision
 //
+// Revision 2 9/1/2023
+// Updated decode_table_0xCB to fetch_byte rather than fetch_opcode so R does not increase
 //
 //------------------------------------------------------------------------
 //
@@ -1999,7 +2001,8 @@ void decode_table_0xCB()  {
 
     
     if ( (prefix_dd==1) || (prefix_fd==1)  )  { 
-        cb_prefix_offset = Fetch_opcode();
+        //cb_prefix_offset = Fetch_opcode();
+        cb_prefix_offset = Fetch_byte();
         opcode_byte      = Fetch_opcode();
         CB_opcode = opcode_byte;
     }
