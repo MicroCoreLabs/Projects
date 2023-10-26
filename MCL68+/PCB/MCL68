@@ -1,0 +1,34 @@
+"Source:","Z:\Ted\projs\MCL68+\PCB\MCL68\MCL68.kicad_sch"
+"Date:","6/23/2023 9:30:03 PM"
+"Tool:","Eeschema 7.0.5"
+"Generator:","C:\Program Files\KiCad\bin\scripting\plugins/bom_csv_grouped_by_value.py"
+"Component Count:","13"
+
+"Individual Components:"
+
+"Item","Qty","Reference(s)","Value","LibPart","Footprint","Datasheet"
+"","","C1","10 uF","Device:C_Polarized_US","Capacitor_SMD:C_0805_2012Metric","~"
+"","","U1","68000D","CPU_NXP_68000:68000D","Package_DIP:DIP-64_W25.4mm","https://www.nxp.com/docs/en/reference-manual/MC68000UM.pdf"
+"","","U2","74HCT574","74xx:74HCT574","Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm","http://www.ti.com/lit/gpn/sn74HCT574"
+"","","U3","74LS257","74xx:74LS257","Package_SO:TSSOP-16_4.4x5mm_P0.65mm","http://www.ti.com/lit/gpn/sn74LS257"
+"","","U4","74HCT541","74xx:74HCT541","Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm","http://www.ti.com/lit/gpn/sn74HCT541"
+"","","U5","Teensy4.1","teensy_old:Teensy4.1","Package_DIP:DIP-48_W15.24mm",""
+"","","U6","74HCT574","74xx:74HCT574","Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm","http://www.ti.com/lit/gpn/sn74HCT574"
+"","","U7","74HCT574","74xx:74HCT574","Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm","http://www.ti.com/lit/gpn/sn74HCT574"
+"","","U8","74LS257","74xx:74LS257","Package_SO:TSSOP-16_4.4x5mm_P0.65mm","http://www.ti.com/lit/gpn/sn74LS257"
+"","","U9","74HCT574","74xx:74HCT574","Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm","http://www.ti.com/lit/gpn/sn74HCT574"
+"","","U10","74HCT574","74xx:74HCT574","Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm","http://www.ti.com/lit/gpn/sn74HCT574"
+"","","U11","74HCT541","74xx:74HCT541","Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm","http://www.ti.com/lit/gpn/sn74HCT541"
+"","","U12","74HCT541","74xx:74HCT541","Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm","http://www.ti.com/lit/gpn/sn74HCT541"
+
+
+
+"Collated Components:"
+
+"Item","Qty","Reference(s)","Value","LibPart","Footprint","Datasheet"
+"1","1","C1","10 uF","Device:C_Polarized_US","Capacitor_SMD:C_0805_2012Metric","~"
+"2","1","U1","68000D","CPU_NXP_68000:68000D","Package_DIP:DIP-64_W25.4mm","https://www.nxp.com/docs/en/reference-manual/MC68000UM.pdf"
+"3","5","U2, U6, U7, U9, U10","74HCT574","74xx:74HCT574","Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm","http://www.ti.com/lit/gpn/sn74HCT574"
+"4","2","U3, U8","74LS257","74xx:74LS257","Package_SO:TSSOP-16_4.4x5mm_P0.65mm","http://www.ti.com/lit/gpn/sn74LS257"
+"5","3","U4, U11, U12","74HCT541","74xx:74HCT541","Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm","http://www.ti.com/lit/gpn/sn74HCT541"
+"6","1","U5","Teensy4.1","teensy_old:Teensy4.1","Package_DIP:DIP-48_W15.24mm",""

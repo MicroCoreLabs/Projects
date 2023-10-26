@@ -12,6 +12,7 @@ Boards:
 	MCL86jr -  IBMPCjr Accelerator which boosts performance to IBM PC/AT speed
     MCL65+  -  MOS 6502 emulator which runs on a Teensy 4.1 and can be used as a 6502 drop-in replacment
 	MCL64   -  MOS 6510 emulator which runs on a Teensy 4.1 and can be used as a drop-in replacment in the Commodore 64
+	MCL68+  -  Motorola 68000 emulator which runs on a Teensy 4.1 and can be used as a drop-in replacment 
 
 	
 Emulated Processors:

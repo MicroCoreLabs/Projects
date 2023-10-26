@@ -1,0 +1,8 @@
+BOM
+
+Item    Quantity        Reference                   Value               URL
+---------------------------------------------------------------------------------------------------------------------------------------------------
+1           5           U2, U6, U7, U9, U10         74LVC574APW,118     www.digikey.com/en/products/detail/nexperia-usa-inc/74LVC574APW-118/1231691
+2           2           U3, U8                      74LVC257APW,118     www.digikey.com/en/products/detail/nexperia-usa-inc/74LVC257APW-118/1231543
+3           3           U4, U11, U12                74LVC541APW,118     www.digikey.com/en/products/detail/nexperia-usa-inc/74LVC541APW-118/1231665
+4           1           C1                          10uF 0805           www.digikey.com/en/products/detail/samsung-electro-mechanics/CL21A106KOQNNNE/3886754

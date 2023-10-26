@@ -1,0 +1,19 @@
+### Footprint positions - created on Fri Jun 23 21:52:30 2023 ###
+### Printed by KiCad version 7.0.5
+## Unit = mm, Angle = deg.
+## Side : All
+# Ref     Val        Package                          PosX       PosY       Rot  Side
+C1        10_uF      C_0805_2012Metric             13.2334    14.1732    0.0000  bottom
+U4        74HCT541   TSSOP-20_4.4x6.5mm_P0.65mm    16.4923    31.4804  180.0000  bottom
+U8        74LS257    TSSOP-16_4.4x5mm_P0.65mm      16.3830    23.3680    0.0000  bottom
+U11       74HCT541   TSSOP-20_4.4x6.5mm_P0.65mm    17.0003    58.5776  180.0000  bottom
+U12       74HCT541   TSSOP-20_4.4x6.5mm_P0.65mm    13.9777    66.6594  180.0000  bottom
+U1        68000D     DIP-64_W25.4mm                 4.0386    81.6610    0.0000  top
+U2        74HCT574   TSSOP-20_4.4x6.5mm_P0.65mm    16.4886    23.3857  -90.0000  top
+U3        74LS257    TSSOP-16_4.4x5mm_P0.65mm      16.5862    47.1170    0.0000  top
+U5        Teensy4.1  DIP-48_W15.24mm                8.9408    61.2648    0.0000  top
+U6        74HCT574   TSSOP-20_4.4x6.5mm_P0.65mm    16.4846    15.0368  -90.0000  top
+U7        74HCT574   TSSOP-20_4.4x6.5mm_P0.65mm    16.4846     6.6548  -90.0000  top
+U9        74HCT574   TSSOP-20_4.4x6.5mm_P0.65mm    16.4736    40.0227  -90.0000  top
+U10       74HCT574   TSSOP-20_4.4x6.5mm_P0.65mm    16.4736    31.7169  -90.0000  top
+## End
