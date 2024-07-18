@@ -1,0 +1,1 @@
+asm6809   -l Testcode.lst  -o Testcode.bin  Testcode.asm

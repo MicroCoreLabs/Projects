@@ -1,0 +1,2292 @@
+                      ;
+                      ;
+                      ;  File Name   :  MCL6809 Opcode Tests
+                      ;  Used on     :  
+                      ;  Author      :  Ted Fried, MicroCore Labs
+                      ;  Creation    :  7/1/2024
+                      ;
+                      ;   Description:
+                      ;   ============
+                      ;   
+                      ;  MC6809 assembly program to test each opcode, flag, and addressing mode.
+                      ;
+                      ;  If failures are detected, the code will immediately loop on itself.
+                      ;
+                      ;  I used ASM6809.EXE to assemble the code and generate the binary.
+                      ;  Please set the reset vector to 0x0000.
+                      ;
+                      ;------------------------------------------------------------------------
+                      ;
+                      ; Modification History:
+                      ; =====================
+                      ;
+                      ; Revision 1 7/1/2024 
+                      ; Initial revision
+                      ;
+                      ;
+                      ;------------------------------------------------------------------------
+                      ;
+                      ; Copyright (c) 2024 Ted Fried
+                      ; 
+                      ; Permission is hereby granted, free of charge, to any person obtaining a copy
+                      ; of this software and associated documentation files (the "Software"), to deal
+                      ; in the Software without restriction, including without limitation the rights
+                      ; to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+                      ; copies of the Software, and to permit persons to whom the Software is
+                      ; furnished to do so, subject to the following conditions:
+                      ; 
+                      ; The above copyright notice and this permission notice shall be included in all
+                      ; copies or substantial portions of the Software.
+                      ; 
+                      ; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+                      ; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+                      ; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+                      ; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+                      ; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+                      ; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+                      ; SOFTWARE.
+                      ;
+                      
+                      ; Scratch workspace from  0x0000 
+                      ; Test code starts at     0x2000
+                      ; System Stack starts at  0xF100
+                      ; User Stack starts at    0xF200
+                      
+                      
+0000  7E2000            jmp op_LOAD_STORES
+                      
+                        
+1B00                    ORG 0x01B00 
+1B00  8600              lda #$000         ; SWI
+1B02  C600              ldb #$000  
+1B04  8E0000            ldx #$000  
+1B07  108E0000          ldy #$000 
+1B0B  3B                rti
+                          
+1BA0                    ORG 0x01BA0 
+1BA0  8600              lda #$000         ; SWI2
+1BA2  C600              ldb #$000  
+1BA4  8E0000            ldx #$000  
+1BA7  108E0000          ldy #$000 
+1BAB  3B                rti
+                          
+1BB0                    ORG 0x01BB0 
+1BB0  8600              lda #$000         ; SWI3
+1BB2  C600              ldb #$000  
+1BB4  8E0000            ldx #$000  
+1BB7  108E0000          ldy #$000 
+1BBB  3B                rti
+                        
+                         
+                        
+2000                    ORG 0x02000 
+                      
+                      ; Test - Loads, stores using all addressing modes
+                      ; ----------------------------------------------------------------------
+2000                  op_LOAD_STORES   
+2000  12                nop
+2001  12                nop
+2002  12                nop
+                      
+                        ; Immediate Loads
+                        ; ----------------
+2003  86AA              lda #$0AA  
+2005  C6BB              ldb #$0BB
+2007  CCFACE            ldd #$FACE
+200A  CE1234            ldu #$01234
+200D  10CE5678          lds #$05678
+2011  8EDEAD            ldx #$0DEAD
+2014  108EBEEF          ldy #$0BEEF
+2018  12                nop
+2019  12                nop
+201A  12                nop
+                        
+                        ; Populate memory with test values
+                        ; 0x1200: 12 34
+                        ; 0x1204: 12 38
+                        ; 0x1212: 88 99
+                        ; 0x1234: 12 34 56 78 DE AD BE EF 
+                        ; 0x1258: 33 44 55 66 
+                        ; 0x1260: 33 44
+                        ; 0x8E12: 66 77
+                        ; 0x8F38: 5A 5B 
+                        ; 0x8F40: 12 34 
+                        
+201B  108E1200          ldy #$01200
+201F  8E1234            ldx #$01234
+2022  AFA4              stx ,Y    
+2024  108E1204          ldy #$01204
+2028  8E1238            ldx #$01238
+202B  AFA4              stx ,Y  
+202D  108E1234          ldy #$01234
+2031  8E1234            ldx #$01234
+2034  AFA4              stx ,Y
+2036  8E1236            ldx #$01236
+2039  108E5678          ldy #$05678
+203D  10AF84            sty ,X
+2040  CE1238            ldu #$01238
+2043  10CEDEAD          lds #$0DEAD
+2047  10EFC4            sts ,U
+204A  10CE123A          lds #$0123A
+204E  CEBEEF            ldu #$0BEEF
+2051  EFE4              stu ,S
+2053  CE1258            ldu #$01258
+2056  10CE3344          lds #$03344
+205A  10EFC4            sts ,U
+205D  10CE125A          lds #$0125A
+2061  CE5566            ldu #$05566
+2064  EFE4              stu ,S
+2066  10CE8F38          lds #$08F38
+206A  CE5A5B            ldu #$05A5B
+206D  EFE4              stu ,S
+206F  10CE8F40          lds #$08F40
+2073  CE1234            ldu #$01234
+2076  EFE4              stu ,S
+2078  10CE8E12          lds #$08E12
+207C  CE6677            ldu #$06677
+207F  EFE4              stu ,S
+2081  10CE1212          lds #$01212
+2085  CE8899            ldu #$08899
+2088  EFE4              stu ,S
+208A  CE1260            ldu #$01260
+208D  10CE3344          lds #$03344
+2091  10EFC4            sts ,U
+2094  12                nop
+2095  12                nop
+2096  12                nop
+                        
+                        
+                        ; ----------------------------------------
+                        ; Test - Loads
+                        ; ----------------------------------------
+                        
+                        ; Direct  
+                        ; ----------
+2097  8612              lda #$012  
+2099  1E8B              exg a,dp          ; Set the Direct Page
+209B                    SETDP 0x012       ; Tell the assembler about it
+                        
+209B  9634              lda <$034  
+209D  8112              cmpa #0x012
+209F  10261192          lbne FAIL
+                        
+20A3  D635              ldb <$035  
+20A5  C134              cmpb #0x034
+20A7  1026118A          lbne FAIL
+                        
+20AB  DC36              ldd <$036
+20AD  10835678          cmpd #0x05678
+20B1  10261180          lbne FAIL
+                       
+20B5  DE38              ldu <$038
+20B7  1183DEAD          cmpu #0x0DEAD
+20BB  10261176          lbne FAIL
+                      
+20BF  10DE3A            lds <$03a
+20C2  118CBEEF          cmps #0x0BEEF
+20C6  1026116B          lbne FAIL
+                      
+20CA  9E35              ldx <$035
+20CC  8C3456            cmpx #0x03456
+20CF  10261162          lbne FAIL
+                      
+20D3  109E37            ldy <$037 
+20D6  108C78DE          cmpy #0x078DE
+20DA  10261157          lbne FAIL
+                      
+20DE  12                nop
+20DF  12                nop
+20E0  12                nop
+                       
+                      
+                        ; Extended Direct                 
+                        ; -----------------
+20E1  B6123B            lda >$0123B   
+20E4  81EF              cmpa #0x0EF
+20E6  1026114B          lbne FAIL
+                        
+20EA  F6123A            ldb >$0123a   
+20ED  C1BE              cmpb #0x0BE
+20EF  10261142          lbne FAIL
+                        
+20F3  FC1238            ldd >$01238   
+20F6  1083DEAD          cmpd #0x0DEAD
+20FA  10261137          lbne FAIL
+                       
+20FE  FE1234            ldu >$01234
+2101  11831234          cmpu #0x01234
+2105  1026112C          lbne FAIL
+                      
+2109  10FE1234          lds >$01234
+210D  118C1234          cmps #0x01234
+2111  10261120          lbne FAIL
+                      
+2115  BE1235            ldx >$01235
+2118  8C3456            cmpx #0x03456
+211B  10261116          lbne FAIL
+                      
+211F  10BE1236          ldy >$01236 
+2123  108C5678          cmpy #0x05678
+2127  1026110A          lbne FAIL
+                      
+212B  12                nop
+212C  12                nop
+212D  12                nop  
+                      
+                      
+                      
+                        ; Indexed - Extended Indirect                 
+                        ; ---------------------------
+                        
+                        ; Load memory with the indirect pointers - addresses + 0x0030
+                        ; 0x1400: 0x1234
+                        ; 0x1410: 0x1238
+                      
+212E  108E1400          ldy #$01400
+2132  8E1234            ldx #$01234
+2135  AFA4              stx ,Y
+2137  8E1410            ldx #$01410
+213A  108E1238          ldy #$01238
+213E  10AF84            sty ,X
+                      
+                         
+2141  A69F1400          lda [$01400]  
+2145  8112              cmpa #0x012
+2147  102610EA          lbne FAIL
+                        
+214B  E69F1400          ldb [$01400]  
+214F  C112              cmpb #0x012
+2151  102610E0          lbne FAIL
+                        
+2155  EC9F1400          ldd [$01400]  
+2159  10831234          cmpd #0x01234
+215D  102610D4          lbne FAIL
+                       
+2161  EE9F1410          ldu [$01410]
+2165  1183DEAD          cmpu #0x0DEAD
+2169  102610C8          lbne FAIL
+                      
+216D  10EE9F1410        lds [$01410]
+2172  118CDEAD          cmps #0x0DEAD
+2176  102610BB          lbne FAIL
+                      
+217A  AE9F1400          ldx [$01400]
+217E  8C1234            cmpx #0x01234
+2181  102610B0          lbne FAIL
+                      
+2185  10AE9F1400        ldy [$01400] 
+218A  108C1234          cmpy #0x01234
+218E  102610A3          lbne FAIL
+                      
+2192  12                nop
+2193  12                nop
+2194  12                nop  
+                      
+                        
+                      
+                        ; Indexed - Non-Indirect Register with opcode offsets from register 
+                        ; ------------------------------------------------------------------
+                        
+2195  CE1234            ldu #$01234       ; Set R index registers
+2198  10CE1238          lds #$01238
+219C  8E1234            ldx #$01234
+219F  108E1238          ldy #$01238
+                        
+21A3  A6C4              lda ,U            ; Indexed - Non-Indirect Register (no offset) 
+21A5  8112              cmpa #0x012
+21A7  1026108A          lbne FAIL
+                        
+21AB  A67F              lda -1,S          ; Indexed - Non-Indirect Register (5-bit offset) 
+21AD  8178              cmpa #0x078
+21AF  10261082          lbne FAIL
+                        
+21B3  A6E820            lda 32,S          ; Indexed - Non-Indirect Register (8-bit offset) 
+21B6  8133              cmpa #0x033
+21B8  10261079          lbne FAIL
+                        
+21BC  A6E97D00          lda 32000,S       ; Indexed - Non-Indirect Register (16-bit offset) 
+21C0  815A              cmpa #0x05A
+21C2  1026106F          lbne FAIL
+                      
+                        
+21C6  E6A4              ldb ,Y            ; Indexed - Non-Indirect Register (no offset)
+21C8  C1DE              cmpb #0x0DE
+21CA  10261067          lbne FAIL
+                        
+21CE  8602              lda #2            ; Indexed - Non-Indirect Register (Accumulator-A offset)
+21D0  E6A6              ldb A,Y            
+21D2  C1BE              cmpb #0x0BE
+21D4  1026105D          lbne FAIL
+                        
+21D8  C603              ldb #3            ; Indexed - Non-Indirect Register (Accumulator-B offset)
+21DA  A6A5              lda B,Y            
+21DC  81EF              cmpa #0x0EF
+21DE  10261053          lbne FAIL
+                          
+21E2  CC0001            ldd #1            ; Indexed - Non-Indirect Register (Accumulator-B offset)
+21E5  A6AB              lda D,Y            
+21E7  81AD              cmpa #0x0AD
+21E9  10261048          lbne FAIL
+                        
+                        
+                      
+21ED  ECE4              ldd ,S            ; Indexed - Non-Indirect Register (no offset)
+21EF  1083DEAD          cmpd #0x0DEAD
+21F3  1026103E          lbne FAIL
+                       
+21F7  ECE0              ldd ,S+           ; Indexed - Non-Indirect Register (Post-increment)
+21F9  1083DEAD          cmpd #0x0DEAD
+21FD  10261034          lbne FAIL
+                        
+2201  ECE0              ldd ,S+           ; Indexed - Non-Indirect Register (Post-increment +1)
+2203  1083ADBE          cmpd #0x0ADBE
+2207  1026102A          lbne FAIL
+                         
+220B  ECE1              ldd ,S++          ; Indexed - Non-Indirect Register (Post-increment +2)
+220D  1083BEEF          cmpd #0x0BEEF
+2211  10261020          lbne FAIL
+                       
+2215  8E1238            ldx #$01238
+2218  EE82              ldu ,-X           ; Indexed - Non-Indirect Register (Pre-decrement -1)
+221A  118378DE          cmpu #0x078DE
+221E  10261013          lbne FAIL
+                      
+2222                  PCR_LABEL 
+2222  8E1238            ldx #$01238
+2225  EE83              ldu ,--X                      ; Indexed - Non-Indirect Register (Pre-decrement -2)
+2227  11835678          cmpu #0x05678
+222B  10261006          lbne FAIL
+                          
+222F  A68CF0            lda PCR_LABEL,PCR             ; Indexed - Non-Indirect PCR - PC Relative - 8-bit offset  
+2232  818E              cmpa #0x08E
+2234  10260FFD          lbne FAIL
+                           
+2238  A68DFDC4          lda op_LOAD_STORES,PCR        ; Indexed - Non-Indirect PCR - PC Relative - 16-bit offset  
+223C  8112              cmpa #0x012
+223E  10260FF3          lbne FAIL
+                        
+                      
+2242  A69CDD            lda [PCR_LABEL,PCR]           ; Indexed - Indirect PCR - PC Relative - 8-bit offset  
+2245  8166              cmpa #0x066
+2247  10260FEA          lbne FAIL
+                        
+224B  A69DFDB1          lda [op_LOAD_STORES,PCR]      ; Indexed - Indirect PCR - PC Relative - 16-bit offset  
+224F  8188              cmpa #0x088
+2251  10260FE0          lbne FAIL
+                             
+                        
+                        
+                        
+2255  CE1234            ldu #$01234       ; Restore R index registers
+2258  10CE1238          lds #$01238
+225C  8E1234            ldx #$01234
+225F  108E1238          ldy #$01238
+                      
+2263  EE84              ldu ,X
+                       
+                      
+2265  10CE1200          lds #$01200           ; Indexed - Indirect Register (8-bit offset)
+2269  A6F804            lda [4,S]          
+226C  11831234          cmpu #0x01234
+2270  10260FC1          lbne FAIL
+                      
+2274  10EEA4            lds ,Y
+2277  118CDEAD          cmps #0x0DEAD
+227B  10260FB6          lbne FAIL
+                      
+227F  AEA4              ldx ,Y
+2281  8CDEAD            cmpx #0x0DEAD
+2284  10260FAD          lbne FAIL
+                      
+2288  10AEA4            ldy ,Y
+228B  108CDEAD          cmpy #0x0DEAD
+228F  10260FA2          lbne FAIL
+2293  81DE              cmpa #0x0DE
+2295  10260F9C          lbne FAIL
+                      
+2299  10CE1300          lds #$01300           ; Indexed - Indirect Register (16-bit offset)
+229D  A6F9FF00          lda [(-0x00100),S]            
+22A1  8112              cmpa #0x012
+22A3  10260F8E          lbne FAIL
+                       
+22A7  CE11FF            ldu #$011FF           ; Indexed - Indirect Register (Accumulator-A offset)
+22AA  8601              lda #$00001
+22AC  A6D6              lda [A,U]         
+22AE  8112              cmpa #0x012
+22B0  10260F81          lbne FAIL
+                         
+22B4  CE11FF            ldu #$011FF           ; Indexed - Indirect Register (Accumulator-B offset)
+22B7  C601              ldb #$00001
+22B9  A6D5              lda [B,U]         
+22BB  8112              cmpa #0x012
+22BD  10260F74          lbne FAIL
+                          
+22C1  CE10FF            ldu #$010FF           ; Indexed - Indirect Register (Accumulator-D offset)
+22C4  CC0101            ldd #$00101
+22C7  A6DB              lda [D,U]         
+22C9  8112              cmpa #0x012
+22CB  10260F66          lbne FAIL
+                        
+                         
+22CF  10CE1200          lds #$01200
+22D3  10AEF1            ldy [,S++]            ; Indexed - ndirect Register (Post-increment +2)
+22D6  108C1234          cmpy #0x01234
+22DA  10260F57          lbne FAIL
+22DE  118C1202          cmps #0x01202
+22E2  10260F4F          lbne FAIL
+                         
+                         
+22E6  10CE1202          lds #$01202
+22EA  10AEF3            ldy [,--S]            ; Indexed - ndirect Register (Pre_decement -2)
+22ED  108C1234          cmpy #0x01234
+22F1  10260F40          lbne FAIL
+22F5  118C1200          cmps #0x01200
+22F9  10260F38          lbne FAIL
+22FD  12                nop
+22FE  12                nop
+22FF  12                nop
+                      
+                      
+                        ; ----------------------------------------
+                        ; Test - Stores
+                        ; ----------------------------------------
+                        
+2300  8618              lda #$018  
+2302  1E8B              exg a,dp          ; Set the Direct Page
+2304                    SETDP 0x018       ; Tell the assembler about it
+                        
+2304  108E1A00          ldy #$01A00       ; Store same pattern at 0x1800, 0x1900, 0x1A00 using each of the addressing modes
+2308  86AA              lda #0x0AA
+230A  9700              sta <0x00
+230C  B71900            sta >0x1900
+230F  A7A0              sta ,Y+
+2311  C6BB              ldb #0x0BB
+2313  D701              stb <0x01
+2315  F71901            stb >0x1901
+2318  E7A0              stb ,Y+
+231A  CCD00D            ldd #0x0D00D
+231D  DD02              std <0x02
+231F  FD1902            std >0x1902
+2322  EDA1              std ,Y++
+2324  10CE5005          lds #0x05005
+2328  10DF04            sts <0x04
+232B  10FF1904          sts >0x1904
+232F  10EFA1            sts ,Y++
+2332  CE6006            ldu #0x06006
+2335  DF06              stu <0x06
+2337  FF1906            stu >0x1906
+233A  EFA1              stu ,Y++
+233C  8E1001            ldx #0x01001
+233F  9F08              stx <0x08
+2341  BF1908            stx >0x1908
+2344  AFA1              stx ,Y++
+                        
+2346  C600              ldb #0x00
+2348  CC0000            ldd #0x00
+234B  10CE0000          lds #0x00
+234F  CE0000            ldu #0x00
+2352  8E0000            ldx #0x00
+2355  108E0000          ldy #0x00
+                         
+2359  9600              lda <0x00
+235B  81AA              cmpa #$0AA
+235D  10260ED4          lbne FAIL 
+2361  8600              lda #0x00
+2363  B61900            lda >0x1900
+2366  81AA              cmpa #$0AA
+2368  10260EC9          lbne FAIL 
+                         
+236C  D601              ldb <0x01
+236E  C1BB              cmpb #$0BB
+2370  10260EC1          lbne FAIL 
+2374  C600              ldb #0x00
+2376  F61901            ldb >0x1901
+2379  C1BB              cmpb #$0BB
+237B  10260EB6          lbne FAIL 
+                      
+                         
+237F  DC02              ldd <0x02
+2381  1083D00D          cmpd #$0D00D
+2385  10260EAC          lbne FAIL 
+2389  CC0000            ldd #0x00
+238C  FC1902            ldd >0x1902
+238F  1083D00D          cmpd #$0D00D
+2393  10260E9E          lbne FAIL 
+                         
+2397  10DE04            lds <0x04
+239A  118C5005          cmps #$05005
+239E  10260E93          lbne FAIL 
+23A2  10CE0000          lds #0x00
+23A6  10FE1904          lds >0x1904
+23AA  118C5005          cmps #$05005
+23AE  10260E83          lbne FAIL 
+                         
+23B2  DE06              ldu <0x06
+23B4  11836006          cmpu #0x06006
+23B8  10260E79          lbne FAIL 
+23BC  CE0000            ldu #0x00
+23BF  FE1906            ldu >0x1906
+23C2  11836006          cmpu #0x06006
+23C6  10260E6B          lbne FAIL 
+                         
+23CA  9E08              ldx <0x08
+23CC  8C1001            cmpx #$01001
+23CF  10260E62          lbne FAIL 
+23D3  8E0000            ldx #0x00
+23D6  BE1908            ldx >0x1908
+23D9  8C1001            cmpx #$01001
+23DC  10260E55          lbne FAIL 
+                        
+                        ; LEA tests
+23E0  108E1234          ldy #0x01234
+23E4  32A4              leas ,Y
+23E6  118C1234          cmps #0x01234
+23EA  10260E47          lbne FAIL 
+23EE  33A4              leau ,Y
+23F0  11831234          cmpu #0x01234
+23F4  10260E3D          lbne FAIL 
+23F8  30A4              leax ,Y
+23FA  8C1234            cmpx #0x01234
+23FD  10260E34          lbne FAIL 
+2401  8E1234            ldx #0x01234
+2404  3184              leay ,X
+2406  108C1234          cmpy #0x01234
+240A  10260E27          lbne FAIL 
+                        
+                      
+                      ;-----------------------------------------------------------
+                      ;-----------------------------------------------------------  
+                      
+                      
+                      ; Test brsnche and jump opcodes
+                      ; ----------------------------------------------------------------------
+240E                  op_BRANCHES_JUMPS   
+240E  12                nop
+240F  12                nop
+2410  12                nop
+                        
+2411  2006              bra BRANCHES_JUMPS_START
+                      
+2413                  LOCAL_FAIL  
+2413  7E2413            jmp LOCAL_FAIL
+                        
+2416                  SUBROUTINE_TEST
+2416  12                nop
+2417  12                nop
+2418  39                rts
+                        
+                        
+2419                  BRANCHES_JUMPS_START
+                        
+                        ; Branches - set CC manually then test branch
+                        
+2419  1CF0              andcc #0x0F0      ; Clear arithmetic flags
+241B  102B0E16          lbmi FAIL         ; branch if N=1    
+241F  10270E12          lbeq FAIL         ; branch if Z=1    
+2423  10290E0E          lbvs FAIL         ; branch if V=1    
+2427  10250E0A          lbcs FAIL         ; branch if C=1    
+                        
+242B  2BE6              bmi LOCAL_FAIL    ; branch if N=1    
+242D  27E4              beq LOCAL_FAIL    ; branch if Z=1    
+242F  29E2              bvs LOCAL_FAIL    ; branch if V=1    
+2431  25E0              bcs LOCAL_FAIL    ; branch if C=1    
+                          
+2433  1A0F              orcc #0x00F       ; Set arithmetic flags
+2435  102A0DFC          lbpl FAIL         ; branch if N=0    
+2439  10260DF8          lbne FAIL         ; branch if Z=0    
+243D  10280DF4          lbvc FAIL         ; branch if V=0    
+2441  10240DF0          lbcc FAIL         ; branch if C=0    
+                        
+2445  2ACC              bpl LOCAL_FAIL    ; branch if N=0    
+2447  26CA              bne LOCAL_FAIL    ; branch if Z=0    
+2449  28C8              bvc LOCAL_FAIL    ; branch if V=0    
+244B  24C6              bcc LOCAL_FAIL    ; branch if C=0    
+                        
+244D  2DC4              blt LOCAL_FAIL    ; branch if flag_n!=flag_v    
+244F  102DFFC0          lblt LOCAL_FAIL      
+                          
+2453  2EBE              bgt LOCAL_FAIL    ; branch if (flag_n==flag_v) && (flag_z==0)    
+2455  102EFFBA          lbgt LOCAL_FAIL       
+                         
+2459  1CF7              andcc #0x0F7      ; Clear n flag
+245B  2CB6              bge LOCAL_FAIL    ; branch if flag_n==flag_v    
+245D  102CFFB2          lbge LOCAL_FAIL      
+                           
+2461  1A01              orcc #0x001       ; Set c flag
+2463  22AE              bhi LOCAL_FAIL    ; branch if (flag_z==0) && (flag_c==0)    
+2465  1022FFAA          lbhi LOCAL_FAIL      
+                        
+2469  1CF8              andcc #0x0F8      ; Clear z,v,c flags
+246B  2FA6              ble LOCAL_FAIL    ; branch if (flag_n!=flag_v) || (flag_z==1)   
+246D  102FFFA2          lble LOCAL_FAIL      
+                          
+2471  23A0              bls LOCAL_FAIL    ; branch if (flag_z!=0) || (flag_c!=0)    
+2473  1023FF9C          lbls LOCAL_FAIL      
+                             
+2477  160003            lbra BRANCHES_CONTINUE
+                      
+247A                  LOCAL_FAIL2  
+247A  7E247A            jmp LOCAL_FAIL2
+                        
+247D                  BRANCHES_CONTINUE
+247D  21FB              brn  LOCAL_FAIL2
+247F  1021FFF7          lbrn LOCAL_FAIL2
+                        
+2483  8D91              bsr  SUBROUTINE_TEST  ; Branch Subroutine
+2485  BD2416            jsr  SUBROUTINE_TEST  ; Jump Subroutine
+2488  17FF8B            lbsr SUBROUTINE_TEST  ; Long Branch Subroutine
+                        
+                        
+                        
+                      
+                      
+                      ;-----------------------------------------------------------
+                      ;-----------------------------------------------------------  
+                      
+                        
+                      ; Test - Addition and subtraction 
+                      ; ----------------------------------------------------------------------
+248B                  op_ADD_SUB   
+248B  12                nop
+248C  12                nop
+248D  12                nop
+                        
+248E  8612              lda #$012  
+2490  1E8B              exg a,dp          ; Set the Direct Page
+2492                    SETDP 0x012       ; Tell the assembler about it
+                      
+                      ; Addition
+                      ; ------------
+                      
+2492  8E1234            ldx #0x01234
+2495  C602              ldb #0x02
+2497  3A                abx
+2498  8C1236            cmpx #0x01236
+249B  10260D96          lbne FAIL 
+                          
+249F  8602              lda #0x02         ; ADDA Immediate
+24A1  8B02              adda #0x02
+24A3  8104              cmpa #0x004
+24A5  10260D8C          lbne FAIL 
+                            
+24A9  8602              lda #0x02         ; ADDA Direct
+24AB  9B34              adda <$034
+24AD  8114              cmpa #0x014
+24AF  10260D82          lbne FAIL 
+                           
+24B3  8E1200            ldx #0x01200      ; ADDA Indexed
+24B6  8602              lda #0x02
+24B8  AB84              adda ,X
+24BA  8114              cmpa #0x014
+24BC  10260D75          lbne FAIL 
+                            
+24C0  8602              lda #0x02         ; ADDA Extended
+24C2  BB1234            adda >$01234
+24C5  8114              cmpa #0x014
+24C7  10260D6A          lbne FAIL 
+                        
+                        
+24CB  C602              ldb #0x02         ; ADDB Immediate
+24CD  CB02              addb #0x02
+24CF  C104              cmpb #0x004
+24D1  10260D60          lbne FAIL 
+                            
+24D5  C602              ldb #0x02         ; ADDB Direct
+24D7  DB34              addb <$034
+24D9  C114              cmpb #0x014
+24DB  10260D56          lbne FAIL 
+                           
+24DF  8E1200            ldx #0x01200      ; ADDB Indexed
+24E2  C602              ldb #0x02
+24E4  EB84              addb ,X
+24E6  C114              cmpb #0x014
+24E8  10260D49          lbne FAIL 
+                            
+24EC  C602              ldb #0x02         ; ADDB Extended
+24EE  FB1234            addb >$01234
+24F1  C114              cmpb #0x014
+24F3  10260D3E          lbne FAIL 
+                        
+                      
+24F7  CC1002            ldd #0x01002      ; ADDD Immediate
+24FA  C30002            addd #0x02
+24FD  10831004          cmpd #0x01004
+2501  10260D30          lbne FAIL 
+                            
+2505  CC1002            ldd #0x01002      ; ADDD Direct
+2508  D334              addd <$034
+250A  10832236          cmpd #0x02236
+250E  10260D23          lbne FAIL 
+                           
+2512  8E1200            ldx #0x01200      ; ADDD Indexed
+2515  CC0002            ldd #0x02
+2518  E384              addd ,X
+251A  10831236          cmpd #0x01236
+251E  10260D13          lbne FAIL 
+                            
+2522  CC0002            ldd #0x02         ; ADDD Extended
+2525  F31234            addd >$01234
+2528  10831236          cmpd #0x01236
+252C  10260D05          lbne FAIL 
+                        
+                        
+                      
+2530  8602              lda #0x02         ; ADCA Immediate
+2532  1A01              orcc #0x001       ; Set Carry flag
+2534  8902              adca #0x02
+2536  8105              cmpa #0x005
+2538  10260CF9          lbne FAIL 
+                            
+253C  8602              lda #0x02         ; ADCA Direct
+253E  1A01              orcc #0x001       ; Set Carry flag
+2540  9934              adca <$034
+2542  8115              cmpa #0x015
+2544  10260CED          lbne FAIL 
+                           
+2548  8E1200            ldx #0x01200      ; ADCA Indexed
+254B  8602              lda #0x02
+254D  1A01              orcc #0x001       ; Set Carry flag
+254F  A984              adca ,X
+2551  8115              cmpa #0x015
+2553  10260CDE          lbne FAIL 
+                            
+2557  8602              lda #0x02         ; ADCA Extended
+2559  1A01              orcc #0x001       ; Set Carry flag
+255B  B91234            adca >$01234
+255E  8115              cmpa #0x015
+2560  10260CD1          lbne FAIL 
+                        
+                          
+                      
+2564  C602              ldb #0x02         ; ADCB Immediate
+2566  1A01              orcc #0x001       ; Set Carry flag
+2568  C902              adcb #0x02
+256A  C105              cmpb #0x005
+256C  10260CC5          lbne FAIL 
+                            
+2570  C602              ldb #0x02         ; ADCB Direct
+2572  1A01              orcc #0x001       ; Set Carry flag
+2574  D934              adcb <$034
+2576  C115              cmpb #0x015
+2578  10260CB9          lbne FAIL 
+                           
+257C  8E1200            ldx #0x01200      ; ADCB Indexed
+257F  C602              ldb #0x02
+2581  1A01              orcc #0x001       ; Set Carry flag
+2583  E984              adcb ,X
+2585  C115              cmpb #0x015
+2587  10260CAA          lbne FAIL 
+                            
+258B  C602              ldb #0x02         ; ADCB Extended
+258D  1A01              orcc #0x001       ; Set Carry flag
+258F  F91234            adcb >$01234
+2592  C115              cmpb #0x015
+2594  10260C9D          lbne FAIL 
+                        
+                        
+                      ; Subtraction
+                      ; ------------
+                      
+2598  8602              lda #0x02         ; SUBA Immediate
+259A  8002              suba #0x02
+259C  8100              cmpa #0x00
+259E  10260C93          lbne FAIL 
+                            
+25A2  8612              lda #0x12         ; SUBA Direct
+25A4  9034              suba <$034
+25A6  8100              cmpa #0x000
+25A8  10260C89          lbne FAIL 
+                           
+25AC  8E1200            ldx #0x01200      ; SUBA Indexed
+25AF  8612              lda #0x012
+25B1  A084              suba ,X
+25B3  8100              cmpa #0x000
+25B5  10260C7C          lbne FAIL 
+                            
+25B9  8612              lda #0x012        ; SUBA Extended
+25BB  B01234            suba >$01234
+25BE  8100              cmpa #0x000
+25C0  10260C71          lbne FAIL 
+                        
+                        
+25C4  C602              ldb #0x02         ; SUBB Immediate
+25C6  C002              subb #0x02
+25C8  C100              cmpb #0x000
+25CA  10260C67          lbne FAIL 
+                            
+25CE  C612              ldb #0x012        ; SUBB Direct
+25D0  D034              subb <$034
+25D2  C100              cmpb #0x00
+25D4  10260C5D          lbne FAIL 
+                           
+25D8  8E1200            ldx #0x01200      ; SUBB Indexed
+25DB  C612              ldb #0x012
+25DD  E084              subb ,X
+25DF  C100              cmpb #0x00
+25E1  10260C50          lbne FAIL 
+                            
+25E5  C612              ldb #0x012        ; SUBB Extended
+25E7  F01234            subb >$01234
+25EA  C100              cmpb #0x00
+25EC  10260C45          lbne FAIL 
+                        
+                      
+25F0  CC1234            ldd #0x01234      ; SUBD Immediate
+25F3  831234            subd #0x01234
+25F6  10830000          cmpd #0x00
+25FA  10260C37          lbne FAIL 
+                            
+25FE  CC1234            ldd #0x01234      ; SUBD Direct
+2601  9334              subd <$034
+2603  10830000          cmpd #0x00
+2607  10260C2A          lbne FAIL 
+                           
+260B  8E1234            ldx #0x01234      ; SUBD Indexed
+260E  CC1234            ldd #0x01234
+2611  A384              subd ,X
+2613  10830000          cmpd #0x00
+2617  10260C1A          lbne FAIL 
+                            
+261B  CC1234            ldd #0x01234      ; SUBD Extended
+261E  B31234            subd >$01234
+2621  10830000          cmpd #0x00
+2625  10260C0C          lbne FAIL 
+                        
+                        
+                      
+2629  8603              lda #0x03         ; SBCA Immediate
+262B  1A01              orcc #0x001       ; Set Carry flag
+262D  8202              sbca #0x02
+262F  8100              cmpa #0x000
+2631  10260C00          lbne FAIL 
+                            
+2635  8613              lda #0x013        ; SBCA Direct
+2637  1A01              orcc #0x001       ; Set Carry flag
+2639  9234              sbca <$034
+263B  8100              cmpa #0x00
+263D  10260BF4          lbne FAIL 
+                           
+2641  8E1200            ldx #0x01200      ; SBCA Indexed
+2644  8613              lda #0x013
+2646  1A01              orcc #0x001       ; Set Carry flag
+2648  A284              sbca ,X
+264A  8100              cmpa #0x000
+264C  10260BE5          lbne FAIL 
+                            
+2650  8613              lda #0x013        ; SBCA Extended
+2652  1A01              orcc #0x001       ; Set Carry flag
+2654  B21234            sbca >$01234
+2657  8100              cmpa #0x00
+2659  10260BD8          lbne FAIL 
+                        
+                          
+                      
+265D  C603              ldb #0x03         ; SBCB Immediate
+265F  1A01              orcc #0x001       ; Set Carry flag
+2661  C202              sbcb #0x02
+2663  C100              cmpb #0x000
+2665  10260BCC          lbne FAIL 
+                            
+2669  C613              ldb #0x013        ; SBCB Direct
+266B  1A01              orcc #0x001       ; Set Carry flag
+266D  D234              sbcb <$034
+266F  C100              cmpb #0x00
+2671  10260BC0          lbne FAIL 
+                           
+2675  8E1200            ldx #0x01200      ; SBCB Indexed
+2678  C613              ldb #0x013
+267A  1A01              orcc #0x001       ; Set Carry flag
+267C  E284              sbcb ,X
+267E  C100              cmpb #0x000
+2680  10260BB1          lbne FAIL 
+                            
+2684  C613              ldb #0x013        ; SBCB Extended
+2686  1A01              orcc #0x001       ; Set Carry flag
+2688  F21234            sbcb >$01234
+268B  C100              cmpb #0x00
+268D  10260BA4          lbne FAIL 
+                        
+                        
+                                          ; ADDA Flags check
+2691  8600              lda #0x00         
+2693  8B00              adda #0x00        ; Expected: n=0  z=1  v=0  c=0
+2695  102B0B9C          lbmi FAIL         ; branch if N=1    
+2699  10260B98          lbne FAIL         ; branch if Z=0    
+269D  10290B94          lbvs FAIL         ; branch if V=1    
+26A1  10250B90          lbcs FAIL         ; branch if C=1  
+                        
+26A5  86FE              lda #0xFE         
+26A7  8B01              adda #0x01        ; Expected: n=1  z=0  v=0  c=0
+26A9  102A0B88          lbpl FAIL         ; branch if N=0    
+26AD  10270B84          lbeq FAIL         ; branch if Z=1    
+26B1  10290B80          lbvs FAIL         ; branch if V=1    
+26B5  10250B7C          lbcs FAIL         ; branch if C=1      
+                        
+26B9  867E              lda #0x7E         
+26BB  8B03              adda #0x03        ; Expected: v=1
+26BD  10280B74          lbvc FAIL         ; branch if V=0    
+                          
+26C1  86FE              lda #0xFE         
+26C3  8B03              adda #0x03        ; Expected: c=1
+26C5  10240B6C          lbcc FAIL         ; branch if C=0    
+                         
+                        
+                        
+                                          ; SUBA Flags check
+26C9  8600              lda #0x00         
+26CB  8000              suba #0x00        ; Expected: n=0  z=1  v=0  c=0
+26CD  102B0B64          lbmi FAIL         ; branch if N=1    
+26D1  10260B60          lbne FAIL         ; branch if Z=0    
+26D5  10290B5C          lbvs FAIL         ; branch if V=1    
+26D9  10250B58          lbcs FAIL         ; branch if C=1  
+                        
+26DD  86FE              lda #0xFE         
+26DF  8001              suba #0x01        ; Expected: n=1  z=0  v=0  c=0
+26E1  102A0B50          lbpl FAIL         ; branch if N=0    
+26E5  10270B4C          lbeq FAIL         ; branch if Z=1    
+26E9  10290B48          lbvs FAIL         ; branch if V=1    
+26ED  10250B44          lbcs FAIL         ; branch if C=1      
+                        
+26F1  867E              lda #0x7E         
+26F3  8003              suba #0x03        ; Expected: v=0
+26F5  10290B3C          lbvs FAIL         ; branch if V=1    
+                          
+26F9  86FE              lda #0xFE         
+26FB  8003              suba #0x03        ; Expected: c=0
+26FD  10250B34          lbcs FAIL         ; branch if C=1      
+                         
+                      
+                        ; Comparisons
+                        ; --------------
+                        
+                        ; Immediate
+                        ; ---------
+2701  8680              lda #0x080        ; Checking opcode support - flags already checked with SUB tests
+2703  8180              cmpa #0x080
+2705  10260B2C          lbne FAIL 
+                        
+2709  C680              ldb #0x080
+270B  C180              cmpb #0x080
+270D  10260B24          lbne FAIL 
+                         
+2711  CC1111            ldd #0x01111
+2714  10831111          cmpd #0x01111
+2718  10260B19          lbne FAIL 
+                         
+271C  10CE2222          lds #0x02222
+2720  118C2222          cmps #0x02222
+2724  10260B0D          lbne FAIL 
+                         
+2728  CE3333            ldu #0x03333
+272B  11833333          cmpu #0x03333
+272F  10260B02          lbne FAIL 
+                         
+2733  8E4444            ldx #0x04444
+2736  8C4444            cmpx #0x04444
+2739  10260AF8          lbne FAIL 
+                         
+273D  108E5555          ldy #0x05555
+2741  108C5555          cmpy #0x05555
+2745  10260AEC          lbne FAIL 
+                      
+                        
+                        ; Direct  
+                        ; ----------
+2749  8612              lda #$012  
+274B  1E8B              exg a,dp          ; Set the Direct Page
+274D                    SETDP 0x012       ; Tell the assembler about it
+                        
+274D  8612              lda #$012  
+274F  9134              cmpa <0x034
+2751  10260AE0          lbne FAIL
+                          
+2755  C612              ldb #$012  
+2757  D134              cmpb <0x034
+2759  10260AD8          lbne FAIL
+                          
+275D  CC1234            ldd #$01234    
+2760  109334            cmpd <0x034
+2763  10260ACE          lbne FAIL
+                          
+2767  CE1234            ldu #$01234    
+276A  119334            cmpu <0x034
+276D  10260AC4          lbne FAIL
+                        
+2771  10CE1234          lds #$01234    
+2775  119C34            cmps <0x034
+2778  10260AB9          lbne FAIL
+                          
+277C  8E1234            ldx #$01234    
+277F  9C34              cmpx <0x034
+2781  10260AB0          lbne FAIL
+                        
+2785  108E1234          ldy #$01234    
+2789  109C34            cmpy <0x034
+278C  10260AA5          lbne FAIL
+                             
+                          
+                        ; Indexed
+                        ; --------
+                          
+                      
+2790  8E1234            ldx #0x01234  
+                        
+2793  8612              lda #0x012
+2795  A184              cmpa ,X
+2797  10260A9A          lbne FAIL 
+                          
+279B  C612              ldb #0x012
+279D  E184              cmpb ,X
+279F  10260A92          lbne FAIL 
+                          
+27A3  CC1234            ldd #0x01234
+27A6  10A384            cmpd ,X
+27A9  10260A88          lbne FAIL 
+                            
+27AD  10CE1234          lds #0x01234
+27B1  11AC84            cmps ,X
+27B4  10260A7D          lbne FAIL 
+                            
+27B8  CE1234            ldu #0x01234
+27BB  11A384            cmpu ,X
+27BE  10260A73          lbne FAIL 
+                            
+27C2  108E1234          ldy #0x01234
+27C6  10AC84            cmpy ,X
+27C9  10260A68          lbne FAIL 
+                            
+27CD  108E1234          ldy #0x01234  
+27D1  8E1234            ldx #0x01234
+27D4  ACA4              cmpx ,Y
+27D6  10260A5B          lbne FAIL 
+                            
+                            
+                        ; Extended Direct                 
+                        ; -----------------
+27DA  8612              lda #$012 
+27DC  B11234            cmpa >0x01234
+27DF  10260A52          lbne FAIL
+                        
+27E3  C612              ldb #$012 
+27E5  F11234            cmpb >0x01234
+27E8  10260A49          lbne FAIL
+                          
+27EC  CC1234            ldd #$01234   
+27EF  10B31234          cmpd >0x01234
+27F3  10260A3E          lbne FAIL
+                          
+27F7  CE1234            ldu #$01234   
+27FA  11B31234          cmpu >0x01234
+27FE  10260A33          lbne FAIL
+                          
+2802  10CE1234          lds #$01234   
+2806  11BC1234          cmps >0x01234
+280A  10260A27          lbne FAIL
+                          
+280E  8E1234            ldx #$01234   
+2811  BC1234            cmpx >0x01234
+2814  10260A1D          lbne FAIL
+                          
+2818  108E1234          ldy #$01234   
+281C  10BC1234          cmpy >0x01234
+2820  10260A11          lbne FAIL
+                        
+                      
+                         
+                      
+                        ; Increment
+                        ; ---------
+2824  8612              lda #$012 
+2826  4C                inca
+2827  8113              cmpa #0x013
+2829  10260A08          lbne FAIL
+                        
+282D  C622              ldb #$022 
+282F  5C                incb
+2830  C123              cmpb #0x023
+2832  102609FF          lbne FAIL
+                         
+2836  8612              lda #$012  
+2838  1E8B              exg a,dp          ; Set the Direct Page
+283A                    SETDP 0x012       ; Tell the assembler about it
+                        
+283A  0C60              inc <0x060
+283C  D660              ldb <0x060
+283E  C134              cmpb #0x034
+2840  102609F1          lbne FAIL
+                        
+2844  8E1260            ldx #0x01260   
+2847  8612              lda #0x012
+2849  6C84              inc ,X
+284B  D660              ldb <0x060
+284D  C135              cmpb #0x035
+284F  102609E2          lbne FAIL    
+                      
+2853  7C1260            inc >0x01260
+2856  D660              ldb <0x060
+2858  C136              cmpb #0x036
+285A  102609D7          lbne FAIL     
+                        
+                        ; Flags check
+                        ; -----------
+285E  867F              lda #$07F 
+2860  4C                inca
+2861  102809D0          lbvc FAIL         ; branch if V=0    
+2865  102A09CC          lbpl FAIL         ; branch if N=0    
+2869  102709C8          lbeq FAIL         ; branch if Z=1    
+                        
+                        ; Decrement
+                        ; ---------
+286D  8612              lda #$012 
+286F  4A                deca
+2870  8111              cmpa #0x011
+2872  102609BF          lbne FAIL
+                        
+2876  C622              ldb #$022 
+2878  5A                decb
+2879  C121              cmpb #0x021
+287B  102609B6          lbne FAIL
+                         
+287F  8612              lda #$012  
+2881  1E8B              exg a,dp          ; Set the Direct Page
+2883                    SETDP 0x012       ; Tell the assembler about it
+                        
+2883  0A60              dec <0x060
+2885  D660              ldb <0x060
+2887  C135              cmpb #0x035
+2889  102609A8          lbne FAIL
+                        
+288D  8E1260            ldx #0x01260   
+2890  8612              lda #0x012
+2892  6A84              dec ,X
+2894  D660              ldb <0x060
+2896  C134              cmpb #0x034
+2898  10260999          lbne FAIL    
+                      
+289C  7A1260            dec >0x01260
+289F  D660              ldb <0x060
+28A1  C133              cmpb #0x033
+28A3  1026098E          lbne FAIL     
+                        
+                        
+                        ; Flags check
+                        ; -----------
+28A7  8680              lda #$080 
+28A9  4A                deca
+28AA  10280987          lbvc FAIL         ; branch if V=0    
+28AE  102B0983          lbmi FAIL         ; branch if N=1    
+28B2  1027097F          lbeq FAIL         ; branch if Z=1    
+                          
+                      
+                      
+                      ;-----------------------------------------------------------
+                      ;-----------------------------------------------------------  
+                      
+                        
+                      ; Test - Boolean Bit and Test
+                      ;-----------------------------------------------------------  
+                        
+                        ; ---
+                        ; AND
+                        ; ---
+                      
+28B6  8688              lda #0x0088                           ; Immediate
+28B8  84F0              anda #0x0F0
+28BA  10290977          lbvs FAIL         ; branch if V=1    
+28BE  102A0973          lbpl FAIL         ; branch if N=0   
+28C2  1027096F          lbeq FAIL         ; branch if Z=1    
+28C6  8180              cmpa #0x080
+28C8  10260969          lbne FAIL  
+                        
+28CC  C65A              ldb #0x005A   
+28CE  C40F              andb #0x00F
+28D0  10290961          lbvs FAIL         ; branch if V=1    
+28D4  102B095D          lbmi FAIL         ; branch if N=1    
+28D8  10270959          lbeq FAIL         ; branch if Z=1    
+28DC  C10A              cmpb #0x00A
+28DE  10260953          lbne FAIL
+                          
+                          
+28E2  1C00              andcc #0x000
+28E4  1029094D          lbvs FAIL         ; branch if V=1    
+28E8  102B0949          lbmi FAIL         ; branch if N=1    
+28EC  10270945          lbeq FAIL         ; branch if Z=1    
+28F0  1A0F              orcc #0x00F
+28F2  1028093F          lbvc FAIL         ; branch if V=0    
+28F6  102A093B          lbpl FAIL         ; branch if N=0    
+28FA  10260937          lbne FAIL         ; branch if Z=0       
+                      
+                        
+28FE  860F              lda #0x00F                            ; Direct
+2900  9434              anda <$034
+2902  1029092F          lbvs FAIL         ; branch if V=1    
+2906  102B092B          lbmi FAIL         ; branch if N=1    
+290A  10270927          lbeq FAIL         ; branch if Z=1    
+290E  8102              cmpa #0x002
+2910  10260921          lbne FAIL  
+                        
+2914  860F              lda #0x00F                            ; Indexed
+2916  8E1200            ldx #0x01200       
+2919  A484              anda ,X
+291B  10290916          lbvs FAIL         ; branch if V=1    
+291F  102B0912          lbmi FAIL         ; branch if N=1    
+2923  1027090E          lbeq FAIL         ; branch if Z=1    
+2927  8102              cmpa #0x002
+2929  10260908          lbne FAIL  
+                        
+292D  860F              lda #0x00F                            ; Extended
+292F  8E1200            ldx #0x01200       
+2932  B41234            anda >$01234
+2935  102908FC          lbvs FAIL         ; branch if V=1    
+2939  102B08F8          lbmi FAIL         ; branch if N=1    
+293D  102708F4          lbeq FAIL         ; branch if Z=1    
+2941  8102              cmpa #0x002
+2943  102608EE          lbne FAIL  
+                        
+                              
+                        
+2947  C60F              ldb #0x00F                            ; Direct
+2949  D434              andb <$034
+294B  102908E6          lbvs FAIL         ; branch if V=1    
+294F  102B08E2          lbmi FAIL         ; branch if N=1    
+2953  102708DE          lbeq FAIL         ; branch if Z=1    
+2957  C102              cmpb #0x002
+2959  102608D8          lbne FAIL  
+                        
+295D  C60F              ldb #0x00F                            ; Indexed
+295F  8E1200            ldx #0x01200       
+2962  E484              andb ,X
+2964  102908CD          lbvs FAIL         ; branch if V=1    
+2968  102B08C9          lbmi FAIL         ; branch if N=1    
+296C  102708C5          lbeq FAIL         ; branch if Z=1    
+2970  C102              cmpb #0x002
+2972  102608BF          lbne FAIL  
+                        
+2976  C60F              ldb #0x00F                            ; Extended
+2978  8E1200            ldx #0x01200       
+297B  F41234            andb >$01234
+297E  102908B3          lbvs FAIL         ; branch if V=1    
+2982  102B08AF          lbmi FAIL         ; branch if N=1    
+2986  102708AB          lbeq FAIL         ; branch if Z=1    
+298A  C102              cmpb #0x002
+298C  102608A5          lbne FAIL  
+                        
+                              
+                      
+                        ; ---
+                        ; OR
+                        ; ---
+                      
+2990  860A              lda #0x000A                           ; Immediate
+2992  8A50              ora #0x050
+2994  1029089D          lbvs FAIL         ; branch if V=1    
+2998  102B0899          lbmi FAIL         ; branch if N=1    
+299C  10270895          lbeq FAIL         ; branch if Z=1    
+29A0  815A              cmpa #0x5A
+29A2  1026088F          lbne FAIL  
+                        
+29A6  C6A0              ldb #0x00A0   
+29A8  CA05              orb #0x005
+29AA  10290887          lbvs FAIL         ; branch if V=1    
+29AE  102A0883          lbpl FAIL         ; branch if N=0    
+29B2  1027087F          lbeq FAIL         ; branch if Z=1    
+29B6  C1A5              cmpb #0x0A5
+29B8  10260879          lbne FAIL
+                          
+                            
+29BC  1A0F              orcc #0x00F
+29BE  10280873          lbvc FAIL         ; branch if V=0    
+29C2  102A086F          lbpl FAIL         ; branch if N=0    
+29C6  1026086B          lbne FAIL         ; branch if Z=0       
+                      
+                        
+29CA  860F              lda #0x00F                            ; Direct
+29CC  9A34              ora <$034
+29CE  10290863          lbvs FAIL         ; branch if V=1    
+29D2  102B085F          lbmi FAIL         ; branch if N=1    
+29D6  1027085B          lbeq FAIL         ; branch if Z=1    
+29DA  811F              cmpa #0x01F
+29DC  10260855          lbne FAIL  
+                        
+29E0  860F              lda #0x00F                            ; Indexed
+29E2  8E1200            ldx #0x01200       
+29E5  AA84              ora ,X
+29E7  1029084A          lbvs FAIL         ; branch if V=1    
+29EB  102B0846          lbmi FAIL         ; branch if N=1    
+29EF  10270842          lbeq FAIL         ; branch if Z=1    
+29F3  811F              cmpa #0x01F
+29F5  1026083C          lbne FAIL  
+                        
+29F9  860F              lda #0x00F                            ; Extended
+29FB  8E1200            ldx #0x01200       
+29FE  BA1234            ora >$01234
+2A01  10290830          lbvs FAIL         ; branch if V=1    
+2A05  102B082C          lbmi FAIL         ; branch if N=1    
+2A09  10270828          lbeq FAIL         ; branch if Z=1    
+2A0D  811F              cmpa #0x01F
+2A0F  10260822          lbne FAIL  
+                          
+2A13  C60F              ldb #0x00F                            ; Direct
+2A15  DA34              orb <$034
+2A17  1029081A          lbvs FAIL         ; branch if V=1    
+2A1B  102B0816          lbmi FAIL         ; branch if N=1    
+2A1F  10270812          lbeq FAIL         ; branch if Z=1    
+2A23  C11F              cmpb #0x01F
+2A25  1026080C          lbne FAIL  
+                        
+2A29  C60F              ldb #0x00F                            ; Indexed
+2A2B  8E1200            ldx #0x01200       
+2A2E  EA84              orb ,X
+2A30  10290801          lbvs FAIL         ; branch if V=1    
+2A34  102B07FD          lbmi FAIL         ; branch if N=1    
+2A38  102707F9          lbeq FAIL         ; branch if Z=1    
+2A3C  C11F              cmpb #0x01F
+2A3E  102607F3          lbne FAIL  
+                        
+2A42  C60F              ldb #0x00F                            ; Extended
+2A44  8E1200            ldx #0x01200       
+2A47  FA1234            orb >$01234
+2A4A  102907E7          lbvs FAIL         ; branch if V=1    
+2A4E  102B07E3          lbmi FAIL         ; branch if N=1    
+2A52  102707DF          lbeq FAIL         ; branch if Z=1    
+2A56  C11F              cmpb #0x01F
+2A58  102607D9          lbne FAIL  
+                        
+                              
+                      
+                              
+                      
+                        ; ----
+                        ; EOR
+                        ; ----
+                      
+2A5C  860A              lda #0x000A                           ; Immediate
+2A5E  8850              eora #0x050
+2A60  102907D1          lbvs FAIL         ; branch if V=1    
+2A64  102B07CD          lbmi FAIL         ; branch if N=1    
+2A68  102707C9          lbeq FAIL         ; branch if Z=1    
+2A6C  815A              cmpa #0x5A
+2A6E  102607C3          lbne FAIL  
+                        
+2A72  C6A0              ldb #0x00A0   
+2A74  C805              eorb #0x005
+2A76  102907BB          lbvs FAIL         ; branch if V=1    
+2A7A  102A07B7          lbpl FAIL         ; branch if N=0    
+2A7E  102707B3          lbeq FAIL         ; branch if Z=1    
+2A82  C1A5              cmpb #0x0A5
+2A84  102607AD          lbne FAIL
+                            
+                            
+2A88  860F              lda #0x00F                            ; Direct
+2A8A  9834              eora <$034
+2A8C  102907A5          lbvs FAIL         ; branch if V=1    
+2A90  102B07A1          lbmi FAIL         ; branch if N=1    
+2A94  1027079D          lbeq FAIL         ; branch if Z=1    
+2A98  811D              cmpa #0x01D
+2A9A  10260797          lbne FAIL  
+                        
+2A9E  860F              lda #0x00F                            ; Indexed
+2AA0  8E1200            ldx #0x01200       
+2AA3  A884              eora ,X
+2AA5  1029078C          lbvs FAIL         ; branch if V=1    
+2AA9  102B0788          lbmi FAIL         ; branch if N=1    
+2AAD  10270784          lbeq FAIL         ; branch if Z=1    
+2AB1  811D              cmpa #0x01D
+2AB3  1026077E          lbne FAIL  
+                        
+2AB7  860F              lda #0x00F                            ; Extended
+2AB9  8E1200            ldx #0x01200       
+2ABC  B81234            eora >$01234
+2ABF  10290772          lbvs FAIL         ; branch if V=1    
+2AC3  102B076E          lbmi FAIL         ; branch if N=1    
+2AC7  1027076A          lbeq FAIL         ; branch if Z=1    
+2ACB  811D              cmpa #0x01D
+2ACD  10260764          lbne FAIL  
+                          
+2AD1  C60F              ldb #0x00F                            ; Direct
+2AD3  D834              eorb <$034
+2AD5  1029075C          lbvs FAIL         ; branch if V=1    
+2AD9  102B0758          lbmi FAIL         ; branch if N=1    
+2ADD  10270754          lbeq FAIL         ; branch if Z=1    
+2AE1  C11D              cmpb #0x01D
+2AE3  1026074E          lbne FAIL  
+                        
+2AE7  C60F              ldb #0x00F                            ; Indexed
+2AE9  8E1200            ldx #0x01200       
+2AEC  E884              eorb ,X
+2AEE  10290743          lbvs FAIL         ; branch if V=1    
+2AF2  102B073F          lbmi FAIL         ; branch if N=1    
+2AF6  1027073B          lbeq FAIL         ; branch if Z=1    
+2AFA  C11D              cmpb #0x01D
+2AFC  10260735          lbne FAIL  
+                        
+2B00  C60F              ldb #0x00F                            ; Extended
+2B02  8E1200            ldx #0x01200       
+2B05  F81234            eorb >$01234
+2B08  10290729          lbvs FAIL         ; branch if V=1    
+2B0C  102B0725          lbmi FAIL         ; branch if N=1    
+2B10  10270721          lbeq FAIL         ; branch if Z=1    
+2B14  C11D              cmpb #0x01D
+2B16  1026071B          lbne FAIL  
+                        
+                                    
+                      
+                        ; ----
+                        ; BIT
+                        ; ----
+                      
+2B1A  8688              lda #0x0088                           ; Immediate
+2B1C  85F0              bita #0x0F0
+2B1E  10290713          lbvs FAIL         ; branch if V=1    
+2B22  102A070F          lbpl FAIL         ; branch if N=0   
+2B26  1027070B          lbeq FAIL         ; branch if Z=1    
+                      
+                        
+2B2A  C65A              ldb #0x005A   
+2B2C  C50F              bitb #0x00F
+2B2E  10290703          lbvs FAIL         ; branch if V=1    
+2B32  102B06FF          lbmi FAIL         ; branch if N=1    
+2B36  102706FB          lbeq FAIL         ; branch if Z=1    
+                      
+                          
+                      
+                        
+2B3A  860F              lda #0x00F                            ; Direct
+2B3C  9534              bita <$034
+2B3E  102906F3          lbvs FAIL         ; branch if V=1    
+2B42  102B06EF          lbmi FAIL         ; branch if N=1    
+2B46  102706EB          lbeq FAIL         ; branch if Z=1    
+                      
+                        
+2B4A  860F              lda #0x00F                            ; Indexed
+2B4C  8E1200            ldx #0x01200       
+2B4F  A584              bita ,X
+2B51  102906E0          lbvs FAIL         ; branch if V=1    
+2B55  102B06DC          lbmi FAIL         ; branch if N=1    
+2B59  102706D8          lbeq FAIL         ; branch if Z=1    
+                      
+                        
+2B5D  860F              lda #0x00F                            ; Extended
+2B5F  8E1200            ldx #0x01200       
+2B62  B51234            bita >$01234
+2B65  102906CC          lbvs FAIL         ; branch if V=1    
+2B69  102B06C8          lbmi FAIL         ; branch if N=1    
+2B6D  102706C4          lbeq FAIL         ; branch if Z=1    
+                       
+                               
+                        
+2B71  C60F              ldb #0x00F                            ; Direct
+2B73  D534              bitb <$034
+2B75  102906BC          lbvs FAIL         ; branch if V=1    
+2B79  102B06B8          lbmi FAIL         ; branch if N=1    
+2B7D  102706B4          lbeq FAIL         ; branch if Z=1    
+                      
+                        
+2B81  C60F              ldb #0x00F                            ; Indexed
+2B83  8E1200            ldx #0x01200       
+2B86  E584              bitb ,X
+2B88  102906A9          lbvs FAIL         ; branch if V=1    
+2B8C  102B06A5          lbmi FAIL         ; branch if N=1    
+2B90  102706A1          lbeq FAIL         ; branch if Z=1    
+                       
+                        
+2B94  C60F              ldb #0x00F                            ; Extended
+2B96  8E1200            ldx #0x01200       
+2B99  F51234            bitb >$01234
+2B9C  10290695          lbvs FAIL         ; branch if V=1    
+2BA0  102B0691          lbmi FAIL         ; branch if N=1    
+2BA4  1027068D          lbeq FAIL         ; branch if Z=1    
+                       
+                        
+                        
+                      
+                        ; ----
+                        ; Test
+                        ; ----
+                      
+2BA8  8688              lda #0x0088                           ; Inherent
+2BAA  4D                tsta
+2BAB  10290686          lbvs FAIL         ; branch if V=1    
+2BAF  102A0682          lbpl FAIL         ; branch if N=0   
+2BB3  1027067E          lbeq FAIL         ; branch if Z=1    
+                        
+2BB7  C688              ldb #0x0088                           ; Inherent
+2BB9  5D                tstb
+2BBA  10290677          lbvs FAIL         ; branch if V=1    
+2BBE  102A0673          lbpl FAIL         ; branch if N=0   
+2BC2  1027066F          lbeq FAIL         ; branch if Z=1            
+                        
+2BC6  0D34              tst <$034                             ; Direct
+2BC8  10290669          lbvs FAIL         ; branch if V=1    
+2BCC  102B0665          lbmi FAIL         ; branch if N=1    
+2BD0  10270661          lbeq FAIL         ; branch if Z=1    
+                      
+                        
+2BD4  8E1200            ldx #0x01200                          ; Indexed
+2BD7  6D84              tst ,X
+2BD9  10290658          lbvs FAIL         ; branch if V=1    
+2BDD  102B0654          lbmi FAIL         ; branch if N=1    
+2BE1  10270650          lbeq FAIL         ; branch if Z=1    
+                       
+                        
+2BE5  8E1200            ldx #0x01200                          ; Extended
+2BE8  7D1234            tst >$01234
+2BEB  10290646          lbvs FAIL         ; branch if V=1    
+2BEF  102B0642          lbmi FAIL         ; branch if N=1    
+2BF3  1027063E          lbeq FAIL         ; branch if Z=1    
+                       
+                        
+                      
+                        ; ----
+                        ; COM
+                        ; ----
+                      
+2BF7  8688              lda #0x0088                           ; Inherent
+2BF9  43                coma
+2BFA  10290637          lbvs FAIL         ; branch if V=1    
+2BFE  10240633          lbcc FAIL         ; branch if C=0    
+2C02  102B062F          lbmi FAIL         ; branch if N=1    
+2C06  1027062B          lbeq FAIL         ; branch if Z=1  
+2C0A  8177              cmpa #0x077
+2C0C  10260625          lbne FAIL    
+                        
+2C10  C688              ldb #0x0088                           ; Inherent
+2C12  53                comb
+2C13  1029061E          lbvs FAIL         ; branch if V=1    
+2C17  1024061A          lbcc FAIL         ; branch if C=0    
+2C1B  102B0616          lbmi FAIL         ; branch if N=1    
+2C1F  10270612          lbeq FAIL         ; branch if Z=1            
+2C23  C177              cmpb #0x077
+2C25  1026060C          lbne FAIL  
+                        
+2C29  0334              com <$034                             ; Direct
+2C2B  10290606          lbvs FAIL         ; branch if V=1    
+2C2F  10240602          lbcc FAIL         ; branch if C=0    
+2C33  102A05FE          lbpl FAIL         ; branch if N=0   
+2C37  102705FA          lbeq FAIL         ; branch if Z=1   
+2C3B  9634              lda <$034  
+2C3D  81ED              cmpa #0x0ED
+2C3F  102605F2          lbne FAIL    
+2C43  0334              com <$034                             ; Put back origial value
+                      
+                        
+2C45  8E1234            ldx #0x01234                          ; Indexed
+2C48  6384              com ,X                                 
+2C4A  102905E7          lbvs FAIL         ; branch if V=1    
+2C4E  102405E3          lbcc FAIL         ; branch if C=0    
+2C52  102A05DF          lbpl FAIL         ; branch if N=0   
+2C56  102705DB          lbeq FAIL         ; branch if Z=1    
+2C5A  A684              lda ,X  
+2C5C  A184              cmpa ,X
+2C5E  102605D3          lbne FAIL    
+2C62  6384              com ,X                                ; Put back origial value
+                       
+                        
+2C64  731234            com >$01234                           ; Extended                   
+2C67  102905CA          lbvs FAIL         ; branch if V=1    
+2C6B  102405C6          lbcc FAIL         ; branch if C=0    
+2C6F  102A05C2          lbpl FAIL         ; branch if N=0   
+2C73  102705BE          lbeq FAIL         ; branch if Z=1  
+2C77  B61234            lda >$01234  
+2C7A  81ED              cmpa #0x0ED
+2C7C  102605B5          lbne FAIL  
+2C80  731234            com >$01234                           ; Put back origial value
+                       
+                      
+                      ;-----------------------------------------------------------
+                      ;-----------------------------------------------------------  
+                      
+                      
+                      
+                      ; Test - Shifts
+                      ;-----------------------------------------------------------  
+                      
+                        ; ----
+                        ; ASL
+                        ; ----
+                      
+2C83  8688              lda #0x0088                           ; Inherent
+2C85  48                asla
+2C86  102805AB          lbvc FAIL         ; branch if V=0    
+2C8A  102405A7          lbcc FAIL         ; branch if C=0    
+2C8E  102B05A3          lbmi FAIL         ; branch if N=1    
+2C92  1027059F          lbeq FAIL         ; branch if Z=1  
+2C96  8110              cmpa #0x010
+2C98  10260599          lbne FAIL    
+                        
+2C9C  C688              ldb #0x0088                           ; Inherent
+2C9E  58                aslb
+2C9F  10280592          lbvc FAIL         ; branch if V=0    
+2CA3  1024058E          lbcc FAIL         ; branch if C=0    
+2CA7  102B058A          lbmi FAIL         ; branch if N=1    
+2CAB  10270586          lbeq FAIL         ; branch if Z=1  
+2CAF  C110              cmpb #0x010
+2CB1  10260580          lbne FAIL   
+                        
+2CB5  0800              asl <$000                             ; Direct
+2CB7  1029057A          lbvs FAIL         ; branch if V=1    
+2CBB  10250576          lbcs FAIL         ; branch if C=1      
+2CBF  102B0572          lbmi FAIL         ; branch if N=1    
+2CC3  1027056E          lbeq FAIL         ; branch if Z=1   
+2CC7  9600              lda <$000  
+2CC9  8124              cmpa #0x024
+2CCB  10260566          lbne FAIL    
+2CCF  0334              com <$034                             ; Put back origial value
+                      
+                        
+2CD1  8E1200            ldx #0x01200                          ; Indexed
+2CD4  6884              asl ,X                                 
+2CD6  1029055B          lbvs FAIL         ; branch if V=1    
+2CDA  10250557          lbcs FAIL         ; branch if C=1      
+2CDE  102B0553          lbmi FAIL         ; branch if N=1    
+2CE2  1027054F          lbeq FAIL         ; branch if Z=1    
+2CE6  A684              lda ,X  
+2CE8  A184              cmpa ,X
+2CEA  10260547          lbne FAIL    
+2CEE  6384              com ,X                                ; Put back origial value
+                       
+                        
+2CF0  781200            asl >$01200                           ; Extended                   
+2CF3  1028053E          lbvc FAIL         ; branch if V=0    
+2CF7  1024053A          lbcc FAIL         ; branch if C=0    
+2CFB  102B0536          lbmi FAIL         ; branch if N=1    
+2CFF  10270532          lbeq FAIL         ; branch if Z=1  
+2D03  B61234            lda >$01234  
+2D06  81ED              cmpa #0x0ED
+2D08  10260529          lbne FAIL  
+2D0C  731234            com >$01234                           ; Put back origial value
+                       
+                      
+                      
+                        ; ----
+                        ; ASR
+                        ; ----
+                      
+2D0F  8688              lda #0x0088                           ; Inherent
+2D11  47                asra
+2D12  1025051F          lbcs FAIL         ; branch if C=1      
+2D16  102A051B          lbpl FAIL         ; branch if N=0   
+2D1A  10270517          lbeq FAIL         ; branch if Z=1  
+2D1E  81C4              cmpa #0x0C4
+2D20  10260511          lbne FAIL    
+                        
+2D24  C688              ldb #0x0088                           ; Inherent
+2D26  57                asrb
+2D27  1025050A          lbcs FAIL         ; branch if C=1      
+2D2B  102A0506          lbpl FAIL         ; branch if N=0   
+2D2F  10270502          lbeq FAIL         ; branch if Z=1  
+2D33  C1C4              cmpb #0x0C4
+2D35  102604FC          lbne FAIL   
+                        
+2D39  0700              asr <$000                             ; Direct
+2D3B  102504F6          lbcs FAIL         ; branch if C=1      
+2D3F  102B04F2          lbmi FAIL         ; branch if N=1    
+2D43  102704EE          lbeq FAIL         ; branch if Z=1   
+2D47  9600              lda <$000  
+2D49  8137              cmpa #0x037
+2D4B  102604E6          lbne FAIL    
+2D4F  0334              com <$034                             ; Put back origial value
+                      
+                        
+2D51  8E1200            ldx #0x01200                          ; Indexed
+2D54  6784              asr ,X                                 
+2D56  102404DB          lbcc FAIL         ; branch if C=0    
+2D5A  102B04D7          lbmi FAIL         ; branch if N=1    
+2D5E  102704D3          lbeq FAIL         ; branch if Z=1    
+2D62  A684              lda ,X  
+2D64  A184              cmpa ,X
+2D66  102604CB          lbne FAIL    
+2D6A  6384              com ,X                                ; Put back origial value
+                       
+                        
+2D6C  771200            asr >$01200                           ; Extended                   
+2D6F  102504C2          lbcs FAIL         ; branch if C=1      
+2D73  102A04BE          lbpl FAIL         ; branch if N=0   
+2D77  102704BA          lbeq FAIL         ; branch if Z=1  
+2D7B  B61200            lda >$01200  
+2D7E  81F2              cmpa #0x0F2
+2D80  102604B1          lbne FAIL  
+2D84  731200            com >$01200                           ; Put back origial value
+                       
+                      
+                        ; ----
+                        ; LSR
+                        ; ----
+                      
+2D87  8688              lda #0x0088                           ; Inherent
+2D89  44                lsra
+2D8A  102504A7          lbcs FAIL         ; branch if C=1      
+2D8E  102B04A3          lbmi FAIL         ; branch if N=1    
+2D92  1027049F          lbeq FAIL         ; branch if Z=1  
+2D96  8144              cmpa #0x044
+2D98  10260499          lbne FAIL    
+                        
+2D9C  C688              ldb #0x0088                           ; Inherent
+2D9E  54                lsrb
+2D9F  10250492          lbcs FAIL         ; branch if C=1      
+2DA3  102B048E          lbmi FAIL         ; branch if N=1    
+2DA7  1027048A          lbeq FAIL         ; branch if Z=1  
+2DAB  C144              cmpb #0x044
+2DAD  10260484          lbne FAIL   
+                        
+2DB1  0400              lsr <$000                             ; Direct
+2DB3  1024047E          lbcc FAIL         ; branch if C=0    
+2DB7  102B047A          lbmi FAIL         ; branch if N=1    
+2DBB  10270476          lbeq FAIL         ; branch if Z=1   
+2DBF  9600              lda <$000  
+2DC1  8106              cmpa #0x006
+2DC3  1026046E          lbne FAIL    
+2DC7  0334              com <$034                             ; Put back origial value
+                      
+                        
+2DC9  8E1200            ldx #0x01200                          ; Indexed
+2DCC  6484              lsr ,X                                 
+2DCE  10250463          lbcs FAIL         ; branch if C=1      
+2DD2  102B045F          lbmi FAIL         ; branch if N=1    
+2DD6  1027045B          lbeq FAIL         ; branch if Z=1    
+2DDA  A684              lda ,X  
+2DDC  8103              cmpa #0x003
+2DDE  10260453          lbne FAIL    
+2DE2  6384              com ,X                                ; Put back origial value
+                       
+                        
+2DE4  741200            lsr >$01200                           ; Extended                   
+2DE7  1025044A          lbcs FAIL         ; branch if C=1      
+2DEB  102B0446          lbmi FAIL         ; branch if N=1    
+2DEF  10270442          lbeq FAIL         ; branch if Z=1  
+2DF3  B61200            lda >$01200  
+2DF6  817E              cmpa #0x07E
+2DF8  10260439          lbne FAIL  
+2DFC  731200            com >$01200                           ; Put back origial value
+                       
+                      
+                      
+                        ; ----
+                        ; ROL
+                        ; ----
+                      
+2DFF  8688              lda #0x0088                           ; Inherent
+2E01  49                rola
+2E02  1028042F          lbvc FAIL         ; branch if V=0    
+2E06  1024042B          lbcc FAIL         ; branch if C=0    
+2E0A  102B0427          lbmi FAIL         ; branch if N=1    
+2E0E  10270423          lbeq FAIL         ; branch if Z=1  
+2E12  8111              cmpa #0x011
+2E14  1026041D          lbne FAIL    
+                        
+2E18  C688              ldb #0x0088                           ; Inherent
+2E1A  59                rolb
+2E1B  10280416          lbvc FAIL         ; branch if V=0    
+2E1F  10240412          lbcc FAIL         ; branch if C=0    
+2E23  102B040E          lbmi FAIL         ; branch if N=1    
+2E27  1027040A          lbeq FAIL         ; branch if Z=1  
+2E2B  C110              cmpb #0x010
+2E2D  10260404          lbne FAIL   
+                        
+2E31  0900              rol <$000                             ; Direct
+2E33  102803FE          lbvc FAIL         ; branch if V=0    
+2E37  102403FA          lbcc FAIL         ; branch if C=0    
+2E3B  102B03F6          lbmi FAIL         ; branch if N=1    
+2E3F  102703F2          lbeq FAIL         ; branch if Z=1   
+2E43  9600              lda <$000  
+2E45  8102              cmpa #0x002
+2E47  102603EA          lbne FAIL    
+                      
+                        
+2E4B  8E1200            ldx #0x01200                          ; Indexed
+2E4E  6984              rol ,X                                 
+2E50  102903E1          lbvs FAIL         ; branch if V=1    
+2E54  102503DD          lbcs FAIL         ; branch if C=1      
+2E58  102B03D9          lbmi FAIL         ; branch if N=1    
+2E5C  102703D5          lbeq FAIL         ; branch if Z=1    
+2E60  A684              lda ,X  
+2E62  8104              cmpa #0x004
+2E64  102603CD          lbne FAIL    
+                       
+                        
+2E68  791200            rol >$01200                           ; Extended                   
+2E6B  102903C6          lbvs FAIL         ; branch if V=1    
+2E6F  102503C2          lbcs FAIL         ; branch if C=1      
+2E73  102B03BE          lbmi FAIL         ; branch if N=1    
+2E77  102703BA          lbeq FAIL         ; branch if Z=1  
+2E7B  B61200            lda >$01200  
+2E7E  8108              cmpa #0x008
+2E80  102603B1          lbne FAIL  
+                       
+                      
+                      
+                        ; ----
+                        ; ROR
+                        ; ----
+                      
+2E84  8688              lda #0x0088                           ; Inherent
+2E86  46                rora
+2E87  102503AA          lbcs FAIL         ; branch if C=1      
+2E8B  102B03A6          lbmi FAIL         ; branch if N=1    
+2E8F  102703A2          lbeq FAIL         ; branch if Z=1  
+2E93  8144              cmpa #0x044
+2E95  1026039C          lbne FAIL    
+                        
+2E99  C688              ldb #0x0088                           ; Inherent
+2E9B  56                rorb
+2E9C  10250395          lbcs FAIL         ; branch if C=1      
+2EA0  102B0391          lbmi FAIL         ; branch if N=1    
+2EA4  1027038D          lbeq FAIL         ; branch if Z=1  
+2EA8  C144              cmpb #0x044
+2EAA  10260387          lbne FAIL   
+                        
+2EAE  0600              ror <$000                             ; Direct
+2EB0  10250381          lbcs FAIL         ; branch if C=1      
+2EB4  102B037D          lbmi FAIL         ; branch if N=1    
+2EB8  10270379          lbeq FAIL         ; branch if Z=1   
+2EBC  9600              lda <$000  
+2EBE  8104              cmpa #0x004
+2EC0  10260371          lbne FAIL    
+                      
+                        
+2EC4  8E1200            ldx #0x01200                          ; Indexed
+2EC7  6684              ror ,X                                 
+2EC9  10250368          lbcs FAIL         ; branch if C=1      
+2ECD  102B0364          lbmi FAIL         ; branch if N=1    
+2ED1  10270360          lbeq FAIL         ; branch if Z=1    
+2ED5  A684              lda ,X  
+2ED7  8102              cmpa #0x002
+2ED9  10260358          lbne FAIL    
+                       
+                        
+2EDD  761200            ror >$01200                           ; Extended                   
+2EE0  10250351          lbcs FAIL         ; branch if C=1      
+2EE4  102B034D          lbmi FAIL         ; branch if N=1    
+2EE8  10270349          lbeq FAIL         ; branch if Z=1  
+2EEC  B61200            lda >$01200  
+2EEF  8101              cmpa #0x001
+2EF1  10260340          lbne FAIL  
+                       
+                      
+                      
+                        
+                        ; ----
+                        ; LSR
+                        ; ----
+                        
+2EF5  108E1234          ldy #0x01234
+2EF9  10BF1200          sty >$01200   
+                      
+2EFD  8688              lda #0x0088                           ; Inherent
+2EFF  44                lsra
+2F00  10250331          lbcs FAIL         ; branch if C=1      
+2F04  102B032D          lbmi FAIL         ; branch if N=1    
+2F08  10270329          lbeq FAIL         ; branch if Z=1  
+2F0C  8144              cmpa #0x044
+2F0E  10260323          lbne FAIL    
+                        
+2F12  C688              ldb #0x0088                           ; Inherent
+2F14  54                lsrb
+2F15  1025031C          lbcs FAIL         ; branch if C=1      
+2F19  102B0318          lbmi FAIL         ; branch if N=1    
+2F1D  10270314          lbeq FAIL         ; branch if Z=1  
+2F21  C144              cmpb #0x044
+2F23  1026030E          lbne FAIL   
+                        
+2F27  0400              lsr <$000                             ; Direct
+2F29  10250308          lbcs FAIL         ; branch if C=1      
+2F2D  102B0304          lbmi FAIL         ; branch if N=1    
+2F31  10270300          lbeq FAIL         ; branch if Z=1  
+2F35  9600              lda <$000  
+2F37  8109              cmpa #0x009
+2F39  102602F8          lbne FAIL    
+2F3D  0344              com <$044                             ; Put back origial value
+                      
+                        
+2F3F  8E1200            ldx #0x01200                          ; Indexed
+2F42  6484              lsr ,X                                 
+2F44  102402ED          lbcc FAIL         ; branch if C=0    
+2F48  102B02E9          lbmi FAIL         ; branch if N=1    
+2F4C  102702E5          lbeq FAIL         ; branch if Z=1    
+2F50  A684              lda ,X  
+2F52  8104              cmpa #0x004
+2F54  102602DD          lbne FAIL    
+2F58  6384              com ,X                                ; Put back origial value
+                       
+                        
+2F5A  741200            lsr >$01200                           ; Extended                   
+2F5D  102402D4          lbcc FAIL         ; branch if C=0    
+2F61  102B02D0          lbmi FAIL         ; branch if N=1    
+2F65  102702CC          lbeq FAIL         ; branch if Z=1  
+2F69  B61200            lda >$01200  
+2F6C  817D              cmpa #0x07D
+2F6E  102602C3          lbne FAIL  
+2F72  731200            com >$01200                           ; Put back origial value
+                       
+                      
+                      
+                      ;-----------------------------------------------------------
+                      ;-----------------------------------------------------------  
+                      
+                      
+                      
+                      ; Test - Math
+                      ;-----------------------------------------------------------  
+                      
+                        ; ----
+                        ; CLR
+                        ; ----
+2F75  8688              lda #0x088
+2F77  4F                clra
+2F78  102B02B9          lbmi FAIL         ; branch if N=1    
+2F7C  102602B5          lbne FAIL         ; branch if Z=0  
+2F80  102902B1          lbvs FAIL         ; branch if V=1    
+2F84  102502AD          lbcs FAIL         ; branch if C=1      
+2F88  8100              cmpa #0x000
+2F8A  102602A7          lbne FAIL  
+                        
+2F8E  C65A              ldb #0x05A
+2F90  5F                clrb
+2F91  C100              cmpb #0x000
+2F93  1026029E          lbne FAIL  
+                        
+2F97  0300              com <$000                  ; Direct
+2F99  0F00              clr <$000                
+2F9B  B61200            lda >$01200
+2F9E  8100              cmpa #0x000
+2FA0  10260291          lbne FAIL  
+                      
+                          
+2FA4  108E1200          ldy #0x01200              ; Indexed
+2FA8  731200            com >$01200       
+2FAB  6FA4              clr ,Y        
+2FAD  B61200            lda >$01200
+2FB0  8100              cmpa #0x000
+2FB2  1026027F          lbne FAIL  
+                      
+                          
+2FB6  731200            com >$01200               ; Extended
+2FB9  7F1200            clr >$01200               
+2FBC  B61200            lda >$01200
+2FBF  8100              cmpa #0x000
+2FC1  10260270          lbne FAIL  
+                      
+                      
+                        ; ----
+                        ; DAA
+                        ; ----
+                        
+2FC5  CC0000            ldd #0x0
+2FC8  108EFF00          ldy #0x0FF00
+2FCC  10BF1200          sty >$01200               
+2FD0                  DAA_LOOP
+2FD0  B61200            lda >$01200
+2FD3  19                daa
+2FD4  BB1201            adda >$01201
+2FD7  B71201            sta >$01201
+2FDA  7A1200            dec >$01200               
+2FDD  26F1              bne DAA_LOOP
+                        
+2FDF  B61201            lda >$01201
+2FE2  818A              cmpa #0x08A
+2FE4  1026024D          lbne FAIL  
+                      
+                      
+                      
+                      
+                        ; ----
+                        ; EXG
+                        ; ----
+                        
+2FE8  86AA              lda #0x0AA
+2FEA  C6BB              ldb #0x0BB
+2FEC  1E89              exg a,b
+2FEE  81BB              cmpa #0x0BB
+2FF0  10260241          lbne FAIL  
+2FF4  C1AA              cmpb #0x0AA
+2FF6  1026023B          lbne FAIL  
+                        
+2FFA  8EAAAA            ldx #0x0AAAA
+2FFD  108EBBBB          ldy #0x0BBBB
+3001  1E12              exg x,y
+3003  8CBBBB            cmpx #0x0BBBB
+3006  1026022B          lbne FAIL  
+300A  108CAAAA          cmpy #0x0AAAA
+300E  10260223          lbne FAIL  
+                        
+3012  CE1111            ldu #0x01111
+3015  10CE2222          lds #0x02222
+3019  1E34              exg u,s
+301B  11832222          cmpu #0x02222
+301F  10260212          lbne FAIL  
+3023  118C1111          cmps #0x01111
+3027  1026020A          lbne FAIL  
+                      
+302B  1E31              exg u,x
+302D  1183BBBB          cmpu #0x0BBBB
+3031  10260200          lbne FAIL  
+3035  8C2222            cmpx #0x02222
+3038  102601F9          lbne FAIL  
+                        
+303C  1E42              exg s,y
+303E  118CAAAA          cmps #0x0AAAA
+3042  102601EF          lbne FAIL  
+3046  108C1111          cmpy #0x01111
+304A  102601E7          lbne FAIL  
+                        
+304E  1E13              exg x,u
+3050  8CBBBB            cmpx #0x0BBBB
+3053  102601DE          lbne FAIL  
+3057  11832222          cmpu #0x02222
+305B  102601D6          lbne FAIL  
+                        
+305F  1E24              exg y,s
+3061  108CAAAA          cmpy #0x0AAAA
+3065  102601CC          lbne FAIL  
+3069  118C1111          cmps #0x01111
+306D  102601C4          lbne FAIL  
+                        
+                        
+                        ; ----
+                        ; TFR
+                        ; ----
+                        
+3071  1F89              tfr a,b
+3073  C1BB              cmpb #0x0BB
+3075  102601BC          lbne FAIL 
+                        
+3079  1F12              tfr x,y
+307B  108CBBBB          cmpy #0x0BBBB
+307F  102601B2          lbne FAIL 
+                        
+3083  1F34              tfr u,s
+3085  118C2222          cmps #0x02222
+3089  102601A8          lbne FAIL 
+                          
+                      
+                        ; ----
+                        ; NEG
+                        ; ----
+                      
+308D  8688              lda #0x0088                           ; Inherent
+308F  40                nega
+3090  102901A1          lbvs FAIL         ; branch if V=1    
+3094  1024019D          lbcc FAIL         ; branch if C=0    
+3098  102B0199          lbmi FAIL         ; branch if N=1    
+309C  10270195          lbeq FAIL         ; branch if Z=1  
+30A0  8178              cmpa #0x078
+30A2  1026018F          lbne FAIL    
+                        
+30A6  C688              ldb #0x0088                           ; Inherent
+30A8  50                negb
+30A9  10290188          lbvs FAIL         ; branch if V=1    
+30AD  10240184          lbcc FAIL         ; branch if C=0    
+30B1  102B0180          lbmi FAIL         ; branch if N=1    
+30B5  1027017C          lbeq FAIL         ; branch if Z=1            
+30B9  C178              cmpb #0x078
+30BB  10260176          lbne FAIL  
+                        
+30BF  0034              neg <$034                             ; Direct
+30C1  10290170          lbvs FAIL         ; branch if V=1    
+30C5  1024016C          lbcc FAIL         ; branch if C=0    
+30C9  102A0168          lbpl FAIL         ; branch if N=0   
+30CD  10270164          lbeq FAIL         ; branch if Z=1   
+30D1  9634              lda <$034  
+30D3  81EE              cmpa #0x0EE
+30D5  1026015C          lbne FAIL    
+30D9  0334              com <$034                             ; Put back origial value
+                      
+                        
+30DB  8E1234            ldx #0x01234                          ; Indexed
+30DE  6084              neg ,X                                 
+30E0  10290151          lbvs FAIL         ; branch if V=1    
+30E4  1024014D          lbcc FAIL         ; branch if C=0    
+30E8  102A0149          lbpl FAIL         ; branch if N=0   
+30EC  10270145          lbeq FAIL         ; branch if Z=1    
+30F0  A684              lda ,X  
+30F2  81EF              cmpa #0x0EF
+30F4  1026013D          lbne FAIL    
+30F8  6084              neg ,X                                ; Put back origial value
+                       
+                        
+30FA  701234            neg >$01234                           ; Extended                   
+30FD  10290134          lbvs FAIL         ; branch if V=1    
+3101  10240130          lbcc FAIL         ; branch if C=0    
+3105  102A012C          lbpl FAIL         ; branch if N=0   
+3109  10270128          lbeq FAIL         ; branch if Z=1  
+310D  B61234            lda >$01234  
+3110  81EF              cmpa #0x0EF
+3112  1026011F          lbne FAIL  
+3116  701234            neg >$01234                           ; Put back origial value
+                       
+                      
+                      
+                        ; ----
+                        ; MUL
+                        ; ----
+                        
+3119  CC0000            ldd #0x0
+311C  108EFF00          ldy #0x0FF00
+3120  10BF1200          sty >$01200               
+3124                  MUL_LOOP
+3124  FC1200            ldd >$01200
+3127  3D                mul
+3128  F31202            addd >$01202
+312B  FD1202            std >$01202
+312E  7C1201            inc >$01201               
+3131  7A1200            dec >$01200               
+3134  26EE              bne MUL_LOOP
+                        
+3136  FC1202            ldd >$01202
+3139  10832B00          cmpd #0x02B00
+313D  102600F4          lbne FAIL  
+                        
+                        
+                        
+                        ; ----
+                        ; SEX
+                        ; ----
+                        
+3141  C67F              ldb #0x07F
+3143  1D                sex
+3144  8100              cmpa #0x00
+3146  102600EB          lbne FAIL    
+                          
+314A  C680              ldb #0x080
+314C  1D                sex
+314D  81FF              cmpa #0x0FF
+314F  102600E2          lbne FAIL    
+                        
+                      ;-----------------------------------------------------------
+                      ;-----------------------------------------------------------  
+                      
+                      
+                      
+                      ; Test - Stack
+                      ;-----------------------------------------------------------  
+                        
+                        ; System Stack starts at  0xF100
+                        ; User Stack starts at    0xF200
+                      
+3153  86AA              lda #0x0AA
+3155  C6BB              ldb #0x0BB
+3157  8E1234            ldx #0x01234
+315A  108E5678          ldy #0x05678
+315E  10CEF100          lds #0x0F100
+3162  CEF200            ldu #0x0F200
+3165  343E              pshs #0x03E
+3167  363E              pshu #0x03E
+                      
+3169  B6F1F9            lda >$0F1F9       ; register_A
+316C  81AA              cmpa #0x0AA
+316E  102600C3          lbne FAIL  
+3172  B6F1FA            lda >$0F1FA       ; register_B
+3175  81BB              cmpa #0x0BB
+3177  102600BA          lbne FAIL  
+317B  B6F1FB            lda >$0F1FB       ; register_DP
+317E  8112              cmpa #0x012
+3180  102600B1          lbne FAIL  
+3184  BEF1FC            ldx >$0F1FC       ; register_X
+3187  8C1234            cmpx #0x01234
+318A  102600A7          lbne FAIL  
+318E  BEF1FE            ldx >$0F1FE       ; register_Y
+3191  8C5678            cmpx #0x05678
+3194  1026009D          lbne FAIL  
+                        
+                      
+3198  8600              lda #0x00
+319A  C600              ldb #0x00
+319C  8E0000            ldx #0x00
+319F  108E0000          ldy #0x00
+                        
+31A3  353E              puls #0x03E
+31A5  373E              pulu #0x03E
+                              
+31A7  81AA              cmpa #0x0AA       ; register_A
+31A9  10260088          lbne FAIL     
+                                      
+31AD  C1BB              cmpb #0x0BB       ; register_B
+31AF  10260082          lbne FAIL     
+                                      
+31B3  8C1234            cmpx #0x01234     ; register_X
+31B6  1026007B          lbne FAIL     
+                                      
+31BA  108C5678          cmpy #0x05678     ; register_Y
+31BE  10260073          lbne FAIL  
+                        
+31C2  12                nop
+31C3  12                nop
+                        
+                        
+                      ;-----------------------------------------------------------
+                      ;-----------------------------------------------------------  
+                      
+                      
+                      
+                      ; Test - Traps, Interrupts
+                      ;-----------------------------------------------------------  
+                        
+                        
+31C4  86AA              lda #0x0AA
+31C6  C6BB              ldb #0x0BB
+31C8  8E1234            ldx #0x01234
+31CB  108E5678          ldy #0x05678
+                        
+31CF  3F                swi
+31D0  81AA              cmpa #0x0AA
+31D2  1026005F          lbne FAIL  
+31D6  C1BB              cmpb #0x0BB
+31D8  10260059          lbne FAIL  
+31DC  8C1234            cmpx #0x01234
+31DF  10260052          lbne FAIL  
+31E3  108C5678          cmpy #0x05678  
+31E7  1026004A          lbne FAIL  
+31EB  12                nop
+31EC  12                nop
+31ED  12                nop
+                          
+31EE  103F              swi2
+31F0  81AA              cmpa #0x0AA
+31F2  1026003F          lbne FAIL  
+31F6  C1BB              cmpb #0x0BB
+31F8  10260039          lbne FAIL  
+31FC  8C1234            cmpx #0x01234
+31FF  10260032          lbne FAIL  
+3203  108C5678          cmpy #0x05678  
+3207  1026002A          lbne FAIL  
+320B  12                nop
+320C  12                nop
+320D  12                nop
+                          
+320E  113F              swi3
+3210  81AA              cmpa #0x0AA
+3212  1026001F          lbne FAIL  
+3216  C1BB              cmpb #0x0BB
+3218  10260019          lbne FAIL  
+321C  8C1234            cmpx #0x01234
+321F  10260012          lbne FAIL  
+3223  108C5678          cmpy #0x05678  
+3227  1026000A          lbne FAIL  
+322B  12                nop
+322C  12                nop
+322D  12                nop
+                        
+                        ;sync
+                      
+                        ;cwai #0x66
+                        
+                        
+322E  7E3231            jmp ALL_DONE
+                         
+                      ;-----------------------------------------------------------
+                      ;-----------------------------------------------------------  
+                      ; Loop here when all tests pass
+                      ;
+3231                  ALL_DONE  
+3231  3D                mul
+3232  7E3231            jmp ALL_DONE  
+                        
+                      ; Loop here when any test fails
+                      ;
+3235                  FAIL  
+3235  7E3235            jmp FAIL
+                      
+                      
+                      
+                      
+                      
