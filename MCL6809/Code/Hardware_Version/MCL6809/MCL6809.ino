@@ -155,7 +155,9 @@ uint32_t  direct_nmi_n      = 1;
 uint32_t  direct_nmi_n_d1   = 1; 
 uint32_t  direct_nmi_n_d2   = 1; 
 uint32_t  direct_irq_n_d1   = 1;
+uint32_t  direct_irq_n_d2   = 1;
 uint32_t  direct_firq_n_d1  = 1;
+uint32_t  direct_firq_n_d2  = 1;
 uint32_t  direct_halt_n     = 1; 
 uint32_t  direct_irq_n      = 1; 
 uint32_t  direct_firq_n     = 1; 
@@ -317,8 +319,12 @@ inline void wait_for_CLK_falling_edge() {
      
     
     direct_nmi_n_d2  = direct_nmi_n_d1;      
-  direct_nmi_n_d1  = direct_nmi_n;
+    direct_nmi_n_d1  = direct_nmi_n;
+	
+    direct_irq_n_d2  = direct_irq_n_d1;
     direct_irq_n_d1  = direct_irq_n;
+	
+    direct_firq_n_d2 = direct_firq_n_d1;
     direct_firq_n_d1 = direct_firq_n;
 
     direct_reset_n    = (GPIO9_raw_data&0x00000100);                    // Sample all signals at E falling edge
@@ -716,7 +722,7 @@ void opcode_0x13 ()   { VMA_Cycle(1,register_PC);             // SYNC
                         digitalWriteFast(PIN_DATA_OE_n,0x1);
                         pinMode(PIN_RDWR_n,          INPUT);
             VMA_Cycle(1,0xFFFF); 
-                      while ( (direct_irq_n!=0) && (direct_firq_n!=0) && (direct_nmi_n!=0) )  wait_for_CLK_falling_edge();
+                      while ( (direct_irq_n_d2!=0) && (direct_firq_n_d2!=0) && (direct_nmi_n!=0) )  wait_for_CLK_falling_edge();
                         digitalWriteFast(PIN_ADDR_OE_n,0x0);
                         pinMode(PIN_RDWR_n,          OUTPUT);
             VMA_Cycle(1,0xFFFF); 
@@ -739,11 +745,11 @@ void opcode_0x3C ()   {                   // CWAI
   PushS8(register_A);
   PushS8(REGISTER_CC);
   VMA_Cycle(1,0xFFFF);
-  while ( (direct_irq_n!=0) && (direct_firq_n!=0) && (direct_nmi_n!=0) )  wait_for_CLK_falling_edge();
+  while ( (direct_irq_n_d2!=0) && (direct_firq_n_d2!=0) && (direct_nmi_n!=0) )  wait_for_CLK_falling_edge();
     
        if (direct_nmi_n==0)                register_PC = Read_Word(0xFFFC);
-  else if (flag_f==0 && direct_firq_n==0)  register_PC = Read_Word(0xFFF6);
-  else if (flag_i==0 && direct_irq_n==0)   register_PC = Read_Word(0xFFF8);
+  else if (flag_f==0 && direct_firq_n_d2==0)  register_PC = Read_Word(0xFFF6);
+  else if (flag_i==0 && direct_irq_n_d2==0)   register_PC = Read_Word(0xFFF8);
   
   VMA_Cycle(1,0xFFFF);
   return;
@@ -1816,8 +1822,8 @@ void loop() {
       
            if (direct_reset_n==0)                  { Reset_sequence(); }
       else if (nmi_latched==1)                     { NMI_Handler();    }           
-      else if (flag_f==0 && direct_firq_n_d1==0)   { FIRQ_Handler();   }
-      else if (flag_i==0 && direct_irq_n_d1==0)    { IRQ_Handler();    }
+      else if (flag_f==0 && direct_firq_n_d2==0)   { FIRQ_Handler();   }
+      else if (flag_i==0 && direct_irq_n_d2==0)    { IRQ_Handler();    }
 
      }
      
