@@ -21,6 +21,10 @@
 // Revision 2 10/5/2024
 // Added support for SD to Parallel interface
 //
+// Revision 3 10/11/2024
+// Added variable wait states for Expanded RAM
+//  - For 4.77 Mhz, can be changed to zero wait states for Write cycles and two for Read cycles
+//
 //------------------------------------------------------------------------
 //
 // Copyright (c) 2024 Ted Fried
@@ -330,7 +334,7 @@ inline uint8_t PSRAM_Read(uint32_t address_in) {
   nibble_out = address_in >> 4;    PSRAM_Write_Clk_Cycle();
   nibble_out = address_in;         PSRAM_Write_Clk_Cycle();
 
-  GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + DATA_OE_n_LOW + CHRDY_OE_n_HIGH;  // Two WAIT STATES
+  //GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;  // De-assert CHRDY early for 4.77 Mhz
 
   
  // Four clocks of hi-Z - Make PSRAM Data signals hi-Z during this time
@@ -376,7 +380,7 @@ inline uint8_t PSRAM_Write(uint32_t address_in , int8_t local_data) {
   nibble_out = address_in >> 4;    PSRAM_Write_Clk_Cycle();
   nibble_out = address_in;         PSRAM_Write_Clk_Cycle();
 
-  GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;  // de-assert wait state
+  //GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;  // De-assert CHRDY early for 4.77 Mhz
 
   
 // Send byte data in twp clock cycles
@@ -411,6 +415,8 @@ inline void Mem_Read_Cycle() {
 
       isa_data_out = PSRAM_Read(psram_address);      
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;  // Output data 
+	    GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;  // De-assert CHRDY
+
       
       
       while ( (gpio9_int&0xF0) != 0xF0 ) { gpio9_int = GPIO9_DR; }  // Wait here until cycle is complete
@@ -449,13 +455,15 @@ inline void Mem_Write_Cycle() {
       else if (page_base_address == 0xE0000)  {  psram_address = (reg_0x260<<14) | (isa_address & 0x03FFF);  }
     
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
-      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;    // Steer data mux to Data[7:0] and Assert CHRDY_n=0 to begin wait states
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_LOW + DATA_OE_n_HIGH;    // Steer data mux to Data[7:0] and Assert CHRDY_n=0 to begin wait states
 
       delayNanoseconds(10);  // Wait some time for buffers to switch from address to data
     
       gpio6_int = GPIO6_DR;
       data_in = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
       PSRAM_Write(psram_address , data_in);  
+	    GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;  // De-assert CHRDY
+
      
       while ( (gpio9_int&0xF0) != 0xF0 ) {   // Wait here until cycle is complete
         gpio6_int = GPIO6_DR;   // Needed?
