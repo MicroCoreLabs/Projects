@@ -1,0 +1,4 @@
+*.obj
+*.map
+*.sys
+log.txt
