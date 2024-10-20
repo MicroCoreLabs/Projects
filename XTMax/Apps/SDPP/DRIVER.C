@@ -367,7 +367,7 @@ PUBLIC void Initialize (rh_init_t far *rh)
   WORD brkadr, reboot[2];  int status, i;
 
   /* The version number is sneakily stored in the device header! */
-  cdprintf("SD pport device driver V%c.%c (C) 2014 by Dan Marks\n     based on TU58 by Robert Armstrong\n",
+  cdprintf("SD Card driver for XTMax\n     based on SD pport device driver V%c.%c (C) 2014 by Dan Marks\n     based on TU58 by Robert Armstrong\n",
     header.name[6], header.name[7]);
 
   /* Parse the options from the CONFIG.SYS file, if any... */

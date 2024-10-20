@@ -12,15 +12,6 @@
 /-------------------------------------------------------------------------/
   Features and Limitations:
 
-  * Easy to Port Bit-banging SPI
-    It uses only four GPIO pins. No interrupt, no SPI is needed.
-
-  * Platform Independent
-    You need to modify only a few macros to control GPIO ports.
-
-  * Low Speed
-    The data transfer rate will be several times slower than hardware SPI.
-
   * No Media Change Detection
     Application program needs to perform f_mount() after media change.
 
@@ -35,34 +26,15 @@
 /* Platform dependent macros and functions needed to be modified           */
 /*-------------------------------------------------------------------------*/
 
-#define outportbyte(a,b) outp(a,b)
-#define inportbyte(a) inp(a)
-
 static WORD portbases[5] = {0x3BC,0x378,0x278,0x3E8,0x2E8};
 
 BYTE sd_card_check = 0;
 BYTE portbase = 2;
 
-WORD OUTPORT=0x378;
-WORD STATUSPORT=0x379;
-WORD CONTROLPORT=0x37A;
+WORD DATAPORT=0x378;
+WORD CONTROLPORT=0x379;
 
-#define VAR_INIT() {STATUSPORT=OUTPORT+1; CONTROLPORT=OUTPORT+2; outportbyte(CONTROLPORT,inportbyte(CONTROLPORT) & 0xCF); }
-
-/* MISOPIN (SD card DAT0/DO pin 7) is PPORT SELECT (DB-25 pin 13) */
-#define MISOPIN     (0x01 << 4)
-/* Card Detect (N/A) is PPORT BUSY (DB-25 pin 11) */
-#define CDDETECTPIN (0x01 << 7)
-
-/* Do not interface 5 to 3.3 volts directly! Use level converter... */
-
-/* MOSI (SD card CMD/DI pin 2) is PPORT D0 (DB-25 pin 2) */
-#define MOSIPIN     (0x01 << 0)
-/* CLOCK (SD card CLK/SCLK pin 5) is PPORT D1 (DB-25 pin 3) */
-#define CLOCKPIN    (0x01 << 1)
-/* Card Select (SD card CAT3/CS pin 1) is PPORT D2 (DB-25 pin 4) */
-#define CSPIN       (0x01 << 2)
-/* Connect ground to one of PPORT pins 18-25 */
+#define VAR_INIT() {CONTROLPORT=DATAPORT+1;}
 
 #if 1
 #define TOUTCHR(x)
@@ -102,32 +74,9 @@ static BYTE toutword(WORD x)
 void setportbase(BYTE val)
 {
   if ((val >= 1) && (val <= (sizeof(portbases)/sizeof(portbases[0])) ))
-    OUTPORT = portbases[val-1];
+    DATAPORT = portbases[val-1];
   VAR_INIT();
 }
-
-#define DO_INIT()
-#define DI_INIT()
-#define CK_INIT() 
-#define CS_INIT()
-
-const int bit_delay_val = 10;
-
-#define BITDLY()
-
-#define DO(statusport) (inportbyte((statusport)) & MISOPIN)  
-#define CDDETECT(statusport) (inportbyte((statusport)) & CDDETECTPIN)
-#define CLOCKBITHIGHMOSIHIGH(outport) outportbyte((outport),MOSIPIN|CLOCKPIN) 
-#define CLOCKBITHIGHMOSILOW(outport) outportbyte((outport),CLOCKPIN) 
-#define CLOCKBITLOWMOSIHIGH(outport) outportbyte((outport),MOSIPIN) 
-#define CLOCKBITLOWMOSILOW(outport) outportbyte((outport),0) 
-#define CLOCKBITHIGHMOSIHIGHNOCS(outport) outportbyte((outport),MOSIPIN|CLOCKPIN|CSPIN) 
-#define CLOCKBITLOWMOSIHIGHNOCS(outport) outportbyte((outport),MOSIPIN|CSPIN) 
-#define CS_L(outport) outportbyte((outport),MOSIPIN)
-#define CS_H(outport) outportbyte((outport),MOSIPIN|CSPIN)               
-#define CK_L(outport)
-
-#define ADJ_VAL 1
 
 static
 void dly_us (UINT n) 
@@ -238,53 +187,23 @@ void xmit_mmc (
    UINT bc                  /* Number of bytes to send */
 )
 {
+#if 1
    BYTE d;
-   WORD outport = OUTPORT;
-
    do {
       d = *buff++;   /* Get a byte to be sent */
-      if (d & 0x80) 
-      {  CLOCKBITLOWMOSIHIGH(outport); BITDLY(); CLOCKBITHIGHMOSIHIGH(outport); BITDLY();
-      } else
-      {  CLOCKBITLOWMOSILOW(outport); BITDLY(); CLOCKBITHIGHMOSILOW(outport); BITDLY();
-      } 
-      if (d & 0x40) 
-      {  CLOCKBITLOWMOSIHIGH(outport); BITDLY(); CLOCKBITHIGHMOSIHIGH(outport); BITDLY();
-      } else
-      {  CLOCKBITLOWMOSILOW(outport); BITDLY(); CLOCKBITHIGHMOSILOW(outport); BITDLY();
-      } 
-      if (d & 0x20) 
-      {  CLOCKBITLOWMOSIHIGH(outport); BITDLY(); CLOCKBITHIGHMOSIHIGH(outport); BITDLY();
-      } else
-      {  CLOCKBITLOWMOSILOW(outport); BITDLY(); CLOCKBITHIGHMOSILOW(outport); BITDLY();
-      } 
-      if (d & 0x10) 
-      {  CLOCKBITLOWMOSIHIGH(outport); BITDLY(); CLOCKBITHIGHMOSIHIGH(outport); BITDLY();
-      } else
-      {  CLOCKBITLOWMOSILOW(outport); BITDLY(); CLOCKBITHIGHMOSILOW(outport); BITDLY();
-      } 
-      if (d & 0x08) 
-      {  CLOCKBITLOWMOSIHIGH(outport); BITDLY(); CLOCKBITHIGHMOSIHIGH(outport); BITDLY();
-      } else
-      {  CLOCKBITLOWMOSILOW(outport); BITDLY(); CLOCKBITHIGHMOSILOW(outport); BITDLY();
-      } 
-      if (d & 0x04) 
-      {  CLOCKBITLOWMOSIHIGH(outport); BITDLY(); CLOCKBITHIGHMOSIHIGH(outport); BITDLY();
-      } else
-      {  CLOCKBITLOWMOSILOW(outport); BITDLY(); CLOCKBITHIGHMOSILOW(outport); BITDLY();
-      } 
-      if (d & 0x02) 
-      {  CLOCKBITLOWMOSIHIGH(outport); BITDLY(); CLOCKBITHIGHMOSIHIGH(outport); BITDLY();
-      } else
-      {  CLOCKBITLOWMOSILOW(outport); BITDLY(); CLOCKBITHIGHMOSILOW(outport); BITDLY();
-      } 
-      if (d & 0x01) 
-      {  CLOCKBITLOWMOSIHIGH(outport); BITDLY(); CLOCKBITHIGHMOSIHIGH(outport); BITDLY();
-      } else
-      {  CLOCKBITLOWMOSILOW(outport); BITDLY(); CLOCKBITHIGHMOSILOW(outport); BITDLY();
-      } 
+      outp(DATAPORT, d);
    } while (--bc);
-   CLOCKBITLOWMOSIHIGH(outport);
+#else
+   // Requires to add `-2' in the CC command line in the Makefile.
+   _asm {
+      mov   cx,bc
+      mov   dx,DATAPORT
+      push  ds
+      lds   si,dword ptr buff
+      rep   outsb
+      pop   ds
+   }
+#endif
 }
 
 
@@ -299,62 +218,24 @@ void rcvr_mmc (
    UINT bc            /* Number of bytes to receive */
 )
 {
+#if 1
    BYTE r;
-   WORD outport = OUTPORT;
-   WORD statusport = STATUSPORT;
    
    do {
-      CLOCKBITHIGHMOSIHIGH(outport); BITDLY();
-      r = 0;  if (DO(statusport)) r++;  /* bit7 */
-      CLOCKBITLOWMOSIHIGH(outport); BITDLY();
-
-      CLOCKBITHIGHMOSIHIGH(outport); BITDLY();
-      r <<= 1; if (DO(statusport)) r++;   /* bit6 */
-      CLOCKBITLOWMOSIHIGH(outport); BITDLY();
-
-      CLOCKBITHIGHMOSIHIGH(outport); BITDLY();
-      r <<= 1; if (DO(statusport)) r++;   /* bit5 */
-      CLOCKBITLOWMOSIHIGH(outport); BITDLY();
-
-      CLOCKBITHIGHMOSIHIGH(outport); BITDLY();
-      r <<= 1; if (DO(statusport)) r++;   /* bit4 */
-      CLOCKBITLOWMOSIHIGH(outport); BITDLY();
-
-      CLOCKBITHIGHMOSIHIGH(outport); BITDLY();
-      r <<= 1; if (DO(statusport)) r++;   /* bit3 */
-      CLOCKBITLOWMOSIHIGH(outport); BITDLY();
-
-      CLOCKBITHIGHMOSIHIGH(outport); BITDLY();
-      r <<= 1; if (DO(statusport)) r++;   /* bit2 */
-      CLOCKBITLOWMOSIHIGH(outport); BITDLY();
-
-      CLOCKBITHIGHMOSIHIGH(outport); BITDLY();
-      r <<= 1; if (DO(statusport)) r++;   /* bit1 */
-      CLOCKBITLOWMOSIHIGH(outport); BITDLY();
-
-      CLOCKBITHIGHMOSIHIGH(outport); BITDLY();
-      r <<= 1; if (DO(statusport)) r++;   /* bit0 */
-      CLOCKBITLOWMOSIHIGH(outport); BITDLY();
-
+      r = inp(DATAPORT);
       *buff++ = r;         /* Store a received byte */
    } while (--bc);
-}
-
-/*-----------------------------------------------------------------------*/
-/* Receive bytes from the card (bitbanging)                              */
-/*-----------------------------------------------------------------------*/
-
-static
-void dummy_rcvr_mmc (void)
-{
-   int i;
-   WORD outport = OUTPORT;
-   CLOCKBITLOWMOSIHIGHNOCS(outport); BITDLY();
-   for (i=0;i<8;i++)
-   {
-      CLOCKBITHIGHMOSIHIGHNOCS(outport); BITDLY();
-      CLOCKBITLOWMOSIHIGHNOCS(outport); BITDLY();
+#else
+   // Requires to add `-2' in the CC command line in the Makefile.
+   _asm {
+      mov   cx,bc
+      mov   dx,DATAPORT
+      push  es
+      les   di,dword ptr buff
+      rep   insb
+      pop   es
    }
+#endif
 }
 
 /*-----------------------------------------------------------------------*/
@@ -369,7 +250,7 @@ int wait_ready (void)   /* 1:OK, 0:Timeout */
 
 
    for (tmr = 5000; tmr; tmr--) {   /* Wait for ready in timeout of 500ms */
-      rcvr_mmc(&d, 1);
+      d = inp(DATAPORT);
       if (d == 0xFF) break;
       dly_us(100);
    }
@@ -386,10 +267,10 @@ int wait_ready (void)   /* 1:OK, 0:Timeout */
 static
 void deselect (void)
 {
-   BYTE d;
-
-   CS_H(OUTPORT);
-   dummy_rcvr_mmc();  /* Dummy clock (force DO hi-z for multiple slave SPI) */
+   outp(CONTROLPORT, 1); // CS high
+#if 0
+   outp(DATAPORT, 0xFF); /* Dummy clock (force DO hi-z for multiple slave SPI) */
+#endif
 }
 
 
@@ -403,8 +284,10 @@ int select (void) /* 1:OK, 0:Timeout */
 {
    BYTE d;
 
-   CS_L(OUTPORT); 
-   rcvr_mmc(&d, 1);  /* Dummy clock (force DO enabled) */
+   outp(CONTROLPORT, 0); // CS low
+#if 0
+   (void)inp(DATAPORT); /* Dummy clock (force DO enabled) */
+#endif
 
    if (wait_ready()) return 1;   /* OK */
    deselect();
@@ -423,21 +306,21 @@ int rcvr_datablock ( /* 1:OK, 0:Failed */
    UINT btr                 /* Byte count */
 )
 {
-   BYTE d[2];
+   BYTE d;
    UINT tmr;
 
 
    for (tmr = 1000; tmr; tmr--) {   /* Wait for data packet in timeout of 100ms */
-      rcvr_mmc(d, 1);
-      if (d[0] != 0xFF) break;
+      d = inp(DATAPORT);
+      if (d != 0xFF) break;
       dly_us(100);
    }
-   if (d[0] != 0xFE) {
+   if (d != 0xFE) {
     return 0;      /* If not valid data token, return with error */
    }
 
    rcvr_mmc(buff, btr);       /* Receive the data block into buffer */
-   rcvr_mmc(d, 2);               /* Discard CRC */
+   (void)inp(DATAPORT); (void)inp(DATAPORT); /* Discard CRC */
 
    return 1;                  /* Return with success */
 }
@@ -454,18 +337,18 @@ int xmit_datablock ( /* 1:OK, 0:Failed */
    BYTE token               /* Data/Stop token */
 )
 {
-   BYTE d[2];
+   BYTE d;
 
 
    if (!wait_ready()) return 0;
 
-   d[0] = token;
-   xmit_mmc(d, 1);            /* Xmit a token */
+   d = token;
+   xmit_mmc(&d, 1);            /* Xmit a token */
    if (token != 0xFD) {    /* Is it data token? */
       xmit_mmc(buff, 512); /* Xmit the 512 byte data block to MMC */
-      rcvr_mmc(d, 2);         /* Xmit dummy CRC (0xFF,0xFF) */
-      rcvr_mmc(d, 1);         /* Receive data response */
-      if ((d[0] & 0x1F) != 0x05) /* If not accepted, return with error */
+      (void)inp(DATAPORT); (void)inp(DATAPORT); /* Xmit dummy CRC (0xFF,0xFF) */
+      d = inp(DATAPORT);;         /* Receive data response */
+      if ((d & 0x1F) != 0x05) /* If not accepted, return with error */
       {
          return 0;
       }
@@ -528,11 +411,11 @@ BYTE send_cmd (      /* Returns command response (bit7==1:Send failed)*/
    xmit_mmc(buf, 6);
 
    /* Receive command response */
-   if (cmd == CMD12) rcvr_mmc(&d, 1);  /* Skip a stuff byte when stop reading */
+   if (cmd == CMD12) (void)inp(DATAPORT);  /* Skip a stuff byte when stop reading */
    n = 10;                       /* Wait for a valid response in timeout of 10 attempts */
    do
    {
-      rcvr_mmc(&d, 1);
+      d = inp(DATAPORT);
    }
    while ((d & 0x80) && (--n));
       TOUTCHR('P');
@@ -558,7 +441,7 @@ DSTATUS disk_status (
 )
 {
    if (drv) return STA_NOINIT;
-   if ((sd_card_check) && (CDDETECT(STATUSPORT)))
+   if ((sd_card_check) && (inp(CONTROLPORT) & 0x80))
    {
       Stat = STA_NOINIT;
       return STA_NOINIT;
@@ -571,7 +454,7 @@ DRESULT disk_result (
 )
 {
    if (drv) return RES_NOTRDY;
-   if ((sd_card_check) && (CDDETECT(STATUSPORT)))
+   if ((sd_card_check) && (inp(CONTROLPORT) & 0x80))
    {
       Stat = STA_NOINIT;
       return RES_NOTRDY;
@@ -595,18 +478,14 @@ DSTATUS disk_initialize (
    setportbase(portbase);
 
    if (drv) return RES_NOTRDY;
-   if ((sd_card_check) && (CDDETECT(STATUSPORT)))
+   if ((sd_card_check) && (inp(CONTROLPORT) & 0x80))
       return RES_NOTRDY;
 
    ty = 0;
    for (n = 5; n; n--) {
-      CS_INIT(); CS_H(OUTPORT);   /* Initialize port pin tied to CS */
+      outp(CONTROLPORT, 1); // CS high
       dly_us(10000);       /* 10ms. time for SD card to power up */
-      CS_INIT(); CS_H(OUTPORT);   /* Initialize port pin tied to CS */
-      CK_INIT(); CK_L(OUTPORT);   /* Initialize port pin tied to SCLK */
-      DI_INIT();           /* Initialize port pin tied to DI */
-      DO_INIT();           /* Initialize port pin tied to DO */
-      for (tmr = 10; tmr; tmr--) dummy_rcvr_mmc(); /* Apply 80 dummy clocks and the card gets ready to receive command */
+      for (tmr = 10; tmr; tmr--) outp(DATAPORT, 0xFF); /* Apply 80 dummy clocks and the card gets ready to receive command */
       if (send_cmd(CMD0, 0) == 1) {       /* Enter Idle state */
          if (send_cmd(CMD8, 0x1AA) == 1) {   /* SDv2? */
             rcvr_mmc(buf, 4);                   /* Get trailing return value of R7 resp */
