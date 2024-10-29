@@ -3557,7 +3557,7 @@ info:
 ;	EMM driver initial routine work data area
 ;--------------------------------------------------------------------
 start_msg       db      CR,LF
-                DB	'LTEMM: Lo-tech EMM Driver '
+                DB	'LTEMM: Lo-tech EMM Driver for XTMax '
 msg_ver         db      'r01'
 		DB	CR,LF,'$'
 install_msg	label   byte
@@ -3573,8 +3573,9 @@ notinst		DB	'Installation failed - No EMS available.',CR,LF,LF,'$'
 pagemsg		DB	'0000 Pages testing, Esc bypass test',CR,'$'
 tstpage		DB	'0000',CR,'$'
 info_msg        db       CR,LF
-		db      'Expanded Memory Manager for the Lo-tech 2MB EMS board.',CR,LF
+		db      'Expanded Memory Manager for the XTMax expansion board.',CR,LF
 		db	 CR,LF
+		db	'Based on Lo-tech EMM Driver for the Lo-tech 2MB EMS board..',CR,LF
 		db	'Based on original works Copyright (c) 1988, Alex Tsourikov.',CR,LF
 		db	'All rights reserved.',CR,LF
                 db       CR,LF

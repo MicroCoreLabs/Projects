@@ -81,7 +81,7 @@ hardware_info_struct            STRUC
 hardware_info_struct            ENDS
 
 HANDLE_CNT		EQU	64	;max handle count
-PAGE_MAX		EQU	128	;max logical page count
+PAGE_MAX		EQU	255	;max logical page count
 BACK_MAX		EQU	5	;max mapping data backup count
 I8042			EQU	60H	;i8042 i/o port address
 TIME_OUT		EQU	1000	;
