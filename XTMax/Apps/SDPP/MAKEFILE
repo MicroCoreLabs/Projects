@@ -1,0 +1,26 @@
+# Makefile for the TU58 Device Driver project - RLA [12-Aug-94]
+
+CC=bcc -c -ms -Z -O -Ol -Oe
+ASM=tasm -mx
+
+.c.obj:
+   $(CC) $<
+
+.asm.obj:
+   $(ASM) $*
+
+sd.sys:   header.obj cprint.obj sd.obj sdmm.obj driver.obj
+   tlink -t -m -s -n header cprint sd sdmm driver, sd.sys
+
+sd.com:   header.obj cprint.obj sd.obj sdmm.obj driver.obj
+   tlink -t -m -s -n header cprint sd sdmm driver, sd.sys
+   rename sd.sys sd.com
+
+clean:
+   del *.obj
+   del sd.sys
+
+driver.obj: cprint.c sdmm.c driver.c cprint.c cprint.h standard.h driver.h sd.h
+sd.obj:   sd.c sd.h standard.h driver.h
+sdmm.obj:   sdmm.c diskio.h integer.h
+header.obj: header.asm

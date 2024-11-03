@@ -1,0 +1,100 @@
+;*****************************************************************
+;*							         *
+;*							         *
+;*	EMM/EMS driver program for BOCARAM30 Memory board        *
+;*							         *
+;*							         *
+;*****************************************************************
+;               Some useful macros ...
+;Обмен байтами между SOURCE и DESTINATION
+Exbyte          MACRO
+                mov     al,[si]
+                xchg    al,es:[di]
+                mov     [si],al
+                inc     si
+                inc     di
+                ENDM
+
+;Обмен словами между SOURCE и DESTINATION
+Exword          MACRO
+                mov     ax,[si]
+                xchg    ax,es:[di]
+                mov     [si],ax
+                add     di,2
+                add     si,2
+                ENDM
+
+;Вычисление абсолютного адреса FAR-указателя
+;Вход  :  указатель в формате сегмент:смещение
+;Выход :  DX:AX = абсолютный адрес
+FarPtrAddress   MACRO   Segment,Offset
+                mov     dx,Segment
+                mov     ax,Offset
+                mov     bx,dx
+                mov     cl,4
+                shl     bx,cl
+                and     dx,0F000h
+                rol     dx,cl
+                add     ax,bx
+                adc     dx,0
+                ENDM
+
+;Вычисление абсолютного адреса FAR-указателя
+;Вход  :  указатель сегмент:смещение (DX:AX)
+;Выход :  DX:AX = абсолютный адрес
+FarAddress      MACRO
+                mov     bx,dx
+                mov     cl,4
+                shl     bx,cl
+                and     dx,0F000h
+                rol     dx,cl
+                add     ax,bx
+                adc     dx,0
+                ENDM
+
+;Сдвиг влево 32-разрядного числа (DX:AX) на COUNT раз
+Shl32           MACRO   Count
+                 REPT    Count
+                 shl     ax,1
+                 rcl     dx,1
+                 ENDM
+                ENDM
+
+;Сдвиг вправо 32-разрядного числа (DX:AX) на COUNT раз
+Shr32           MACRO   Count
+                 REPT    Count
+                 shr     dx,1
+                 rcr     ax,1
+                 ENDM
+                ENDM
+
+;Сложение 32-разрядных чисел (DX:AX) + HIGH-LOW
+Add32           MACRO   High,Low
+                add     ax,Low
+                adc     dx,High
+                ENDM
+
+;Вычитание 32-разрядных чисел (DX:AX) - HIGH-LOW
+Sub32           MACRO   High,Low
+                sub     ax,Low
+                sbb     dx,High
+                ENDM
+
+;Загрузка 32-разрядного числа в (DX:AX)
+Load32          MACRO   High,Low
+                mov     dx,High
+                mov     ax,Low
+                ENDM
+
+;Загрузка 32-разрядного числа в (DX:AX)
+FLoad32         MACRO   Strt
+                les     ax,dword ptr Strt
+                mov     dx,es
+                ENDM
+
+;Сохранение 32-разрядного числа (DX:AX) в HIGH-LOW
+Save32          MACRO   High,Low
+                mov     High,dx
+                mov     Low,ax
+                ENDM
+
