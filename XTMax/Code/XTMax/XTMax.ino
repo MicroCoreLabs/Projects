@@ -24,6 +24,9 @@
 // Revision 3 10/11/2024
 // Added variable wait states for Expanded RAM
 //  - For 4.77 Mhz, can be changed to zero wait states for Write cycles and two for Read cycles
+// 
+// Revision 4 11/11/2024
+// - Updated MicroSD support and conventional memory to 640 KB
 //
 //------------------------------------------------------------------------
 //
@@ -99,9 +102,9 @@
 #define PIN_DOUT5           7 
 #define PIN_DOUT4           8 
 #define PIN_DOUT3           13
-#define PIN_DOUT2           11
-#define PIN_DOUT1           12
-#define PIN_DOUT0           10
+#define PIN_DOUT2           11  // temp spi_mosi
+#define PIN_DOUT1           12  // temp spi_cs
+#define PIN_DOUT0           10  // temp spi clk
 
 #define PIN_PSRAM_D3        54    // GPIO9-29
 #define PIN_PSRAM_D2        50    // GPIO9-28
@@ -155,21 +158,29 @@ uint32_t  isa_address = 0;
 uint32_t  page_base_address = 0;
 uint32_t  psram_address = 0;
 uint32_t  sd_pin_outputs = 0;
+uint32_t  databit_out = 0;
 
-uint8_t  data_in = 0;
-uint8_t  isa_data_out = 0;
-uint8_t  lpt_data = 0;
-uint8_t  lpt_status = 0x6F;
-uint8_t  lpt_control = 0xEC;
-uint8_t  nibble_in =0;
-uint8_t  nibble_out =0;
-uint8_t  read_byte =0;
-uint8_t  reg_0x260 =0;
-uint8_t  reg_0x261 =0;
-uint8_t  reg_0x262 =0;
-uint8_t  reg_0x263 =0;
+uint8_t   data_in = 0;
+uint8_t   isa_data_out = 0;
+uint8_t   lpt_data = 0;
+uint8_t   lpt_status = 0x6F;
+uint8_t   lpt_control = 0xEC;
+uint8_t   nibble_in =0;
+uint8_t   nibble_out =0;
+uint8_t   read_byte =0;
+uint8_t   reg_0x260 =0;
+uint8_t   reg_0x261 =0;
+uint8_t   reg_0x262 =0;
+uint8_t   reg_0x263 =0;
+uint8_t   spi_shift_out =0;
+uint32_t  sd_spi_dataout =0;
+uint8_t   sd_spi_datain =0;
+uint32_t  sd_spi_cs_n = 0x0;
 
-uint8_t  internal_RAM[0x60000];
+
+
+DMAMEM  uint8_t  internal_RAM1[0x60000];
+        uint8_t  internal_RAM2[0x40000];
 
 
 // --------------------------------------------------------------------------------------------------
@@ -257,8 +268,56 @@ void setup() {
 }
 
 
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+inline void SD_SPI_TXRXBit()  {
+    
+    // Drive CLK low and MOSI
+    //
+    GPIO7_DR = GPIO7_DR & 0xE0000000;  // Trigger out
+    sd_pin_outputs = (sd_spi_cs_n<<17) | (0x0<<13) | databit_out;                      // SD_CS_n - SD_CLK - SD_MOSI
+    GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_LOW + DATA_OE_n_HIGH;
+    delayNanoseconds(10);
+    
+    // Drive CLK high
+    //
+    GPIO7_DR = GPIO7_DR | 0x10000000;  // Trigger out
+    sd_pin_outputs = (sd_spi_cs_n<<17) | (0x1<<13) | databit_out;                      // SD_CS_n - SD_CLK - SD_MOSI
+    GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_LOW + DATA_OE_n_HIGH;
+    sd_spi_datain = sd_spi_datain << 1;
+    if ((GPIO8_DR&0x00004000)!=0) {sd_spi_datain = sd_spi_datain | 0x01; }             // Shift in MISO data
+    delayNanoseconds(10);
+
+    // Drive CLK and MOSI low
+    //
+    sd_pin_outputs = (sd_spi_cs_n<<17) | (0x0<<13) | 0x0;                              // SD_CS_n - SD_CLK - SD_MOSI
+    GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_LOW + DATA_OE_n_HIGH;
+    
+    return;
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+inline void SD_SPI_Cycle()  {
+    
+    GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_LOW + DATA_OE_n_HIGH ;  // Assert CHRDY_n=0 to begin wait states
+
+    databit_out = ((sd_spi_dataout&0x80)<<5 );  SD_SPI_TXRXBit();  // Bit 7
+    databit_out = ((sd_spi_dataout&0x40)<<6 );  SD_SPI_TXRXBit();  // Bit 6
+    databit_out = ((sd_spi_dataout&0x20)<<7 );  SD_SPI_TXRXBit();  // Bit 5
+    databit_out = ((sd_spi_dataout&0x10)<<8 );  SD_SPI_TXRXBit();  // Bit 4
+    databit_out = ((sd_spi_dataout&0x08)<<9 );  SD_SPI_TXRXBit();  // Bit 3
+    databit_out = ((sd_spi_dataout&0x04)<<10);  SD_SPI_TXRXBit();  // Bit 2
+    databit_out = ((sd_spi_dataout&0x02)<<11);  SD_SPI_TXRXBit();  // Bit 1
+    databit_out = ((sd_spi_dataout&0x01)<<12);  SD_SPI_TXRXBit();  // Bit 0
+
+    GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;  // De-assert CHRDY
 
 
+  return;
+}
 
 // --------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------
@@ -393,6 +452,26 @@ inline uint8_t PSRAM_Write(uint32_t address_in , int8_t local_data) {
 return read_byte;
  }
  
+ 
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+inline uint8_t Internal_RAM_Read() {
+    uint8_t local_temp;
+    
+    if (isa_address<0x60000)    local_temp = internal_RAM1[isa_address];
+    else                        local_temp = internal_RAM2[isa_address-0x60000];
+    
+    return local_temp;
+}
+
+inline void Internal_RAM_Write() {
+    
+    if (isa_address<0x60000)    internal_RAM1[isa_address]         = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
+    else                        internal_RAM2[isa_address-0x60000] = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
+    
+    return;
+}
 
 // --------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------
@@ -415,7 +494,7 @@ inline void Mem_Read_Cycle() {
 
       isa_data_out = PSRAM_Read(psram_address);      
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;  // Output data 
-	    GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;  // De-assert CHRDY
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;  // De-assert CHRDY
 
       
       
@@ -425,8 +504,9 @@ inline void Mem_Read_Cycle() {
     }
     
     
-  else if ( (isa_address>=0x40000) && (isa_address<0xA0000) )  {    // 384 KB
-      isa_data_out = internal_RAM[isa_address-0x40000];
+  //else if ( (isa_address>=0x40000) && (isa_address<0xA0000) )  {    // 384 KB
+  else if ( (isa_address>=0x10000) && (isa_address<0xA0000) )  {    // 384 KB
+      isa_data_out = Internal_RAM_Read();
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;
       
@@ -462,11 +542,11 @@ inline void Mem_Write_Cycle() {
       gpio6_int = GPIO6_DR;
       data_in = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
       PSRAM_Write(psram_address , data_in);  
-	    GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;  // De-assert CHRDY
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;  // De-assert CHRDY
 
      
       while ( (gpio9_int&0xF0) != 0xF0 ) {   // Wait here until cycle is complete
-        gpio6_int = GPIO6_DR;   // Needed?
+        gpio6_int = GPIO6_DR;     
         gpio9_int = GPIO9_DR; 
         }  
       
@@ -475,16 +555,17 @@ inline void Mem_Write_Cycle() {
     }   
         
     
-    else if ( (isa_address>=0x40000) && (isa_address<0xA0000) )  {    // 384 KB
+    //else if ( (isa_address>=0x40000) && (isa_address<0xA0000) )  {    // 384 KB
+    else if ( (isa_address>=0x10000) && (isa_address<0xA0000) )  {    // 384 KB
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
     
       while ( (gpio9_int&0xF0) != 0xF0 ) {   // Wait here until cycle is complete
-        gpio6_int = GPIO6_DR;   // Needed?
+        gpio6_int = GPIO6_DR;     
         gpio9_int = GPIO9_DR; 
         }  
       
-      internal_RAM[isa_address-0x40000] = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
+      Internal_RAM_Write();
       
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
@@ -521,14 +602,9 @@ inline void IO_Read_Cycle() {
         
     else if ((isa_address&0x0FF8)==0x378 )  {   // Location of Parallel Port
   
-      if ((GPIO8_DR&0x00004000)!=0) { lpt_status = lpt_status | 0xFF;   }  
-      else                          { lpt_status = lpt_status & 0x00;   } // PIN_SD_MISO    43    GPIO8-14
-  
-
       switch (isa_address)  {
-          case 0x378:  isa_data_out = lpt_data;     break;
-          case 0x379:  isa_data_out = lpt_status;   break;
-          case 0x37A:  isa_data_out = lpt_control;  break;
+          case 0x378:  sd_spi_dataout = 0xff; SD_SPI_Cycle(); isa_data_out = sd_spi_datain; break;
+
       }
       
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
@@ -555,7 +631,7 @@ inline void IO_Write_Cycle() {
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
     
       while ( (gpio9_int&0xF0) != 0xF0 ) {   // Wait here until cycle is complete
-        gpio6_int = GPIO6_DR;  // Needed?
+        gpio6_int = GPIO6_DR;    
         gpio9_int = GPIO9_DR; 
         }  
 
@@ -572,23 +648,27 @@ inline void IO_Write_Cycle() {
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
     }
     
+    
     else if ((isa_address&0x0FF8)==0x378 )  {   // Location of Parallel Port
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
     
-      while ( (gpio9_int&0xF0) != 0xF0 ) {   // Wait here until cycle is complete
-        gpio6_int = GPIO6_DR;  // Needed?
-        gpio9_int = GPIO9_DR; 
-        }  
-
+      delayNanoseconds(50); // Give some time for write data to be available after IOWR_n goes low
+      gpio6_int = GPIO6_DR;
       data_in = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
       
       switch (isa_address)  {
-        case 0x378:  lpt_data    = data_in;  break;
-        case 0x37A:  lpt_control = data_in;  break;
+        case 0x378:  sd_spi_dataout = data_in;  SD_SPI_Cycle(); break;
+        case 0x379:  sd_spi_cs_n    = data_in&0x1;              break;
       }
+      
+      //gpio9_int = GPIO9_DR;
+      while ( (gpio9_int&0xF0) != 0xF0 ) {   // Wait here until cycle is complete
+        gpio6_int = GPIO6_DR;    
+        gpio9_int = GPIO9_DR; 
+        }  
 
-      sd_pin_outputs = ((lpt_data&0x4)<<15) | ((lpt_data&0x2)<<12) | ((lpt_data&0x1)<<12);   // lpt_data[2]=SD_CS_n - lpt_data[1]=SD_CLK - lpt_data[0]=SD_MOSI
+      sd_pin_outputs = (sd_spi_cs_n<<17);   // SD_CS_n - SD_CLK - SD_MOSI
       
       //trigger_out = ((lpt_data&0x1)<<28); // SD_MOSI
       //trigger_out = ((lpt_data&0x2)<<27); // SD_CLK
@@ -614,11 +694,10 @@ void loop() {
   // Give Teensy 4.1 a moment
   //
   //delay (1000);
-
+ 
   PSRAM_Configure();
 
   while (1) {
-      
       
       gpio6_int = GPIO6_DR;
       gpio9_int = GPIO9_DR;
