@@ -146,6 +146,17 @@
 #define PSRAM_RESET_VALUE  0x01000000
 #define PSRAM_CLK_HIGH     0x02000000
 
+		
+// XTMax extends expanded memory after motherboard installed RAM.
+// Set to:
+//         0x10000 when motherboard contains  64 KB
+//         0x20000 when motherboard contains 128 KB
+//         0x40000 when motherboard contains 256 KB
+//         0x80000 when motherboard contains 512 KB		
+#define EXPANDED_RAM_BASE_ADDRESS     0x40000
+
+  
+
     
 // --------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------
@@ -173,9 +184,9 @@ uint8_t   reg_0x261 =0;
 uint8_t   reg_0x262 =0;
 uint8_t   reg_0x263 =0;
 uint8_t   spi_shift_out =0;
-uint32_t  sd_spi_dataout =0;
 uint8_t   sd_spi_datain =0;
 uint32_t  sd_spi_cs_n = 0x0;
+uint32_t  sd_spi_dataout =0;
 
 
 
@@ -504,8 +515,7 @@ inline void Mem_Read_Cycle() {
     }
     
     
-  //else if ( (isa_address>=0x40000) && (isa_address<0xA0000) )  {    // 384 KB
-  else if ( (isa_address>=0x10000) && (isa_address<0xA0000) )  {    // 384 KB
+  else if ( (isa_address>=EXPANDED_RAM_BASE_ADDRESS) && (isa_address<0xA0000) )  {  // Expanded RAM
       isa_data_out = Internal_RAM_Read();
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;
@@ -554,9 +564,8 @@ inline void Mem_Write_Cycle() {
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
     }   
         
-    
-    //else if ( (isa_address>=0x40000) && (isa_address<0xA0000) )  {    // 384 KB
-    else if ( (isa_address>=0x10000) && (isa_address<0xA0000) )  {    // 384 KB
+  
+    else if ( (isa_address>=EXPANDED_RAM_BASE_ADDRESS) && (isa_address<0xA0000) )  {    // Expanded RAM
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
     
