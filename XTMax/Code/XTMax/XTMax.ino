@@ -29,7 +29,10 @@
 // - Updated MicroSD support and conventional memory to 640 KB
 //
 // Revision 5 11/26/2024
-// - XTMsx automatically configured addition to conventional memory to 640 KB
+// - XTMax automatically configured addition to conventional memory to 640 KB
+//
+// Revision 6 12/14/2024
+// - Made SD LPT base a # define
 //
 //------------------------------------------------------------------------
 //
@@ -148,6 +151,8 @@
 
 #define PSRAM_RESET_VALUE  0x01000000
 #define PSRAM_CLK_HIGH     0x02000000
+
+#define SD_LPT_BASE        0x378     
 
  
    
@@ -633,10 +638,10 @@ inline void IO_Read_Cycle() {
     }
    
        
-    else if ((isa_address&0x0FF8)==0x378 )  {   // Location of Parallel Port
+    else if ((isa_address&0x0FFC)==SD_LPT_BASE )  {   // Location of Parallel Port
  
       switch (isa_address)  {
-          case 0x378:  sd_spi_dataout = 0xff; SD_SPI_Cycle(); isa_data_out = sd_spi_datain; break;
+          case SD_LPT_BASE:  sd_spi_dataout = 0xff; SD_SPI_Cycle(); isa_data_out = sd_spi_datain; break;
 
       }
      
@@ -682,7 +687,7 @@ inline void IO_Write_Cycle() {
     }
    
    
-    else if ((isa_address&0x0FF8)==0x378 )  {   // Location of Parallel Port
+    else if ((isa_address&0x0FFC)==SD_LPT_BASE )  {   // Location of Parallel Port
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
    
@@ -691,8 +696,8 @@ inline void IO_Write_Cycle() {
       data_in = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
      
       switch (isa_address)  {
-        case 0x378:  sd_spi_dataout = data_in;  SD_SPI_Cycle(); break;
-        case 0x379:  sd_spi_cs_n    = data_in&0x1;              break;
+        case SD_LPT_BASE    :  sd_spi_dataout = data_in;  SD_SPI_Cycle(); break;
+        case (SD_LPT_BASE+1):  sd_spi_cs_n    = data_in&0x1;              break;
       }
      
       //gpio9_int = GPIO9_DR;
