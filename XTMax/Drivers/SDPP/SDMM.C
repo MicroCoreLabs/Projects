@@ -188,11 +188,19 @@ void xmit_mmc (
 )
 {
 #ifndef USE286
-   BYTE d;
-   do {
-      d = *buff++;   /* Get a byte to be sent */
-      outp(DATAPORT, d);
-   } while (--bc);
+   _asm {
+      mov   cx,bc
+      mov   dx,DATAPORT
+      push  ds
+      lds   si,dword ptr buff
+   }
+   repeat:
+   _asm {
+      lodsb
+      out   dx, al
+      loop  repeat
+      pop   ds
+   }
 #else
    _asm {
       mov   cx,bc
@@ -218,12 +226,19 @@ void rcvr_mmc (
 )
 {
 #ifndef USE286
-   BYTE r;
-   
-   do {
-      r = inp(DATAPORT);
-      *buff++ = r;         /* Store a received byte */
-   } while (--bc);
+   _asm {
+      mov   cx,bc
+      mov   dx,DATAPORT
+      push  es
+      les   di,dword ptr buff
+   }
+   repeat:
+   _asm {
+      in    al, dx
+      stosb
+      loop  repeat
+      pop   es
+   }
 #else
    _asm {
       mov   cx,bc
