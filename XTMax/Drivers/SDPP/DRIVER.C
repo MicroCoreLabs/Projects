@@ -256,13 +256,13 @@ PUBLIC void GenericIOCTL (rh_generic_ioctl_t far *rh)
       case GET_ACCESS:      ((access_flag_t far *) (rh->packet))->allowed = 1;
              rh->rh.status = DONE;
              return;
+      case GET_MEDIA_ID:
       case SET_MEDIA_ID:
       case SET_ACCESS:
       case SET_PARAMETERS:
       case FORMAT_TRACK:
              rh->rh.status = DONE;
              return;
-      case GET_MEDIA_ID:
       default: ;
     }
   cdprintf("SD: unimplemented IOCTL - unit=%d, major=0x%2x, minor=0x%2x\n",
