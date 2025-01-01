@@ -129,7 +129,7 @@ _header  DD -1    ; link to the next device
    DW DGROUP:STRATEGY   ; address of the strategy routine
    DW DGROUP:INTERRUPT;  "     "   "  interrupt   "
    DB 1     ; number of drives
-   DB 'SDCDv11'   ; DOS doesn't really use these bytes
+   DB 'SDCDv12'   ; DOS doesn't really use these bytes
 
 ;   The geometry (sectors/track, tracks/cylinder) defined in the BPB is rather
 ; arbitrary in the case of the TU58, but there are things to watch out for.

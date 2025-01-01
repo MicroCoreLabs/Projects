@@ -187,14 +187,13 @@ void xmit_mmc (
    UINT bc                  /* Number of bytes to send */
 )
 {
-#if 1
+#ifndef USE286
    BYTE d;
    do {
       d = *buff++;   /* Get a byte to be sent */
       outp(DATAPORT, d);
    } while (--bc);
 #else
-   // Requires to add `-2' in the CC command line in the Makefile.
    _asm {
       mov   cx,bc
       mov   dx,DATAPORT
@@ -218,7 +217,7 @@ void rcvr_mmc (
    UINT bc            /* Number of bytes to receive */
 )
 {
-#if 1
+#ifndef USE286
    BYTE r;
    
    do {
@@ -226,7 +225,6 @@ void rcvr_mmc (
       *buff++ = r;         /* Store a received byte */
    } while (--bc);
 #else
-   // Requires to add `-2' in the CC command line in the Makefile.
    _asm {
       mov   cx,bc
       mov   dx,DATAPORT
@@ -268,9 +266,6 @@ static
 void deselect (void)
 {
    outp(CONTROLPORT, 1); // CS high
-#if 0
-   outp(DATAPORT, 0xFF); /* Dummy clock (force DO hi-z for multiple slave SPI) */
-#endif
 }
 
 
@@ -285,9 +280,6 @@ int select (void) /* 1:OK, 0:Timeout */
    BYTE d;
 
    outp(CONTROLPORT, 0); // CS low
-#if 0
-   (void)inp(DATAPORT); /* Dummy clock (force DO enabled) */
-#endif
 
    if (wait_ready()) return 1;   /* OK */
    deselect();
