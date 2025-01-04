@@ -3,24 +3,30 @@
 CC=bcc -c -ms -Z -O -Ol -Oe
 ASM=tasm -mx
 
-.c.obj:
-   $(CC) $<
+DEPS=cprint.c driver.c sd.c sdmm.c cprint.h diskio.h driver.h integer.h sd.h standard.h 
+
+all: sd.sys sd286.sys
 
 .asm.obj:
    $(ASM) $*
 
-sd.sys:   header.obj cprint.obj sd.obj sdmm.obj driver.obj
-   tlink -t -m -s -n header cprint sd sdmm driver, sd.sys
+sd.sys: header.obj $(DEPS)
+   $(CC) cprint.c
+   $(CC) sd.c
+   $(CC) sdmm.c
+   $(CC) driver.c
+   tlink -t -m -s -n header cprint sd sdmm driver, $@
 
-sd.com:   header.obj cprint.obj sd.obj sdmm.obj driver.obj
-   tlink -t -m -s -n header cprint sd sdmm driver, sd.sys
-   rename sd.sys sd.com
+sd286.sys: header.obj $(DEPS)
+   $(CC) -1 -DUSE286 cprint.c
+   $(CC) -1 -DUSE286 sd.c
+   $(CC) -1 -DUSE286 sdmm.c
+   $(CC) -1 -DUSE286 driver.c
+   tlink -t -m -s -n header cprint sd sdmm driver, $@
 
 clean:
    del *.obj
-   del sd.sys
+   del *.map
+   del *.sys
 
-driver.obj: cprint.c sdmm.c driver.c cprint.c cprint.h standard.h driver.h sd.h
-sd.obj:   sd.c sd.h standard.h driver.h
-sdmm.obj:   sdmm.c diskio.h integer.h
 header.obj: header.asm
