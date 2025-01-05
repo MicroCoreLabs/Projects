@@ -3,6 +3,7 @@
 /-------------------------------------------------------------------------/
 /
 /  Copyright (C) 2013, ChaN, all right reserved.
+/  Copyright (C) 2024, Ted Fried, Matthieu Bucchianeri
 /
 / * This software is a free software and there is NO WARRANTY.
 / * No restriction on use. You can use, modify and redistribute it for
@@ -26,15 +27,8 @@
 /* Platform dependent macros and functions needed to be modified           */
 /*-------------------------------------------------------------------------*/
 
-static WORD portbases[5] = {0x3BC,0x378,0x278,0x3E8,0x2E8};
-
-BYTE sd_card_check = 0;
-BYTE portbase = 2;
-
-WORD DATAPORT=0x378;
-WORD CONTROLPORT=0x379;
-
-#define VAR_INIT() {CONTROLPORT=DATAPORT+1;}
+WORD DATAPORT=0x280;
+WORD CONTROLPORT=0x282;
 
 #if 1
 #define TOUTCHR(x)
@@ -70,13 +64,6 @@ static BYTE toutword(WORD x)
 }
 
 #endif
-
-void setportbase(BYTE val)
-{
-  if ((val >= 1) && (val <= (sizeof(portbases)/sizeof(portbases[0])) ))
-    DATAPORT = portbases[val-1];
-  VAR_INIT();
-}
 
 static
 void dly_us (UINT n) 
@@ -187,7 +174,10 @@ void xmit_mmc (
    UINT bc                  /* Number of bytes to send */
 )
 {
-#ifndef USE286
+   // NOTE: Callers always use buffer sizes multiple of two.
+   bc >>= 1;
+
+#ifndef USE186
    _asm {
       mov   cx,bc
       mov   dx,DATAPORT
@@ -196,8 +186,8 @@ void xmit_mmc (
    }
    repeat:
    _asm {
-      lodsb
-      out   dx, al
+      lodsw
+      out   dx, ax
       loop  repeat
       pop   ds
    }
@@ -207,7 +197,7 @@ void xmit_mmc (
       mov   dx,DATAPORT
       push  ds
       lds   si,dword ptr buff
-      rep   outsb
+      rep   outsw
       pop   ds
    }
 #endif
@@ -225,7 +215,10 @@ void rcvr_mmc (
    UINT bc            /* Number of bytes to receive */
 )
 {
-#ifndef USE286
+   // NOTE: Callers always use buffer sizes multiple of two.
+   bc >>= 1;
+
+#ifndef USE186
    _asm {
       mov   cx,bc
       mov   dx,DATAPORT
@@ -234,8 +227,8 @@ void rcvr_mmc (
    }
    repeat:
    _asm {
-      in    al, dx
-      stosb
+      in    ax, dx
+      stosw
       loop  repeat
       pop   es
    }
@@ -245,7 +238,7 @@ void rcvr_mmc (
       mov   dx,DATAPORT
       push  es
       les   di,dword ptr buff
-      rep   insb
+      rep   insw
       pop   es
    }
 #endif
@@ -350,7 +343,7 @@ int xmit_datablock ( /* 1:OK, 0:Failed */
    if (!wait_ready()) return 0;
 
    d = token;
-   xmit_mmc(&d, 1);            /* Xmit a token */
+   outp(DATAPORT, d);          /* Xmit a token */
    if (token != 0xFD) {    /* Is it data token? */
       xmit_mmc(buff, 512); /* Xmit the 512 byte data block to MMC */
       (void)inp(DATAPORT); (void)inp(DATAPORT); /* Xmit dummy CRC (0xFF,0xFF) */
@@ -448,11 +441,6 @@ DSTATUS disk_status (
 )
 {
    if (drv) return STA_NOINIT;
-   if ((sd_card_check) && (inp(CONTROLPORT) & 0x80))
-   {
-      Stat = STA_NOINIT;
-      return STA_NOINIT;
-   }
    return Stat;
 }
 
@@ -461,11 +449,6 @@ DRESULT disk_result (
 )
 {
    if (drv) return RES_NOTRDY;
-   if ((sd_card_check) && (inp(CONTROLPORT) & 0x80))
-   {
-      Stat = STA_NOINIT;
-      return RES_NOTRDY;
-   }
    return RES_OK;
 }
 
@@ -482,11 +465,7 @@ DSTATUS disk_initialize (
    UINT tmr;
    DSTATUS s;
 
-   setportbase(portbase);
-
    if (drv) return RES_NOTRDY;
-   if ((sd_card_check) && (inp(CONTROLPORT) & 0x80))
-      return RES_NOTRDY;
 
    ty = 0;
    for (n = 5; n; n--) {

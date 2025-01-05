@@ -2,7 +2,8 @@
 //
 //  File Name   :  XTMax.ino
 //  Used on     : 
-//  Author      :  Ted Fried, MicroCore Labs
+//  Authors     :  Ted Fried, MicroCore Labs
+//                 Matthieu Bucchianeri
 //  Creation    :  9/7/2024
 //
 //   Description:
@@ -33,6 +34,9 @@
 //
 // Revision 6 12/14/2024
 // - Made SD LPT base a # define
+//
+// Revision 7 01/05/2024
+// - Refactor SD card I/O
 //
 //------------------------------------------------------------------------
 //
@@ -152,7 +156,7 @@
 #define PSRAM_RESET_VALUE  0x01000000
 #define PSRAM_CLK_HIGH     0x02000000
 
-#define SD_LPT_BASE        0x378     
+#define SD_BASE            0x280  // Must be a multiple of 2.
 
  
    
@@ -171,9 +175,6 @@ uint32_t  databit_out = 0;
 
 uint8_t   data_in = 0;
 uint8_t   isa_data_out = 0;
-uint8_t   lpt_data = 0;
-uint8_t   lpt_status = 0x6F;
-uint8_t   lpt_control = 0xEC;
 uint8_t   nibble_in =0;
 uint8_t   nibble_out =0;
 uint8_t   read_byte =0;
@@ -638,12 +639,12 @@ inline void IO_Read_Cycle() {
     }
    
        
-    else if ((isa_address&0x0FFC)==SD_LPT_BASE )  {   // Location of Parallel Port
+    else if ((isa_address&0x0FFE)==SD_BASE )  {   // Location of SD Card registers
  
-      switch (isa_address)  {
-          case SD_LPT_BASE:  sd_spi_dataout = 0xff; SD_SPI_Cycle(); isa_data_out = sd_spi_datain; break;
-
-      }
+      // Both registers serve the same function (to allow use of Word I/O)
+      sd_spi_dataout = 0xff;
+      SD_SPI_Cycle();
+      isa_data_out = sd_spi_datain;
      
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;
@@ -687,7 +688,7 @@ inline void IO_Write_Cycle() {
     }
    
    
-    else if ((isa_address&0x0FFC)==SD_LPT_BASE )  {   // Location of Parallel Port
+    else if ((isa_address&0x0FFC)==SD_BASE )  {   // Location of SD Card registers
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
    
@@ -696,8 +697,9 @@ inline void IO_Write_Cycle() {
       data_in = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
      
       switch (isa_address)  {
-        case SD_LPT_BASE    :  sd_spi_dataout = data_in;  SD_SPI_Cycle(); break;
-        case (SD_LPT_BASE+1):  sd_spi_cs_n    = data_in&0x1;              break;
+        case SD_BASE:     // First two registers serve the same function (to allow use of Word I/O)
+        case SD_BASE+1:   sd_spi_dataout = data_in;  SD_SPI_Cycle(); break;
+        case SD_BASE+2:   sd_spi_cs_n    = data_in&0x1;              break;
       }
      
       //gpio9_int = GPIO9_DR;
@@ -708,10 +710,6 @@ inline void IO_Write_Cycle() {
 
       sd_pin_outputs = (sd_spi_cs_n<<17);   // SD_CS_n - SD_CLK - SD_MOSI
      
-      //trigger_out = ((lpt_data&0x1)<<28); // SD_MOSI
-      //trigger_out = ((lpt_data&0x2)<<27); // SD_CLK
-      //trigger_out = ((lpt_data&0x4)<<26); // SD_CS_n
-           
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
     }
