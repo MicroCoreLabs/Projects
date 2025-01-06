@@ -1,7 +1,9 @@
 *************************************************************************
 *							        	*
-*	EMS 4.0 Driver for Lo-tech 2MB EMS Board, rev.01, Mar-14	*
+*	EMS 4.0 Driver for XTMax, rev.02, Jan-2025	*
 *							        	*
+*	Based on Lo-Tech driver	*
+*									*
 *	http://www.lo-tech.co.uk/wiki/2MB-EMS-Board			*
 *	http://www.lo-tech.co.uk/wiki/LTEMM.EXE				*
 *									*
@@ -23,7 +25,7 @@
 *************************************************************************
 
 Syntax:    DEVICE=LTEMM.EXE [/switches]
- /p:nnnn - Page frame address (E000)
+ /p:nnnn - Page frame address (D000)
  /i:nnn  - EMS i/o port base address (260)
  /h:nnn  - Maximal number of handles (64)
  /d:nn   - Depth of contest saves (5)

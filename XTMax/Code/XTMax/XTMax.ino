@@ -35,8 +35,9 @@
 // Revision 6 12/14/2024
 // - Made SD LPT base a # define
 //
-// Revision 7 01/05/2024
+// Revision 7 01/12/2024
 // - Refactor SD card I/O
+// - Add support for 16-bit EMS page offsets.
 //
 //------------------------------------------------------------------------
 //
@@ -156,6 +157,11 @@
 #define PSRAM_RESET_VALUE  0x01000000
 #define PSRAM_CLK_HIGH     0x02000000
 
+#define EMS_BASE_IO        0x260    // Must be a multiple of 8.
+#define EMS_BASE_MEM       0xD0000
+
+#define EMS_TOTAL_SIZE     (8*1024*1024)
+
 #define SD_BASE            0x280  // Must be a multiple of 2.
 
  
@@ -178,10 +184,7 @@ uint8_t   isa_data_out = 0;
 uint8_t   nibble_in =0;
 uint8_t   nibble_out =0;
 uint8_t   read_byte =0;
-uint8_t   reg_0x260 =0;
-uint8_t   reg_0x261 =0;
-uint8_t   reg_0x262 =0;
-uint8_t   reg_0x263 =0;
+uint16_t  ems_frame_pointer[4] = {0, 0, 0, 0};
 uint8_t   spi_shift_out =0;
 uint8_t   sd_spi_datain =0;
 uint32_t  sd_spi_cs_n = 0x0;
@@ -387,6 +390,9 @@ inline void PSRAM_Configure() {
 // --------------------------------------------------------------------------------------------------
 
 inline uint8_t PSRAM_Read(uint32_t address_in) {
+  if (address_in >= EMS_TOTAL_SIZE) {
+    return 0xff;
+  }
 
 // Send Command = Quad Read = 0x0B
 //
@@ -424,15 +430,17 @@ inline uint8_t PSRAM_Read(uint32_t address_in) {
   GPIO9_DR = PSRAM_RESET_VALUE;                       // Drive  CLK=0 , CS_n=1
   GPIO9_GDIR = 0x3F000000;                            // Change Data[3:0] to outputs quickly
 
-return read_byte;
- }
+  return read_byte;
+}
 
  
 // --------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------
 
-inline uint8_t PSRAM_Write(uint32_t address_in , int8_t local_data) {
-
+inline void PSRAM_Write(uint32_t address_in , int8_t local_data) {
+  if (address_in >= EMS_TOTAL_SIZE) {
+    return;
+  }
 
 // Send Command = Quad Write = 0x02
 //
@@ -458,9 +466,7 @@ inline uint8_t PSRAM_Write(uint32_t address_in , int8_t local_data) {
   nibble_out = local_data;        PSRAM_Write_Clk_Cycle();
 
   GPIO9_DR = PSRAM_RESET_VALUE;                       // Drive  CLK=0 , CS_n=1
-
-return read_byte;
- }
+}
  
  
 // --------------------------------------------------------------------------------------------------
@@ -490,14 +496,14 @@ inline void Mem_Read_Cycle() {
    
     isa_address = ADDRESS_DATA_GPIO6_UNSCRAMBLE;
    
-    if ( (isa_address>=0xE0000) && (isa_address<0xF0000) )  {    // Expanded RAM page frame
+    if ( (isa_address>=EMS_BASE_MEM) && (isa_address<EMS_BASE_MEM+0x10000) )  {    // Expanded RAM page frame
      
       page_base_address   = (isa_address & 0xFC000);
  
-           if (page_base_address == 0xEC000)  {  psram_address = (reg_0x263<<14) | (isa_address & 0x03FFF);  }
-      else if (page_base_address == 0xE8000)  {  psram_address = (reg_0x262<<14) | (isa_address & 0x03FFF);  }
-      else if (page_base_address == 0xE4000)  {  psram_address = (reg_0x261<<14) | (isa_address & 0x03FFF);  }
-      else if (page_base_address == 0xE0000)  {  psram_address = (reg_0x260<<14) | (isa_address & 0x03FFF);  }
+           if (page_base_address == (EMS_BASE_MEM | 0xC000))  {  psram_address = (ems_frame_pointer[3]<<14) | (isa_address & 0x03FFF);  }
+      else if (page_base_address == (EMS_BASE_MEM | 0x8000))  {  psram_address = (ems_frame_pointer[2]<<14) | (isa_address & 0x03FFF);  }
+      else if (page_base_address == (EMS_BASE_MEM | 0x4000))  {  psram_address = (ems_frame_pointer[1]<<14) | (isa_address & 0x03FFF);  }
+      else if (page_base_address == (EMS_BASE_MEM | 0x0000))  {  psram_address = (ems_frame_pointer[0]<<14) | (isa_address & 0x03FFF);  }
      
       GPIO7_DR = MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_LOW + DATA_OE_n_LOW ;  // Assert CHRDY_n=0 to begin wait states
@@ -512,16 +518,15 @@ inline void Mem_Read_Cycle() {
      
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
     }
-   
-   
-/*
-XTMax_MEM_Response_Array
-- Array holds value 0,1,2
-0 = unitiailzed - add wait states and snoop
-1 = No wait states and no response
-2 = No wait states and yes respond
 
-*/
+  /*
+    XTMax_MEM_Response_Array
+    - Array holds value 0,1,2
+    0 = unitiailzed - add wait states and snoop
+    1 = No wait states and no response
+    2 = No wait states and yes respond
+
+  */
   else if (isa_address<0xA0000)   {        // "Conventional" RAM
       isa_data_out = Internal_RAM_Read();
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
@@ -565,14 +570,14 @@ inline void Mem_Write_Cycle() {
    
     isa_address = ADDRESS_DATA_GPIO6_UNSCRAMBLE;
    
-    if ( (isa_address>=0xE0000) && (isa_address<0xF0000) )  {    // Expanded RAM page frame
+    if ( (isa_address>=EMS_BASE_MEM) && (isa_address<EMS_BASE_MEM+0x10000) )  {    // Expanded RAM page frame
      
       page_base_address   = (isa_address & 0xFC000);
  
-           if (page_base_address == 0xEC000)  {  psram_address = (reg_0x263<<14) | (isa_address & 0x03FFF);  }
-      else if (page_base_address == 0xE8000)  {  psram_address = (reg_0x262<<14) | (isa_address & 0x03FFF);  }
-      else if (page_base_address == 0xE4000)  {  psram_address = (reg_0x261<<14) | (isa_address & 0x03FFF);  }
-      else if (page_base_address == 0xE0000)  {  psram_address = (reg_0x260<<14) | (isa_address & 0x03FFF);  }
+           if (page_base_address == (EMS_BASE_MEM | 0xC000))  {  psram_address = (ems_frame_pointer[3]<<14) | (isa_address & 0x03FFF);  }
+      else if (page_base_address == (EMS_BASE_MEM | 0x8000))  {  psram_address = (ems_frame_pointer[2]<<14) | (isa_address & 0x03FFF);  }
+      else if (page_base_address == (EMS_BASE_MEM | 0x4000))  {  psram_address = (ems_frame_pointer[1]<<14) | (isa_address & 0x03FFF);  }
+      else if (page_base_address == (EMS_BASE_MEM | 0x0000))  {  psram_address = (ems_frame_pointer[0]<<14) | (isa_address & 0x03FFF);  }
    
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_LOW + DATA_OE_n_HIGH;    // Steer data mux to Data[7:0] and Assert CHRDY_n=0 to begin wait states
@@ -593,8 +598,7 @@ inline void Mem_Write_Cycle() {
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
     }   
-       
- 
+
     else if (isa_address<0xA0000)   {    // XTMax stores the full 640 KB conventional memory
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
@@ -621,13 +625,17 @@ inline void IO_Read_Cycle() {
    
     isa_address = 0xFFFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
    
-    if ((isa_address&0x0FFC)==0x260 )  {   // Location of 16 KB Expanded Memory page frame pointers
+    if ((isa_address&0x0FF8)==EMS_BASE_IO )  {   // Location of 16 KB Expanded Memory page frame pointers
  
       switch (isa_address)  {
-        case 0x260:  isa_data_out = reg_0x260;  break;
-        case 0x261:  isa_data_out = reg_0x261;  break;
-        case 0x262:  isa_data_out = reg_0x262;  break;
-        case 0x263:  isa_data_out = reg_0x263;  break;
+        case EMS_BASE_IO  :  isa_data_out = ems_frame_pointer[0];  break;
+        case EMS_BASE_IO+1:  isa_data_out = ems_frame_pointer[0] >> 8;  break;
+        case EMS_BASE_IO+2:  isa_data_out = ems_frame_pointer[1];  break;
+        case EMS_BASE_IO+3:  isa_data_out = ems_frame_pointer[1] >> 8;  break;
+        case EMS_BASE_IO+4:  isa_data_out = ems_frame_pointer[2];  break;
+        case EMS_BASE_IO+5:  isa_data_out = ems_frame_pointer[2] >> 8;  break;
+        case EMS_BASE_IO+6:  isa_data_out = ems_frame_pointer[3];  break;
+        case EMS_BASE_IO+7:  isa_data_out = ems_frame_pointer[3] >> 8;  break;
       }
      
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
@@ -665,7 +673,7 @@ inline void IO_Write_Cycle() {
    
     isa_address = 0xFFFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
    
-    if ((isa_address&0x0FFC)==0x260 )  {   // Location of 16 KB Expanded Memory page frame pointers
+    if ((isa_address&0x0FF8)==EMS_BASE_IO )  {   // Location of 16 KB Expanded Memory page frame pointers
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
    
@@ -677,10 +685,14 @@ inline void IO_Write_Cycle() {
       data_in = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
      
       switch (isa_address)  {
-        case 0x260:  reg_0x260 = data_in;  break;
-        case 0x261:  reg_0x261 = data_in;  break;
-        case 0x262:  reg_0x262 = data_in;  break;
-        case 0x263:  reg_0x263 = data_in;  break;
+        case EMS_BASE_IO  :  ems_frame_pointer[0] = (ems_frame_pointer[0] & 0xFF00) | data_in;  break;
+        case EMS_BASE_IO+1:  ems_frame_pointer[0] = (ems_frame_pointer[0] & 0x00FF) | ((uint16_t)data_in << 8);  break;
+        case EMS_BASE_IO+2:  ems_frame_pointer[1] = (ems_frame_pointer[1] & 0xFF00) | data_in;  break;
+        case EMS_BASE_IO+3:  ems_frame_pointer[1] = (ems_frame_pointer[1] & 0x00FF) | ((uint16_t)data_in << 8);  break;
+        case EMS_BASE_IO+4:  ems_frame_pointer[2] = (ems_frame_pointer[2] & 0xFF00) | data_in;  break;
+        case EMS_BASE_IO+5:  ems_frame_pointer[2] = (ems_frame_pointer[2] & 0x00FF) | ((uint16_t)data_in << 8);  break;
+        case EMS_BASE_IO+6:  ems_frame_pointer[3] = (ems_frame_pointer[3] & 0xFF00) | data_in;  break;
+        case EMS_BASE_IO+7:  ems_frame_pointer[3] = (ems_frame_pointer[3] & 0x00FF) | ((uint16_t)data_in << 8);  break;
       }
            
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
