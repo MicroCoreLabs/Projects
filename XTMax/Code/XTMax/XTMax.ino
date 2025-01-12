@@ -37,7 +37,10 @@
 //
 // Revision 7 01/12/2025
 // - Refactor SD card I/O
-// - Add support for 16-bit EMS page offsets.
+// - Add support for 16-bit EMS page offsets
+//
+// Revision 8 01/18/2024
+// - Add support for BIOS ROM extension (Boot ROM)
 //
 // Revision 8 01/20/2025
 // - Added chip select for a second PSRAM to allow access to 16 MB of Expanded RAM
@@ -70,6 +73,8 @@
 
 #include <stdint.h>
 #include <stdio.h>
+
+#include "bootrom.h"
 
 
 // Teensy 4.1 pin assignments
@@ -573,6 +578,16 @@ inline void Mem_Read_Cycle() {
      
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
     }
+    else if (isa_address>=BOOTROM_ADDR && isa_address<BOOTROM_ADDR+sizeof(BOOTROM)) {   // Boot ROM
+      isa_data_out = BOOTROM[isa_address-BOOTROM_ADDR];
+      GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;
+
+      while ( (gpio9_int&0xF0) != 0xF0 ) { gpio9_int = GPIO9_DR; }  // Wait here until cycle is complete
+
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
+    }
+
     return;
 }
 
@@ -612,7 +627,6 @@ inline void Mem_Write_Cycle() {
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
     }   
-
     else if (isa_address<0xA0000)   {    // XTMax stores the full 640 KB conventional memory
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
