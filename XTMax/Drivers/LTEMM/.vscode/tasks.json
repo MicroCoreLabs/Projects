@@ -6,7 +6,7 @@
         {
             "label": "Build in DOSBox",
             "type": "shell",
-            "command": "..\\Driver_Build_Tools\\DOSBox\\DOSBox.exe -conf Build.conf",
+            "command": "..\\Driver_Build_Tools\\DOSBox\\DOSBox.exe -conf Build.conf && copy *.EXE ..\\",
             "options": {
                 "cwd": "${workspaceFolder}"
             },

@@ -1,3 +1,4 @@
 *.o
 *.map
+*.exe
 log.txt

@@ -6,14 +6,14 @@
 ;*							         *
 ;*****************************************************************
 ;
-;       Структура физической страницы EMS
+;       я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜ физя┐╜я┐╜скоя┐╜ я┐╜я┐╜раня┐╜я┐╜я┐╜ EMS
 ;
 phys_page_struct                STRUC
-    Emm_Handle2                 DW      ?       ;дескриптор-владелец страницы
+    Emm_Handle2                 DW      ?       ;я┐╜я┐╜я┐╜рипя┐╜я┐╜-я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜ я┐╜я┐╜раня┐╜я┐╜я┐╜
     Phys_page_port		DW	?	;physical page i/o port address
-    Phys_Seg_Addr               DW      ?       ;физический сегментный адрес страницы
-    Log_Page_Data               DB      ?       ;номер логической страницы,картированной
-phys_page_struct                ENDS            ;на эту физическую страницу
+    Phys_Seg_Addr               DW      ?       ;физя┐╜я┐╜ския┐╜ сегя┐╜я┐╜я┐╜я┐╜я┐╜ я┐╜я┐╜я┐╜я┐╜ я┐╜я┐╜раня┐╜я┐╜я┐╜
+    Log_Page_Data               DW      ?       ;я┐╜я┐╜я┐╜я┐╜я┐╜ я┐╜я┐╜я┐╜я┐╜я┐╜скоя┐╜ я┐╜я┐╜раня┐╜я┐╜я┐╜,я┐╜я┐╜я┐╜я┐╜ровя┐╜я┐╜я┐╜я┐╜я┐╜
+phys_page_struct                ENDS            ;я┐╜я┐╜ я┐╜я┐╜я┐╜ физя┐╜я┐╜я┐╜я┐╜я┐╜ я┐╜я┐╜раня┐╜я┐╜я┐╜
 
 handle_page_struct              STRUC
     emm_handle3                 DW      ?
@@ -81,7 +81,7 @@ hardware_info_struct            STRUC
 hardware_info_struct            ENDS
 
 HANDLE_CNT		EQU	64	;max handle count
-PAGE_MAX		EQU	255	;max logical page count
+PAGE_MAX		EQU	2048	;max logical page count
 BACK_MAX		EQU	5	;max mapping data backup count
 I8042			EQU	60H	;i8042 i/o port address
 TIME_OUT		EQU	1000	;
@@ -90,8 +90,7 @@ NON			EQU	0FFFFH	;non or bad logical page code
 CR			EQU	0DH	;Carriage Return code
 LF			EQU	0AH	;Line Feed code
 TAB			EQU	09H	;TAB code
-; JJP DIS_EMS		EQU	0	;physical page disable data
-DIS_EMS			EQU	0FFH	;physical page disable data (lo-tech cards)
+DIS_EMS			EQU	0FFFFH	;physical page disable data (lo-tech cards)
 HANDLE_NAME_SIZE	EQU	8	;EMM handle name byte size
 UNMAP			EQU	0FFFFH	;unmap code
 UNALLOC			EQU	0FFFFH	;unallocate code

@@ -1,6 +1,7 @@
 /* driver.c - MSDOS device driver functions           */
 /*                         */
 /* Copyright (C) 1994 by Robert Armstrong          */
+/* Copyright (C) 2024 by Ted Fried, Matthieu Bucchianeri          */
 /*                         */
 /* This program is free software; you can redistribute it and/or modify */
 /* it under the terms of the GNU General Public License as published by */
@@ -54,9 +55,6 @@ BOOLEAN Debug        = FALSE; /* TRUE to enable debug (verbose) mode */
 BOOLEAN InitNeeded   = TRUE;  /* TRUE if we need to (re) initialize  */
 WORD  RebootVector[2];  /* previous INT 19H vector contents */
 extern DWORD partitionoffset;
-
-extern BYTE  sd_card_check;
-extern BYTE  portbase;
 
 BYTE partition_number;
 
@@ -369,8 +367,8 @@ PUBLIC void Initialize (rh_init_t far *rh)
   /* The version number is sneakily stored in the device header! */
   cdprintf("SD Card driver V%c.%c for XTMax (%s)\n     based on SD pport device driver (C) 2014 by Dan Marks\n     based on TU58 by Robert Armstrong\n",
     header.name[6], header.name[7],
-#ifdef USE286
-    "80286+"
+#ifdef USE186
+    "80186+"
 #else
     "8086"
 #endif
@@ -486,22 +484,12 @@ PRIVATE BOOLEAN parse_options (char far *p)
       case 'd', 'D':
         Debug = TRUE;
    break;
-      case 'k', 'K':
-        sd_card_check = 1;
-   break;
       case 'p', 'P':
         if ((p=option_value(p,&temp)) == NULL)  return FALSE;
         if ((temp < 1) || (temp > 4))
             cdprintf("SD: Invalid partition number %x\n",temp);
         else
             partition_number = temp;
-   break; 
-      case 'b', 'B':
-        if ((p=option_value(p,&temp)) == NULL)  return FALSE;
-        if ((temp < 1) || (temp > 5))
-            cdprintf("SD: Invalid port base index %x\n",temp);
-        else
-            portbase = temp;
    break; 
       default:
         return FALSE;

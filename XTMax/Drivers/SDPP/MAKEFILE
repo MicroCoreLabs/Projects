@@ -5,23 +5,23 @@ ASM=tasm -mx
 
 DEPS=cprint.c driver.c sd.c sdmm.c cprint.h diskio.h driver.h integer.h sd.h standard.h 
 
-all: sd.sys sd286.sys
+all: xtsd.sys xtsd186.sys
 
 .asm.obj:
    $(ASM) $*
 
-sd.sys: header.obj $(DEPS)
+xtsd.sys: header.obj $(DEPS)
    $(CC) cprint.c
    $(CC) sd.c
    $(CC) sdmm.c
    $(CC) driver.c
    tlink -t -m -s -n header cprint sd sdmm driver, $@
 
-sd286.sys: header.obj $(DEPS)
-   $(CC) -1 -DUSE286 cprint.c
-   $(CC) -1 -DUSE286 sd.c
-   $(CC) -1 -DUSE286 sdmm.c
-   $(CC) -1 -DUSE286 driver.c
+xtsd186.sys: header.obj $(DEPS)
+   $(CC) -1 -DUSE186 cprint.c
+   $(CC) -1 -DUSE186 sd.c
+   $(CC) -1 -DUSE186 sdmm.c
+   $(CC) -1 -DUSE186 driver.c
    tlink -t -m -s -n header cprint sd sdmm driver, $@
 
 clean:

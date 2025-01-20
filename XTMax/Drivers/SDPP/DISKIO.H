@@ -24,8 +24,6 @@ typedef enum {
    RES_PARERR     /* 4: Invalid Parameter */
 } DRESULT;
 
-void setportbase(BYTE val);  /* set the port base */
-
 /*---------------------------------------*/
 /* Prototypes for disk control functions */
 #define DOSFAR far
