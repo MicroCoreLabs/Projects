@@ -35,9 +35,12 @@
 // Revision 6 12/14/2024
 // - Made SD LPT base a # define
 //
-// Revision 7 01/12/2024
+// Revision 7 01/12/2025
 // - Refactor SD card I/O
 // - Add support for 16-bit EMS page offsets.
+//
+// Revision 8 01/20/2025
+// - Added chip select for a second PSRAM to allow access to 16 MB of Expanded RAM
 //
 //------------------------------------------------------------------------
 //
@@ -123,6 +126,7 @@
 #define PIN_PSRAM_D0        52    // GPIO9-26
 #define PIN_PSRAM_CLK       53    // GPIO9-25
 #define PIN_PSRAM_CS_n      48    // GPIO9-24
+#define PIN_PSRAM_CS1_n     51    // GPIO9-22
 
 #define PIN_SD_CS_n         46    // GPIO8-17
 #define PIN_SD_MOSI         45    // GPIO8-12
@@ -154,21 +158,19 @@
 #define MUX_ADDR_n_LOW     0x0
 #define MUX_ADDR_n_HIGH    0x00000800
 
-#define PSRAM_RESET_VALUE  0x01000000
+#define PSRAM_RESET_VALUE  0x01400000
 #define PSRAM_CLK_HIGH     0x02000000
 
 #define EMS_BASE_IO        0x260    // Must be a multiple of 8.
 #define EMS_BASE_MEM       0xD0000
 
-#define EMS_TOTAL_SIZE     (8*1024*1024)
+#define EMS_TOTAL_SIZE     (16*1024*1024)
 
 #define SD_BASE            0x280  // Must be a multiple of 2.
 
- 
-   
+    
 // --------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------
-
 
 uint32_t  trigger_out = 0;
 uint32_t  gpio6_int = 0;
@@ -195,6 +197,7 @@ uint8_t XTMax_MEM_Response_Array[16];
 DMAMEM  uint8_t  internal_RAM1[0x60000];
         uint8_t  internal_RAM2[0x40000];
 
+uint8_t psram_cs =0;
 
 // --------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------
@@ -251,6 +254,7 @@ void setup() {
  
   pinMode(PIN_PSRAM_CLK,      OUTPUT);                   
   pinMode(PIN_PSRAM_CS_n,     OUTPUT);                   
+  pinMode(PIN_PSRAM_CS1_n,    OUTPUT);                   
   pinMode(PIN_PSRAM_D3,       INPUT);                   
   pinMode(PIN_PSRAM_D2,       INPUT);
   pinMode(PIN_PSRAM_D1,       INPUT);
@@ -263,7 +267,7 @@ void setup() {
   pinMode(PIN_SD_MISO,        INPUT_PULLUP);
 
 
-  GPIO9_DR = PSRAM_RESET_VALUE;  // Set CLK=0, CS_n=1, DATA=0
+  GPIO9_DR = PSRAM_RESET_VALUE;  // Set CLK=0, CSx_n=1, DATA=0
  
   digitalWriteFast(PIN_CHRDY_OE_n,   0x1);
   digitalWriteFast(PIN_CHRDY_OUT,    0x0);
@@ -336,10 +340,13 @@ inline void SD_SPI_Cycle()  {
 // --------------------------------------------------------------------------------------------------
 
 inline void PSRAM_Write_Clk_Cycle() {
- 
-  GPIO9_DR = (nibble_out&0xF) << 26;               // Drive nibble data , CLK=0 , CS_n=0
+    
+       if (psram_cs==7) GPIO9_DR = ((nibble_out&0xF) << 26) | 0x00000000;      // Drive nibble data , CLK=0 , CSx_n=0
+  else if (psram_cs==0) GPIO9_DR = ((nibble_out&0xF) << 26) | 0x00400000;      // Drive nibble data , CLK=0 , CS_n=0
+  else                  GPIO9_DR = ((nibble_out&0xF) << 26) | 0x01000000;      // Drive nibble data , CLK=0 , CS1_n=0
+    
   delayNanoseconds(1);
-  GPIO9_DR = (nibble_out<<26) | PSRAM_CLK_HIGH;    // Drive nibble data and CLK=1
+  GPIO9_DR = GPIO9_DR | PSRAM_CLK_HIGH;    // Drive nibble data and CLK=1
   delayNanoseconds(1);
  
   return;
@@ -350,11 +357,14 @@ inline void PSRAM_Write_Clk_Cycle() {
 
 inline void PSRAM_Read_Clk_Cycle() {
  
-  GPIO9_DR = 0x0;                                  // Drive  CLK=0 , CS_n=0
+       if (psram_cs==7) GPIO9_DR = 0x00000000;      // Drive CLK=0 , CSx_n=0
+  else if (psram_cs==0) GPIO9_DR = 0x00400000;      // Drive CLK=0 , CS_n=0
+  else                  GPIO9_DR = 0x01000000;      // Drive CLK=0 , CS1_n=0
+    
   delayNanoseconds(1);
-  GPIO9_DR = PSRAM_CLK_HIGH;                       // Drive  CLK=1
+  GPIO9_DR = GPIO9_DR | PSRAM_CLK_HIGH;             // Drive  CLK=1
   delayNanoseconds(1);
-  nibble_in = (GPIO9_DR>>26) & 0xF;                // Sample nibble data 
+  nibble_in = (GPIO9_DR>>26) & 0xF;                 // Sample nibble data 
  
   return;
 }
@@ -366,6 +376,8 @@ inline void PSRAM_Read_Clk_Cycle() {
 inline void PSRAM_Configure() {
 
   delayMicroseconds(200);
+
+  psram_cs=7;
 
   nibble_out = 0x0;    PSRAM_Write_Clk_Cycle();     // Set PSRAM to Quad Mode 0x35
   nibble_out = 0x0;    PSRAM_Write_Clk_Cycle(); 
@@ -380,7 +392,7 @@ inline void PSRAM_Configure() {
   GPIO9_DR = PSRAM_RESET_VALUE;                     // Drive  CLK=0 , CS_n=1
 
  
-  GPIO9_GDIR = 0x3F000000;                          // Change Data[3:0] to outputs quickly
+  GPIO9_GDIR = 0x3F400000;                          // Change Data[3:0] to outputs quickly
 
  
   return;
@@ -390,18 +402,20 @@ inline void PSRAM_Configure() {
 // --------------------------------------------------------------------------------------------------
 
 inline uint8_t PSRAM_Read(uint32_t address_in) {
+    
   if (address_in >= EMS_TOTAL_SIZE) {
-    return 0xff;
-  }
+      return 0xff;
+  }  
+  if (address_in >= 0x7FFFFF)  psram_cs=1; else psram_cs=0;  
 
-// Send Command = Quad Read = 0x0B
-//
+  // Send Command = Quad Read = 0x0B
+  //
   nibble_out = 0x0;    PSRAM_Write_Clk_Cycle(); 
   nibble_out = 0xB;    PSRAM_Write_Clk_Cycle(); 
 
 
-// Send 24-bit address in four clock cycles
-//
+  // Send 24-bit address in six clock cycles
+  //
   nibble_out = address_in >> 20;   PSRAM_Write_Clk_Cycle();
   nibble_out = address_in >> 16;   PSRAM_Write_Clk_Cycle();
   nibble_out = address_in >> 12;   PSRAM_Write_Clk_Cycle();
@@ -414,21 +428,20 @@ inline uint8_t PSRAM_Read(uint32_t address_in) {
  
  // Four clocks of hi-Z - Make PSRAM Data signals hi-Z during this time
  //
- GPIO9_GDIR = 0x03000000;                               // Change Data[3:0] to inputs quickly
+ GPIO9_GDIR = 0x03400000;                               // Change Data[3:0] to inputs quickly
  PSRAM_Write_Clk_Cycle(); 
  PSRAM_Write_Clk_Cycle();   
  PSRAM_Write_Clk_Cycle();   
  PSRAM_Write_Clk_Cycle(); 
 
 
-// Clock in the data
-//
-                   
+  // Clock in the data
+  //                  
   PSRAM_Read_Clk_Cycle();  read_byte = nibble_in;
   PSRAM_Read_Clk_Cycle();  read_byte = (read_byte<<4) | nibble_in;
 
   GPIO9_DR = PSRAM_RESET_VALUE;                       // Drive  CLK=0 , CS_n=1
-  GPIO9_GDIR = 0x3F000000;                            // Change Data[3:0] to outputs quickly
+  GPIO9_GDIR = 0x3F400000;                            // Change Data[3:0] to outputs quickly
 
   return read_byte;
 }
@@ -441,15 +454,17 @@ inline void PSRAM_Write(uint32_t address_in , int8_t local_data) {
   if (address_in >= EMS_TOTAL_SIZE) {
     return;
   }
+  if (address_in >= 0x7FFFFF)  psram_cs=1; else psram_cs=0;  
 
-// Send Command = Quad Write = 0x02
-//
+
+  // Send Command = Quad Write = 0x02
+  //
   nibble_out = 0x0;    PSRAM_Write_Clk_Cycle();
   nibble_out = 0x2;    PSRAM_Write_Clk_Cycle();
 
 
-// Send 24-bit address in four clock cycles
-//
+  // Send 24-bit address in six clock cycles
+  //
   nibble_out = address_in >> 20;   PSRAM_Write_Clk_Cycle();
   nibble_out = address_in >> 16;   PSRAM_Write_Clk_Cycle();
   nibble_out = address_in >> 12;   PSRAM_Write_Clk_Cycle();
@@ -460,8 +475,8 @@ inline void PSRAM_Write(uint32_t address_in , int8_t local_data) {
   //GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;  // De-assert CHRDY early for 4.77 Mhz
 
  
-// Send byte data in twp clock cycles
-//
+  // Send byte data in two clock cycles
+  //
   nibble_out = local_data >> 4;   PSRAM_Write_Clk_Cycle();
   nibble_out = local_data;        PSRAM_Write_Clk_Cycle();
 
@@ -512,8 +527,7 @@ inline void Mem_Read_Cycle() {
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;  // Output data
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;  // De-assert CHRDY
 
-     
-     
+         
       while ( (gpio9_int&0xF0) != 0xF0 ) { gpio9_int = GPIO9_DR; }  // Wait here until cycle is complete
      
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
@@ -615,7 +629,6 @@ inline void Mem_Write_Cycle() {
     }
     return;
 }
-
 
 
 // --------------------------------------------------------------------------------------------------
