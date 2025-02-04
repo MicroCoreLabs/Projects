@@ -83,10 +83,48 @@ entry:
     mov ax, welcome_msg
     call print_string
 
+;
+; Initialize the SD Card.
+;
     call init_sd
-
 %ifndef AS_COM_PROGRAM
     jc .skip
+%endif
+
+;
+; Detecting 80186-compatible so we can use REP INSW/OUTSW.
+; Based on https://www.rcollins.org/ftp/source/cpuid/cpuid.asm
+;
+.cpuid:
+    push sp
+    pop ax
+    cmp ax, sp                      ; if below 80286, these values will differ
+    jz .support_string_io           ; nope, 80286 or higher
+    mov ax, ds:[0xffff]             ; get original data
+    mov word ds:[0xffff], 0xaaaa    ; write signature at test location
+    cmp byte ds:[0], 0xaa           ; 8086 will write the 2nd byte at offset 0
+    mov ds:[0xffff], ax
+    je .test_v20
+    jmp .support_string_io          ; we have an 80186/80188
+.test_v20:
+    push ax                         ; save results
+    xor al, al                      ; force ZF
+    mov al, 0x40                    ; multiplicand
+    mul al                          ; V20 doesn't affect ZF
+    pop ax                          ; restore results
+    jz .support_string_io           ; we have an V20
+    xor dl, dl
+    jmp .store_string_io
+.support_string_io:
+    mov dl, 1
+    mov ax, string_io_msg
+    call print_string
+.store_string_io:
+    mov ax, 0x283           ; scratch register 0
+    xchg ax, dx
+    out dx, al              ; save capability
+
+%ifndef AS_COM_PROGRAM
 ;
 ; Install our BIOS INT13h hook into the interrupt vector table.
 ;
@@ -98,13 +136,13 @@ entry:
     mov es, ax
 
     mov ax, es:[0x13*4+2]
-    mov dx, 0x284           ; scratch register 0
+    mov dx, 0x284           ; scratch register 1-2
     out dx, ax              ; save segment
     call print_hex
     mov ax, colon
     call print_string
     mov ax, es:[0x13*4]
-    mov dx, 0x286           ; scratch register 2
+    mov dx, 0x286           ; scratch register 3-4
     out dx, ax              ; save offset
     call print_hex
     mov ax, newline
@@ -245,14 +283,14 @@ int13h_entry:
 ; Simulate INT 13h with the original vector.
 ;
     pushf                       ; setup for iret below
-    mov dx, 0x284               ; scratch register 0
+    mov dx, 0x284               ; scratch register 1-2
 %ifndef AS_COM_PROGRAM
     in ax, dx
 %else
     mov ax, cs
 %endif
     push ax                     ; setup for iret below
-    mov dx, 0x286               ; scratch register 2
+    mov dx, 0x286               ; scratch register 3-4
 %ifndef AS_COM_PROGRAM
     in ax, dx
 %else
@@ -502,11 +540,23 @@ func_02_read_sector:
     call print_string
 %endif
     mov cx, 256             ; block size (in words)
+    push dx
+    mov dx, 0x283           ; scratch register 0
+    in al, dx
+    pop dx
+    test al, al             ; supports insw?
     cld
+    jz .receive_block
+.receive_block_fast:
+cpu 186
+    rep insw
+cpu 8086
+    jmp .receive_crc
 .receive_block:
     in ax, dx
     stosw
     loop .receive_block
+.receive_crc:
     in ax, dx               ; discard CRC
     add TEMP_LO, 1          ; next block
     adc TEMP_HI, 0          ; carry
@@ -605,17 +655,28 @@ func_03_write_sector:
     out dx, al
     mov cx, 256             ; block size (in words)
     xchg di, si             ; save si (aka TEMP1)
+    push dx
+    mov dx, 0x283           ; scratch register 0
+    in al, dx
+    pop dx
+    test al, al             ; supports outsw?
     cld
+    jz .send_block
+.send_block_fast:
+cpu 186
+    rep outsw
+cpu 8086
+    jmp .end_send_block
 .send_block:
     lodsw
     out dx, ax
     loop .send_block
+.end_send_block:
     xchg si, di             ; restore si (aka TEMP1)
 %ifdef DEBUG_IO
     mov ax, wait_msg
     call print_string
 %endif
-    mov dx, 0x280           ; data port
     mov cx, 2500            ; timeout
     jmp .receive_status_no_delay
 .receive_status:
@@ -1205,6 +1266,7 @@ debug_handler:
 
 welcome_msg     db 'BootROM for XTMax v1.0', 0xD, 0xA
                 db 'Copyright (c) 2025 Matthieu Bucchianeri', 0xD, 0xA, 0
+string_io_msg   db 'CPU supports INS/OUTS instructions', 0xD, 0xA, 0
 old_13h_msg     db 'Old INT13h Vector = ', 0
 new_13h_msg     db 'New INT13h Vector = ', 0
 new_fdpt_msg    db 'New Fixed Disk Parameter Table = ', 0
