@@ -276,7 +276,7 @@ int13h_entry:
     mov TEMP1, dx               ; save dx
     pushf                       ; setup for iret from INT 13h handler
     push cs                     ; setup for iret from INT 13h handler
-    mov ax, .return_from_int13h
+    mov ax, .return_common
     push ax                     ; setup for iret from INT 13h handler
 .simulate_int13h:
 ;
@@ -300,8 +300,7 @@ int13h_entry:
     mov ax, TEMP0               ; restore ax
     mov dx, TEMP1               ; restore dx
     iret                        ; call the INT 13h handler
-.return_from_int13h:
-    jmp .return_common
+                                ; will return at .return_common
 
 ;
 ; This is an operation for the SD Card. Use our own INT 13h logic.
@@ -327,19 +326,18 @@ int13h_entry:
     mov TEMP1, .return
 .call:
     push TEMP1                  ; setup for ret from the handler
-    push bx
+    mov TEMP1, bx               ; save bx
     mov bl, ah
     xor bh, bh
     shl bl, 1
-    mov TEMP1, bx
-    pop bx
+    xchg TEMP1, bx              ; restore bx
     jmp [cs:TEMP1+func_table]
 .update_bda:
-    push es
+    mov TEMP0, es               ; save es
     mov TEMP1, 0x40             ; BIOS data area
     mov es, TEMP1
     mov es:[0x74], ah           ; store HDSTAT
-    pop es
+    mov es, TEMP0               ; restore es
 .return:
 %ifdef DEBUG
     push ax
@@ -365,12 +363,15 @@ int13h_entry:
 .return_common:
     mov TEMP0, sp
     mov TEMP1, [TEMP0+8]        ; grab the flags for iret
-    pushf
-    and TEMP1, 0xfffe           ; clear carry
-    popf
-    adc TEMP1, 0                ; propagate carry
     push TEMP1
+    jnc .return_success
     popf
+    stc
+    jmp .return_with_flags
+.return_success:
+    popf
+    clc
+.return_with_flags:
     pop TEMP1
     pop TEMP0
 %ifdef EXTRA_DEBUG
@@ -1200,18 +1201,14 @@ send_sd_read_write_cmd:
     out dx, al
 .send_cmd:
     mov al, cl              ; command byte
-    out dx, al
-    mov al, bh              ; address byte 1
-    out dx, al
-    mov al, bl              ; address byte 2
-    out dx, al
-    pop ax
-    xchg al, ah             ; address byte 3
-    out dx, al
-    xchg al, ah             ; address byte 4
-    out dx, al
-    mov al, 0x1             ; crc (dummy)
-    out dx, al
+    mov ah, bh              ; address byte 1
+    out dx, ax
+    pop ax                  ; address byte 3
+    xchg al, bl             ; address byte 2
+    out dx, ax
+    xchg al, bl             ; address byte 4
+    mov ah, 0x1             ; crc (dummy)
+    out dx, ax
     mov cx, 8               ; retries
 .receive_r1:
     in al, dx
