@@ -197,7 +197,7 @@ uint8_t   spi_shift_out =0;
 uint8_t   sd_spi_datain =0;
 uint32_t  sd_spi_cs_n = 0x0;
 uint32_t  sd_spi_dataout =0;
-uint8_t   sd_scratch_register[4] = {0, 0, 0, 0};
+uint8_t   sd_scratch_register[5] = {0, 0, 0, 0, 0};
 
 uint8_t XTMax_MEM_Response_Array[16];
 
@@ -681,10 +681,12 @@ inline void IO_Read_Cycle() {
       switch (isa_address)  {
         case SD_BASE:     // First two registers serve the same function (to allow use of Word I/O)
         case SD_BASE+1:   sd_spi_dataout = 0xff; SD_SPI_Cycle(); isa_data_out = sd_spi_datain; break;
-        case SD_BASE+4:   isa_data_out = sd_scratch_register[0]; break;
-        case SD_BASE+5:   isa_data_out = sd_scratch_register[1]; break;
-        case SD_BASE+6:   isa_data_out = sd_scratch_register[2]; break;
-        case SD_BASE+7:   isa_data_out = sd_scratch_register[3]; break;
+        case SD_BASE+2:   break; // Write only
+        case SD_BASE+3:   isa_data_out = sd_scratch_register[0]; break;
+        case SD_BASE+4:   isa_data_out = sd_scratch_register[1]; break;
+        case SD_BASE+5:   isa_data_out = sd_scratch_register[2]; break;
+        case SD_BASE+6:   isa_data_out = sd_scratch_register[3]; break;
+        case SD_BASE+7:   isa_data_out = sd_scratch_register[4]; break;
         }
      
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
@@ -745,10 +747,11 @@ inline void IO_Write_Cycle() {
         case SD_BASE:     // First two registers serve the same function (to allow use of Word I/O)
         case SD_BASE+1:   sd_spi_dataout = data_in;  SD_SPI_Cycle(); break;
         case SD_BASE+2:   sd_spi_cs_n    = data_in&0x1;              break;
-        case SD_BASE+4:   sd_scratch_register[0] = data_in; break;
-        case SD_BASE+5:   sd_scratch_register[1] = data_in; break;
-        case SD_BASE+6:   sd_scratch_register[2] = data_in; break;
-        case SD_BASE+7:   sd_scratch_register[3] = data_in; break;
+        case SD_BASE+3:   sd_scratch_register[0] = data_in; break;
+        case SD_BASE+4:   sd_scratch_register[1] = data_in; break;
+        case SD_BASE+5:   sd_scratch_register[2] = data_in; break;
+        case SD_BASE+6:   sd_scratch_register[3] = data_in; break;
+        case SD_BASE+7:   sd_scratch_register[4] = data_in; break;
       }
      
       //gpio9_int = GPIO9_DR;
