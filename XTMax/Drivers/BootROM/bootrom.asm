@@ -527,10 +527,10 @@ func_02_read_sector:
     call print_string
 %endif
     mov dx, 0x280           ; data port
-    mov cx, 1000            ; timeout
+    mov cx, 50000           ; timeout (50ms)
     jmp .receive_token_no_delay
 .receive_token:
-    call delay_100us
+    call delay_us
 .receive_token_no_delay:
     in al, dx
     cmp al, 0xfe
@@ -678,10 +678,10 @@ cpu 8086
     mov ax, wait_msg
     call print_string
 %endif
-    mov cx, 2500            ; timeout
+    mov cx, 50000           ; timeout (50ms)
     jmp .receive_status_no_delay
 .receive_status:
-    call delay_100us
+    call delay_us
 .receive_status_no_delay:
     in al, dx
     cmp al, 0xff
@@ -705,10 +705,10 @@ cpu 8086
     mov ax, wait_msg
     call print_string
 %endif
-    mov cx, 2500            ; timeout
+    mov cx, 50000           ; timeout (50ms)
     jmp .receive_finish_no_delay
 .receive_finish:
-    call delay_100us
+    call delay_us
 .receive_finish_no_delay:
     in al, dx
     test al, al
@@ -1225,14 +1225,14 @@ send_sd_read_write_cmd:
 ;
 
 ;
-; Wait 100 microseconds.
+; Wait 1 microseconds.
 ; out: AX = <TRASH>
 ;      FL = <TRASH>
-delay_100us:
+delay_us:
     push cx
     push dx
     xor cx, cx
-    mov dx, 100             ; microseconds
+    mov dx, 1               ; microseconds
     mov ah, 0x86            ; wait
     int 0x15
     pop dx
