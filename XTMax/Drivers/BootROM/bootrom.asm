@@ -14,40 +14,26 @@ cpu 8086    ; ensure we remain compatible with 8086
 
 %define FIXED_DISK_0        (0)
 %define FIXED_DISK_1        (1)
-%define FLOPPY_DISK         (-0x80)
 
 ;
 ; Whether we will emulate the 1st or 2nd disk.
 ;
 %define DISK_NUMBER         FIXED_DISK_0
 
-%define EMULATE_FIXED_DISK  (DISK_NUMBER >= FIXED_DISK_0)
-
-;
-; Whether we will use our own bootstrap code.
-;
-;%define USE_BOOTSTRAP
-
 ;
 ; The properties of our emulated disk.
 ;
-%if EMULATE_FIXED_DISK
 %define NUM_CYLINDERS       (1024)
 %define NUM_HEADS           (16)
 %define SECTORS_PER_TRACK   (63)
 ; the last cylinder is reserved on fixed disks
 %define NUM_SECTORS         (NUM_HEADS * (NUM_CYLINDERS - 1) * SECTORS_PER_TRACK)
-%else
-%define NUM_HEADS           (2)
-%define SECTORS_PER_TRACK   (18)
-%define NUM_CYLINDERS       (80)
-%define NUM_SECTORS         (NUM_HEADS * NUM_CYLINDERS * SECTORS_PER_TRACK)
-%endif
 
+; TODO: (feature) the BIOS only specifies 16 heads, however the INT13h functions could use 256.
 %if NUM_HEADS > 16
 %error NUM_HEADS must be 4 bits
 %endif
-%if EMULATE_FIXED_DISK && SECTORS_PER_TRACK > 63
+%if SECTORS_PER_TRACK > 63
 %error SECTORS_PER_TRACK must be 6 bits
 %endif
 %if NUM_CYLINDERS > 1024
@@ -162,7 +148,6 @@ entry:
     mov ax, newline
     call print_string
 
-%if EMULATE_FIXED_DISK
 ;
 ; Install our fixed disk parameter table.
 ; For the 1st disk, it is stored in the interrupt vector table, at vector 41h.
@@ -183,34 +168,12 @@ entry:
     mov ax, newline
     call print_string
 
-%ifdef USE_BOOTSTRAP
-;
-; Install our BIOS INT18h hook into the interrupt vector table.
-;
-.install_18h_vector:
-    mov ax, new_18h_msg
-    call print_string
-
-    mov ax, ROM_SEGMENT
-    mov es:[0x18*4+2], ax   ; store segment
-    call print_hex
-    mov ax, colon
-    call print_string
-    mov ax, int18h_entry
-    mov es:[0x18*4], ax     ; store offset
-    call print_hex
-    mov ax, newline
-    call print_string
-%else
-
 ;
 ; Increment the number of fixed disks in the BIOS Data Area.
 ;
     mov ax, 0x40            ; BIOS data area
     mov es, ax
     inc byte es:[0x75]      ; HDNUM
-%endif
-%endif
 
 .skip:
     sti
@@ -259,19 +222,6 @@ int13h_entry:
 ; This is not an operation for the SD Card. Forward to the BIOS INT 13h handler.
 ;
 .forward_to_bios:
-%ifdef EXTRA_DEBUG
-    push ax
-    mov ax, forward_msg
-    call print_string
-    pop ax
-    push ax
-    mov al, ah
-    xor ah, ah
-    call print_hex
-    mov ax, newline
-    call print_string
-    pop ax
-%endif
     mov TEMP0, ax               ; save ax
     mov TEMP1, dx               ; save dx
     pushf                       ; setup for iret from INT 13h handler
@@ -306,11 +256,7 @@ int13h_entry:
 ; This is an operation for the SD Card. Use our own INT 13h logic.
 ;
 .check_function:
-%if EMULATE_FIXED_DISK
     cmp ah, 0x15                ; is valid function?
-%else
-    cmp ah, 0x16                ; is valid function?
-%endif
     jle .prepare_call
     call func_unsupported
     jmp .update_bda
@@ -405,9 +351,6 @@ func_table:
     dw  func_unsupported            ; diagnostics
     dw  func_10_is_ready            ; diagnostics
     dw  func_15_read_size
-%if !EMULATE_FIXED_DISK
-    dw  func_10_is_ready            ; detect_change
-%endif
 
 func_unsupported:
 %ifdef DEBUG
@@ -807,29 +750,9 @@ func_08_read_params:
     mov es, ax
     mov dl, es:[0x75]       ; HDNUM
     pop es
-%ifndef USE_BOOTSTRAP
-    inc dl                  ; we never added ourselves
-%endif
-
-%if EMULATE_FIXED_DISK
     ; the last cylinder is reserved on fixed disks
     mov ch, ((NUM_CYLINDERS - 2) & 0xff)
     mov cl, (((NUM_CYLINDERS - 2) & 0x300) >> 2) | SECTORS_PER_TRACK
-
-%else
-    mov ch, ((NUM_CYLINDERS - 1) & 0xff)
-    mov cl, (((NUM_CYLINDERS - 1) & 0x300) >> 2) | SECTORS_PER_TRACK
-
-    ; diskette drive parameters table, it is stored in the interrupt vector table, at vector 1Eh.
-    xor ax, ax              ; INT vector segment
-    mov es, ax
-    mov ax, es:[0x1e*4]     ; offset
-    mov di, ax
-    mov ax, es:[0x1e*4+2]   ; segment
-    mov es, ax
-    mov bx, 0x4             ; 1.44 MB
-%endif
-
     xor ax, ax
     clc
 .exit:
@@ -885,13 +808,9 @@ func_15_read_size:
 %ifdef DEBUG
     call debug_handler
 %endif
-%if EMULATE_FIXED_DISK
     mov ah, 0x3             ; drive present
     call get_max_lba
     xchg cx, dx
-%else
-    mov ah, 0x1             ; diskette drive present
-%endif
     clc
     ret
 
@@ -918,36 +837,6 @@ succeeded:
     clc
     ret
 
-%ifdef USE_BOOTSTRAP
-;
-; INT 18h entry point.
-;
-int18h_entry:
-    xor ax, ax
-    mov ds, ax
-    mov es, ax
-    mov cx, 256
-    mov di, 0x7c00
-    rep stosw
-    mov ax, 0x201           ; read 1 sector
-    mov dx, 0x80+DISK_NUMBER
-    mov cx, 1               ; sector 1
-    mov bx, 0x7c00
-    int 0x13
-    cmp word [0x7c00+510], 0xaa55
-    jne .no_boot
-    mov ax, boot_msg
-    call print_string
-    jmp 0:0x7c00
-.no_boot:
-    mov ax, no_boot_msg
-    call print_string
-    sti
-.loop:
-    hlt
-    jmp .loop
-%endif
-
 ;
 ; Disk utilities
 ;
@@ -967,12 +856,10 @@ compute_lba:
     push dx
     push cx
     push dx
-%if EMULATE_FIXED_DISK
     mov al, cl
     and al, 0xc0
     shl ax, 1
     shl ax, 1
-%endif
     mov al, ch          ; cylinder
     mov cx, NUM_HEADS
     mul cx              ; cylinder * hpc
@@ -985,9 +872,7 @@ compute_lba:
     pop cx
     push cx
     xor ch, ch
-%if EMULATE_FIXED_DISK
     and cl, 0x3f
-%endif
     dec cx              ; sector - 1
     add ax, cx          ; (cylinder * hpc + head) * spt + (sector - 1)
     adc dx, 0           ; carry
@@ -1270,11 +1155,6 @@ new_fdpt_msg    db 'New Fixed Disk Parameter Table = ', 0
 init_ok_msg     db 'SD Card initialized successfully', 0xD, 0xA, 0
 init_error_msg  db 'SD Card failed to initialize', 0xD, 0xA, 0
 unsupported_msg db 'Unsupported INT13h Function ', 0
-%ifdef USE_BOOTSTRAP
-new_18h_msg     db 'New INT18h Vector = ', 0
-boot_msg        db 'Booting from SD Card...', 0xD, 0xA, 0
-no_boot_msg     db 'Not bootable', 0xD, 0xA, 0
-%endif
 colon           db ':', 0
 space           db ' ', 0
 newline         db 0xD, 0xA, 0
@@ -1293,10 +1173,6 @@ wait_msg        db 'Waiting for SD Card', 0xD, 0xA, 0
 sd_token_msg    db 'Received token', 0xD, 0xA, 0
 sd_status_msg   db 'Received status ', 0
 sd_idle_msg     db 'Received idle', 0xD, 0xA, 0
-%endif
-
-%ifdef EXTRA_DEBUG
-forward_msg     db 'Forward to BIOS INT13h handler ', 0
 %endif
 %endif
 
