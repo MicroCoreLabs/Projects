@@ -24,20 +24,19 @@ cpu 8086    ; ensure we remain compatible with 8086
 ; The properties of our emulated disk.
 ;
 %define NUM_CYLINDERS       (1024)
-%define NUM_HEADS           (16)
+%define NUM_HEADS           (255)
 %define SECTORS_PER_TRACK   (63)
 ; the last cylinder is reserved on fixed disks
 %define NUM_SECTORS         (NUM_HEADS * (NUM_CYLINDERS - 1) * SECTORS_PER_TRACK)
 
-; TODO: (feature) the BIOS only specifies 16 heads, however the INT13h functions could use 256.
-%if NUM_HEADS > 16
-%error NUM_HEADS must be 4 bits
+%if NUM_HEADS > 255
+%error NUM_HEADS is too large
 %endif
 %if SECTORS_PER_TRACK > 63
-%error SECTORS_PER_TRACK must be 6 bits
+%error SECTORS_PER_TRACK is too large
 %endif
 %if NUM_CYLINDERS > 1024
-%error NUM_CYLINDERS must be 10 bits
+%error NUM_CYLINDERS is too large
 %endif
 
 %ifndef AS_COM_PROGRAM
