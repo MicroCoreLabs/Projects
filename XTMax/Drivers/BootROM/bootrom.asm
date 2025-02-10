@@ -663,7 +663,12 @@ cpu 8086
     add TEMP_LO, 1          ; next block
     adc TEMP_HI, 0          ; carry
     pop cx                  ; number of sectors left to write
+%ifndef DEBUG_IO
     loop .cmd24
+%else
+    dec cx
+    jnz .cmd24
+%endif
 .success:
 .deassert_cs1:
     mov dx, 0x282           ; chip select port
