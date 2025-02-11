@@ -72,7 +72,9 @@ entry:
 %ifndef AS_COM_PROGRAM
     push es
     push ax
+    push cx
     push dx
+    push si
     cli
 %endif
 
@@ -89,32 +91,50 @@ entry:
 
 ;
 ; Detecting 80186-compatible so we can use REP INSW/OUTSW.
-; Based on https://www.rcollins.org/ftp/source/cpuid/cpuid.asm
+; Based on https://cosmodoc.org/topics/processor-detection/
 ;
 .cpuid:
-    push sp
+    ; Push a zero value to the stack, then immediately pop that zero
+    ; value into the FLAGS register. Depending on the CPU, some bits will
+    ; refuse this change and remain on.
+    xor ax, ax
+    push ax
+    popf
+    ; Push the current state of FLAGS to the stack, then immediately pop
+    ; the flag state into AX for further analysis.
+    pushf
     pop ax
-    cmp ax, sp                      ; if below 80286, these values will differ
-    jz .support_string_io           ; nope, 80286 or higher
-    mov ax, ds:[0xffff]             ; get original data
-    mov word ds:[0xffff], 0xaaaa    ; write signature at test location
-    cmp byte ds:[0], 0xaa           ; 8086 will write the 2nd byte at offset 0
-    mov ds:[0xffff], ax
-    jne .support_string_io          ; we have an 80186/80188
-.test_v20:
-    push ax                         ; save results
-    xor al, al                      ; force ZF
-    mov al, 0x40                    ; multiplicand
-    mul al                          ; V20 doesn't affect ZF
-    pop ax                          ; restore results
-    jnz .not_support_string_io      ; not a V20
+    ; Consider only flag bits 12..15, and see if they all remained on.
+    and ax, 0xf000
+    cmp ax, 0xf000
+    jne .support_string_io    ; at least 80286
+    ; Perform "FFh >> 33" then check for a zero or nonzero result.
+    mov al, 0xff
+    mov cl, 0x21
+    shr al, cl
+    jnz .support_string_io    ; at least 80186/80188
+    ; Ensure interrupts are enabled, then save SI's value on the stack.
+    sti
+    ; Here, ES is pointing to some unspecified place in memory. Below is
+    ; a busy loop that reads 64 KiB of memory from ES:SI, loading each
+    ; byte into AL and doing nothing further with it. After each
+    ; iteration, SI is incremented and CX is decremented. The loop ends
+    ; when CX reaches zero. Or does it?
+    mov si, 0
+    mov cx, 0xffff
+    rep lodsb
+    ; See if the value in CX made it all the way to zero. If it did, the
+    ; CPU is a V30 or V20.
+    or cx, cx
+    cli
+    jz .support_string_io    ; at least V20
+.not_support_string_io:
+    xor dl, dl
+    jmp .store_string_io
 .support_string_io:
     mov dl, 1
     mov ax, string_io_msg
     call print_string
-    jmp .store_string_io
-.not_support_string_io:
-    xor dl, dl
 .store_string_io:
     mov ax, XTMAX_IO_BASE+3 ; scratch register 0
     xchg ax, dx
@@ -216,7 +236,9 @@ entry:
 
 .skip:
     sti
+    pop si
     pop dx
+    pop cx
     pop ax
     pop es
     retf
