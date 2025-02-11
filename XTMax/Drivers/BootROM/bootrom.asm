@@ -473,16 +473,20 @@ func_02_read_sector:
     mov ax, wait_msg
     call print_string
 %endif
-    mov dx, XTMAX_IO_BASE+0 ; data port
-    mov cx, 50000           ; timeout (50ms)
-    jmp .receive_token_no_delay
+    mov dx, XTMAX_IO_BASE+15; timeout port
+    mov al, 10              ; 100 ms
+    out dx, al
 .receive_token:
-    call delay_us
-.receive_token_no_delay:
+    mov dx, XTMAX_IO_BASE+0 ; data port
     in al, dx
     cmp al, 0xfe
-    loopne .receive_token
-    jne .error
+    je .got_token
+    mov dx, XTMAX_IO_BASE+15; timeout port
+    in al, dx
+    test al, al
+    jnz .error
+    jmp .receive_token
+.got_token:
 %ifdef DEBUG_IO
     mov ax, sd_token_msg
     call print_string
@@ -625,14 +629,20 @@ cpu 8086
     mov ax, wait_msg
     call print_string
 %endif
-    mov cx, 50000           ; timeout (50ms)
-    jmp .receive_status_no_delay
+    mov dx, XTMAX_IO_BASE+15; timeout port
+    mov al, 25              ; 250 ms
+    out dx, al
 .receive_status:
-    call delay_us
-.receive_status_no_delay:
+    mov dx, XTMAX_IO_BASE+0 ; data port
     in al, dx
     cmp al, 0xff
-    loope .receive_status
+    jne .got_status
+    mov dx, XTMAX_IO_BASE+15; timeout port
+    in al, dx
+    test al, al
+    jnz .error
+    jmp .receive_status
+.got_status:
 %ifdef DEBUG_IO
     push ax
     mov ax, sd_status_msg
@@ -652,15 +662,20 @@ cpu 8086
     mov ax, wait_msg
     call print_string
 %endif
-    mov cx, 50000           ; timeout (50ms)
-    jmp .receive_finish_no_delay
+    mov dx, XTMAX_IO_BASE+15; timeout port
+    mov al, 25              ; 250 ms
+    out dx, al
 .receive_finish:
-    call delay_us
-.receive_finish_no_delay:
+    mov dx, XTMAX_IO_BASE+0 ; data port
     in al, dx
     test al, al
-    loope .receive_finish
-    jz .error
+    jnz .got_finish
+    mov dx, XTMAX_IO_BASE+15; timeout port
+    in al, dx
+    test al, al
+    jnz .error
+    jmp .receive_finish
+.got_finish:
 %ifdef DEBUG_IO
     mov ax, sd_idle_msg
     call print_string
@@ -1117,21 +1132,6 @@ send_sd_read_write_cmd:
 ;
 ; General utilities
 ;
-
-;
-; Wait 1 microseconds.
-; out: AX = <TRASH>
-;      FL = <TRASH>
-delay_us:
-    push cx
-    push dx
-    xor cx, cx
-    mov dx, 1               ; microseconds
-    mov ah, 0x86            ; wait
-    int 0x15
-    pop dx
-    pop cx
-    ret
 
 %include "utils.inc"
 

@@ -172,7 +172,7 @@
 
 #define EMS_TOTAL_SIZE     (16*1024*1024)
 
-#define SD_BASE            0x280  // Must be a multiple of 8.
+#define SD_BASE            0x280  // Must be a multiple of 16.
 
     
 // --------------------------------------------------------------------------------------------------
@@ -198,6 +198,8 @@ uint8_t   sd_spi_datain =0;
 uint32_t  sd_spi_cs_n = 0x0;
 uint32_t  sd_spi_dataout =0;
 uint8_t   sd_scratch_register[5] = {0, 0, 0, 0, 0};
+uint16_t  sd_requested_timeout = 0;
+elapsedMillis sd_timeout;
 
 uint8_t XTMax_MEM_Response_Array[16];
 
@@ -676,7 +678,7 @@ inline void IO_Read_Cycle() {
     }
    
        
-    else if ((isa_address&0x0FF8)==SD_BASE )  {   // Location of SD Card registers
+    else if ((isa_address&0x0FF0)==SD_BASE )  {   // Location of SD Card registers
  
       switch (isa_address)  {
         case SD_BASE:     // First two registers serve the same function (to allow use of Word I/O)
@@ -687,6 +689,8 @@ inline void IO_Read_Cycle() {
         case SD_BASE+5:   isa_data_out = sd_scratch_register[2]; break;
         case SD_BASE+6:   isa_data_out = sd_scratch_register[3]; break;
         case SD_BASE+7:   isa_data_out = sd_scratch_register[4]; break;
+        case SD_BASE+15:  isa_data_out = sd_timeout >= sd_requested_timeout; break;
+        default:          isa_data_out = 0xff; break;
         }
      
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
@@ -735,7 +739,7 @@ inline void IO_Write_Cycle() {
     }
    
    
-    else if ((isa_address&0x0FF8)==SD_BASE )  {   // Location of SD Card registers
+    else if ((isa_address&0x0FF0)==SD_BASE )  {   // Location of SD Card registers
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
    
@@ -752,6 +756,7 @@ inline void IO_Write_Cycle() {
         case SD_BASE+5:   sd_scratch_register[2] = data_in; break;
         case SD_BASE+6:   sd_scratch_register[3] = data_in; break;
         case SD_BASE+7:   sd_scratch_register[4] = data_in; break;
+        case SD_BASE+15:  sd_timeout = 0; sd_requested_timeout = data_in * 10; break;
       }
      
       //gpio9_int = GPIO9_DR;

@@ -254,14 +254,13 @@ int wait_ready (void)   /* 1:OK, 0:Timeout */
    BYTE d;
    UINT tmr;
 
-
-   for (tmr = 5000; tmr; tmr--) {   /* Wait for ready in timeout of 500ms */
+   outp(DATAPORT+15, 50);
+   do {   /* Wait for ready in timeout of 500ms */
       d = inp(DATAPORT);
       if (d == 0xFF) break;
-      dly_us(100);
-   }
+   } while(!inp(DATAPORT+15));
 
-   return tmr ? 1 : 0;
+   return d == 0xFF;
 }
 
 
@@ -310,11 +309,11 @@ int rcvr_datablock ( /* 1:OK, 0:Failed */
    UINT tmr;
 
 
-   for (tmr = 1000; tmr; tmr--) {   /* Wait for data packet in timeout of 100ms */
+   outp(DATAPORT+15, 10);
+   do {   /* Wait for data packet in timeout of 100ms */
       d = inp(DATAPORT);
       if (d != 0xFF) break;
-      dly_us(100);
-   }
+   } while(!inp(DATAPORT+15));
    if (d != 0xFE) {
     return 0;      /* If not valid data token, return with error */
    }
