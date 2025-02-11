@@ -962,14 +962,16 @@ init_sd:
 %endif
     mov dx, XTMAX_IO_BASE+2 ; chip select port
     mov al, 1               ; deassert chip select
+.power_up_delay:
     out dx, al
-    xor cx, cx
-    mov dx, 1000            ; microseconds
+    mov cx, 0x0001
+    mov dx, 0x86a0          ; 0x186a0 = 100 ms
     mov ah, 0x86            ; wait
     int 0x15
+.dummy_cycles:
     mov dx, XTMAX_IO_BASE+0 ; data port
     mov al, 0xff
-    mov cx, 80              ; send 80 clock cycles
+    mov cx, 10              ; send 80 clock cycles
 .synchronize:
     out dx, al
     loop .synchronize
@@ -978,6 +980,8 @@ init_sd:
     mov al, 0               ; assert chip select
     out dx, al
 .cmd0:
+    mov bx, 10              ; retries
+.retry_cmd0:
 %ifdef DEBUG_IO
     mov ax, send_cmd0_msg
     call print_string
@@ -986,7 +990,16 @@ init_sd:
     mov cx, 1               ; response is 1 byte
     mov ah, 1               ; expect idle state
     call send_sd_init_cmd
-    jc .exit
+    jnc .cmd8
+.delay_retry_cmd0:
+    xor cx, cx
+    mov dx, 20000           ; microseconds
+    mov ah, 0x86            ; wait
+    int 0x15
+    dec bx
+    jnz .retry_cmd0
+    stc
+    jmp .exit
 .cmd8:
 %ifdef DEBUG_IO
     mov ax, send_cmd8_msg
@@ -998,7 +1011,9 @@ init_sd:
     call send_sd_init_cmd
     jc .exit
 .acmd41:
-    mov bx, 100             ; retries
+    mov dx, XTMAX_IO_BASE+15; timeout port
+    mov al, 250             ; 2.5 s
+    out dx, al
 .retry_acmd41:
 %ifdef DEBUG_IO
     mov ax, send_acmd41_msg
@@ -1008,22 +1023,19 @@ init_sd:
     mov cx, 1               ; response is 1 byte
     mov ah, 1               ; expect idle state
     call send_sd_init_cmd
-    ; TODO: (older cards) on error, try CMD1
+    ; TODO: (older cards): handle v1 vs v2
     mov si, acmd41
     mov cx, 1               ; response is 1 byte
     mov ah, 0               ; expect ready state
     call send_sd_init_cmd
     jnc .exit
-    pushf
-    xor cx, cx
-    mov dx, 1000            ; microseconds
-    mov ah, 0x86            ; wait
-    int 0x15
-    popf
-    dec bx
-    jnz .retry_acmd41
-    ; TODO: (older cards) send CMD16 to set block size
+    mov dx, XTMAX_IO_BASE+15; timeout port
+    in al, dx
+    test al, al
+    jz .retry_acmd41
+    stc
 .exit:
+    ; TODO: (older cards): retrieve SDHC flag
     pop si
     pop dx
     pop cx
