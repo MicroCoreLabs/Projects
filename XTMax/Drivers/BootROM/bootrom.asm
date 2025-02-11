@@ -94,25 +94,25 @@ entry:
     mov word ds:[0xffff], 0xaaaa    ; write signature at test location
     cmp byte ds:[0], 0xaa           ; 8086 will write the 2nd byte at offset 0
     mov ds:[0xffff], ax
-    je .test_v20
-    jmp .support_string_io          ; we have an 80186/80188
+    jne .support_string_io          ; we have an 80186/80188
 .test_v20:
     push ax                         ; save results
     xor al, al                      ; force ZF
     mov al, 0x40                    ; multiplicand
     mul al                          ; V20 doesn't affect ZF
     pop ax                          ; restore results
-    jz .support_string_io           ; we have an V20
-    xor dl, dl
-    jmp .store_string_io
+    jnz .not_support_string_io      ; not a V20
 .support_string_io:
     mov dl, 1
     mov ax, string_io_msg
     call print_string
+    jmp .store_string_io
+.not_support_string_io:
+    xor dl, dl
 .store_string_io:
-    mov ax, XTMAX_IO_BASE+3         ; scratch register 0
+    mov ax, XTMAX_IO_BASE+3 ; scratch register 0
     xchg ax, dx
-    out dx, al                      ; save capability
+    out dx, al              ; save capability
 
 %ifndef AS_COM_PROGRAM
 ;
