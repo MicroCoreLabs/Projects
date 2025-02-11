@@ -287,7 +287,7 @@ int13h_entry:
     mov TEMP1, dx               ; save dx
     pushf                       ; setup for iret from INT 13h handler
     push cs                     ; setup for iret from INT 13h handler
-    mov ax, .return_common
+    mov ax, .return_from_int13h
     push ax                     ; setup for iret from INT 13h handler
 .simulate_int13h:
 ;
@@ -311,7 +311,24 @@ int13h_entry:
     mov ax, TEMP0               ; restore ax
     mov dx, TEMP1               ; restore dx
     iret                        ; call the INT 13h handler
-                                ; will return at .return_common
+.return_from_int13h:
+    pushf
+    push ax
+    mov ax, TEMP0               ; original ax
+    cmp ah, 0x08                ; is read parameters?
+    jne .skip_update_hdnum
+    mov ax, TEMP1               ; original dx
+    cmp al, 0x80                ; is fixed fixed?
+    jb .skip_update_hdnum
+    push es
+    mov ax, 0x40                ; BIOS data area
+    mov es, ax
+    mov dl, es:[0x75]           ; HDNUM
+    pop es
+.skip_update_hdnum:
+    pop ax
+    popf
+    jmp .return_common
 
 ;
 ; This is an operation for the SD Card. Use our own INT 13h logic.
