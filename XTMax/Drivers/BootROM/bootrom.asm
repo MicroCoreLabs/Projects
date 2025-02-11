@@ -26,6 +26,12 @@ cpu 8086    ; ensure we remain compatible with 8086
 %define DISK_NUMBER         FIXED_DISK_0
 
 ;
+; Whether we will try/force using our own bootstrap code instead of falling back to BASIC.
+;
+%define USE_BOOTSTRAP
+;%define FORCE_OWN_BOOTSTRAP
+
+;
 ; The properties of our emulated disk.
 ;
 %define NUM_CYLINDERS       (1024)
@@ -172,12 +178,41 @@ entry:
     mov ax, newline
     call print_string
 
+%ifdef USE_BOOTSTRAP
+.update_bda:
+;
+; Install our BIOS INT18h hook into the interrupt vector table.
+;
+.install_18h_vector:
+    mov ax, new_18h_msg
+    call print_string
+
+    mov ax, ROM_SEGMENT
+    mov es:[0x18*4+2], ax   ; store segment
+    call print_hex
+    mov ax, colon
+    call print_string
+    mov ax, int18h_entry
+    mov es:[0x18*4], ax     ; store offset
+    call print_hex
+    mov ax, newline
+    call print_string
+%endif
+
+%if !(%isdef(USE_BOOTSTRAP) && %isdef(FORCE_OWN_BOOTSTRAP))
 ;
 ; Increment the number of fixed disks in the BIOS Data Area.
 ;
+    mov ax, num_drives_msg
+    call print_string
     mov ax, 0x40            ; BIOS data area
     mov es, ax
     inc byte es:[0x75]      ; HDNUM
+    mov al, es:[0x75]
+    call print_hex
+    mov ax, newline
+    call print_string
+%endif
 
 .skip:
     sti
@@ -774,6 +809,7 @@ func_08_read_params:
     mov es, ax
     mov dl, es:[0x75]       ; HDNUM
     pop es
+
     ; the last cylinder is reserved on fixed disks
     mov ch, ((NUM_CYLINDERS - 2) & 0xff)
     mov cl, (((NUM_CYLINDERS - 2) & 0x300) >> 2) | SECTORS_PER_TRACK
@@ -864,6 +900,56 @@ succeeded:
 ;
 ; Disk utilities
 ;
+
+%ifdef USE_BOOTSTRAP
+;
+; INT 18h entry point.
+;
+int18h_entry:
+    xor ax, ax
+    mov ds, ax
+    mov es, ax
+.read_boot_sector:
+    mov cx, 256
+    mov di, 0x7c00
+    rep stosw
+    mov ax, 0x201           ; read 1 sector
+    mov dx, 0x80+DISK_NUMBER
+    mov cx, 1               ; sector 1
+    mov bx, 0x7c00
+    int 0x13
+.test_signature:
+    cmp word [0x7c00+510], 0xaa55
+    jne .no_boot
+%if %isdef(USE_BOOTSTRAP) && %isdef(FORCE_OWN_BOOTSTRAP)
+.update_bda:
+;
+; Increment the number of fixed disks in the BIOS Data Area, since we did not do it earlier.
+;
+    mov ax, num_drives_msg
+    call print_string
+    mov ax, 0x40            ; BIOS data area
+    mov es, ax
+    inc byte es:[0x75]      ; HDNUM
+    mov al, es:[0x75]
+    call print_hex
+    mov ax, newline
+    call print_string
+%endif
+.jump_to_boot:
+    mov ax, boot_msg
+    call print_string
+    xor ax, ax
+    mov es, ax
+    jmp 0:0x7c00
+.no_boot:
+    mov ax, no_boot_msg
+    call print_string
+    sti
+.loop:
+    hlt
+    jmp .loop
+%endif
 
 ;
 ; Compute LBA address based on CHS address
@@ -1175,7 +1261,13 @@ new_13h_msg     db 'New INT13h Vector = ', 0
 new_fdpt_msg    db 'New Fixed Disk Parameter Table = ', 0
 init_ok_msg     db 'SD Card initialized successfully', 0xD, 0xA, 0
 init_error_msg  db 'SD Card failed to initialize', 0xD, 0xA, 0
+num_drives_msg  db 'Total Fixed Disk Drives = ', 0
 unsupported_msg db 'Unsupported INT13h Function ', 0
+%ifdef USE_BOOTSTRAP
+new_18h_msg     db 'New INT18h Vector = ', 0
+boot_msg        db 'Booting from SD Card...', 0xD, 0xA, 0
+no_boot_msg     db 'Not bootable', 0xD, 0xA, 0
+%endif
 colon           db ':', 0
 space           db ' ', 0
 newline         db 0xD, 0xA, 0
