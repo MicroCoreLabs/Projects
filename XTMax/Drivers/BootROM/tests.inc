@@ -16,7 +16,7 @@
     mov di, 0xbbcc
     mov bp, 0xddee
 
-    mov dl, 0x80
+    mov dl, 0x81
     mov ah, 0x08
 
     ;mov bx, buf_write
@@ -27,7 +27,7 @@
 
     call do_int13h
 
-    mov dl, 0x80
+    mov dl, 0x81
     mov ah, 0x02
 
     mov bx, ds
@@ -145,6 +145,11 @@ fake_int13h_entry:
     mov al, ah
     xor ah, ah
     call print_hex
+    mov ax, drive_msg
+    call print_string
+    mov ax, dx
+    xor ah, ah
+    call print_hex
     mov ax, newline
     call print_string
     pop ax
@@ -162,6 +167,7 @@ buf_write           db 1, 2, 3, 4, 5, 6, 7, 8
 buf_read            times 1024 db 0
 
 fake_handler_msg    db 'BIOS INT13h Function ', 0
+drive_msg           db ' Drive ', 0
 test_success_msg    db 'Call succeeded ', 0
 test_failed_msg     db 'Call failed ', 0
 

@@ -25,6 +25,14 @@ cpu 8086    ; ensure we remain compatible with 8086
 ;
 %define DISK_NUMBER         FIXED_DISK_0
 
+%if DISK_NUMBER == FIXED_DISK_0
+;
+; Whether we are going to rename the BIOS's 1st disk to be the second disk.
+; This is useful to allow booting from the second disk.
+;
+;%define TAKE_OVER_FIXED_DISK_0
+%endif
+
 ;
 ; Whether we will try/force using our own bootstrap code instead of falling back to BASIC.
 ;
@@ -179,6 +187,13 @@ entry:
     call print_string
 
 ;
+; Move fixed disk 0 to fixed disk 1.
+;
+%ifdef TAKE_OVER_FIXED_DISK_0
+    call swap_fixed_disk_parameters_tables
+%endif
+
+;
 ; Install our fixed disk parameter table.
 ; For the 1st disk, it is stored in the interrupt vector table, at vector 41h.
 ; For the 2nd disk, it is stored in the interrupt vector table, at vector 46h.
@@ -283,6 +298,13 @@ int13h_entry:
 ; This is not an operation for the SD Card. Forward to the BIOS INT 13h handler.
 ;
 .forward_to_bios:
+%ifdef TAKE_OVER_FIXED_DISK_0
+    cmp dl, 0x80+FIXED_DISK_1   ; is this the other fixed drive?
+    jne .no_fixed_disk_take_over
+    mov dl, 0x80+FIXED_DISK_0
+    call swap_fixed_disk_parameters_tables
+.no_fixed_disk_take_over:
+%endif
     mov TEMP0, ax               ; save ax
     mov TEMP1, dx               ; save dx
     pushf                       ; setup for iret from INT 13h handler
@@ -314,12 +336,16 @@ int13h_entry:
 .return_from_int13h:
     pushf
     push ax
-    mov ax, TEMP0               ; original ax
-    cmp ah, 0x08                ; is read parameters?
-    jne .skip_update_hdnum
     mov ax, TEMP1               ; original dx
     cmp al, 0x80                ; is fixed fixed?
     jb .skip_update_hdnum
+%ifdef TAKE_OVER_FIXED_DISK_0
+    mov dl, 0x80+FIXED_DISK_1
+    call swap_fixed_disk_parameters_tables
+%endif
+    mov ax, TEMP0               ; original ax
+    cmp ah, 0x08                ; is read parameters?
+    jne .skip_update_hdnum
     push es
     mov ax, 0x40                ; BIOS data area
     mov es, ax
@@ -988,6 +1014,25 @@ int18h_entry:
 .loop:
     hlt
     jmp .loop
+%endif
+
+%ifdef TAKE_OVER_FIXED_DISK_0
+swap_fixed_disk_parameters_tables:
+    push es
+    push ax
+    push bx
+    xor ax, ax
+    mov es, ax
+    mov ax, es:[(0x41+FIXED_DISK_0*5)*4+2]
+    xchg es:[(0x41+FIXED_DISK_1*5)*4+2], ax
+    mov es:[(0x41+FIXED_DISK_0*5)*4+2], ax
+    mov ax, es:[(0x41+FIXED_DISK_0*5)*4]
+    xchg es:[(0x41+FIXED_DISK_1*5)*4], ax
+    mov es:[(0x41+FIXED_DISK_0*5)*4], ax
+    pop bx
+    pop ax
+    pop es
+    ret
 %endif
 
 ;
