@@ -63,8 +63,8 @@ cpu 8086    ; ensure we remain compatible with 8086
 ; BIOS will look for the AA55 signature between C8000-DFFFF in 2KB increments.
 ; We choose an address in that range.
 ;
-%define ROM_SEGMENT         (0xc000)
-org (ROM_SEGMENT << 4 | 0xe000)
+%define ROM_SEGMENT         (0xce00)
+org 0
 dw 0AA55h   ; signature
 db 4        ; size in blocks of 512 bytes
 
@@ -962,10 +962,6 @@ succeeded:
     clc
     ret
 
-;
-; Disk utilities
-;
-
 %ifdef USE_BOOTSTRAP
 ;
 ; INT 18h entry point.
@@ -1015,6 +1011,10 @@ int18h_entry:
     hlt
     jmp .loop
 %endif
+
+;
+; Disk utilities
+;
 
 %ifdef TAKE_OVER_FIXED_DISK_0
 swap_fixed_disk_parameters_tables:
