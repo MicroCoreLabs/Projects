@@ -286,6 +286,7 @@ entry:
 ; INT 13h entry point.
 ;
 int13h_entry:
+    sti
 %ifdef EXTRA_DEBUG
     call dump_regs
 %endif

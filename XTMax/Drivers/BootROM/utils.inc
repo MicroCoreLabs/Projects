@@ -130,10 +130,15 @@ dump_regs:
     call print_hex
     mov ax, space
     call print_string
+    pushf
+    pop ax
+    call print_hex
+    mov ax, space
+    call print_string
     mov ax, newline
     call print_string
     pop ax
     ret
 
-registers_msg   db ' AX   BX   CX   DX   DS   SI   ES   DI   BP', 0xD, 0xA, 0
+registers_msg   db ' AX   BX   CX   DX   DS   SI   ES   DI   BP  FLAGS', 0xD, 0xA, 0
 %endif

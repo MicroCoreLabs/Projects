@@ -8,6 +8,7 @@
 
     xor ax, ax
     lahf
+    sti
     mov ax, 0x1122
     mov bx, 0x3344
     mov cx, 0x5566
@@ -16,7 +17,7 @@
     mov di, 0xbbcc
     mov bp, 0xddee
 
-    mov dl, 0x81
+    mov dl, 0x80
     mov ah, 0x08
 
     ;mov bx, buf_write
@@ -27,7 +28,7 @@
 
     call do_int13h
 
-    mov dl, 0x81
+    mov dl, 0x80
     mov ah, 0x02
 
     mov bx, ds
@@ -114,6 +115,8 @@ do_int13h:
 
     ; dump registers
 %ifdef DUMP_REGS
+    popf
+    pushf
     call dump_regs
     pop ax
     call print_hex
