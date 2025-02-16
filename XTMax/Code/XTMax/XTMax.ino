@@ -37,10 +37,14 @@
 //
 // Revision 7 01/12/2025
 // - Refactor SD card I/O
-// - Add support for 16-bit EMS page offsets.
+// - Add support for 16-bit EMS page offsets
 //
 // Revision 8 01/20/2025
 // - Added chip select for a second PSRAM to allow access to 16 MB of Expanded RAM
+//
+// Revision 9 01/26/2024
+// - Add support for BIOS ROM extension (Boot ROM)
+// - Add scrach registers for Boot ROM hooking
 //
 //------------------------------------------------------------------------
 //
@@ -70,6 +74,8 @@
 
 #include <stdint.h>
 #include <stdio.h>
+
+#include "bootrom.h"
 
 
 // Teensy 4.1 pin assignments
@@ -166,7 +172,7 @@
 
 #define EMS_TOTAL_SIZE     (16*1024*1024)
 
-#define SD_BASE            0x280  // Must be a multiple of 2.
+#define SD_BASE            0x280  // Must be a multiple of 8.
 
     
 // --------------------------------------------------------------------------------------------------
@@ -191,6 +197,7 @@ uint8_t   spi_shift_out =0;
 uint8_t   sd_spi_datain =0;
 uint32_t  sd_spi_cs_n = 0x0;
 uint32_t  sd_spi_dataout =0;
+uint8_t   sd_scratch_register[5] = {0, 0, 0, 0, 0};
 
 uint8_t XTMax_MEM_Response_Array[16];
 
@@ -573,6 +580,16 @@ inline void Mem_Read_Cycle() {
      
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
     }
+    else if (isa_address>=BOOTROM_ADDR && isa_address<BOOTROM_ADDR+sizeof(BOOTROM)) {   // Boot ROM
+      isa_data_out = BOOTROM[isa_address-BOOTROM_ADDR];
+      GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;
+
+      while ( (gpio9_int&0xF0) != 0xF0 ) { gpio9_int = GPIO9_DR; }  // Wait here until cycle is complete
+
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
+    }
+
     return;
 }
 
@@ -612,7 +629,6 @@ inline void Mem_Write_Cycle() {
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
     }   
-
     else if (isa_address<0xA0000)   {    // XTMax stores the full 640 KB conventional memory
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
@@ -660,12 +676,18 @@ inline void IO_Read_Cycle() {
     }
    
        
-    else if ((isa_address&0x0FFE)==SD_BASE )  {   // Location of SD Card registers
+    else if ((isa_address&0x0FF8)==SD_BASE )  {   // Location of SD Card registers
  
-      // Both registers serve the same function (to allow use of Word I/O)
-      sd_spi_dataout = 0xff;
-      SD_SPI_Cycle();
-      isa_data_out = sd_spi_datain;
+      switch (isa_address)  {
+        case SD_BASE:     // First two registers serve the same function (to allow use of Word I/O)
+        case SD_BASE+1:   sd_spi_dataout = 0xff; SD_SPI_Cycle(); isa_data_out = sd_spi_datain; break;
+        case SD_BASE+2:   break; // Write only
+        case SD_BASE+3:   isa_data_out = sd_scratch_register[0]; break;
+        case SD_BASE+4:   isa_data_out = sd_scratch_register[1]; break;
+        case SD_BASE+5:   isa_data_out = sd_scratch_register[2]; break;
+        case SD_BASE+6:   isa_data_out = sd_scratch_register[3]; break;
+        case SD_BASE+7:   isa_data_out = sd_scratch_register[4]; break;
+        }
      
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;
@@ -713,7 +735,7 @@ inline void IO_Write_Cycle() {
     }
    
    
-    else if ((isa_address&0x0FFC)==SD_BASE )  {   // Location of SD Card registers
+    else if ((isa_address&0x0FF8)==SD_BASE )  {   // Location of SD Card registers
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
    
@@ -725,6 +747,11 @@ inline void IO_Write_Cycle() {
         case SD_BASE:     // First two registers serve the same function (to allow use of Word I/O)
         case SD_BASE+1:   sd_spi_dataout = data_in;  SD_SPI_Cycle(); break;
         case SD_BASE+2:   sd_spi_cs_n    = data_in&0x1;              break;
+        case SD_BASE+3:   sd_scratch_register[0] = data_in; break;
+        case SD_BASE+4:   sd_scratch_register[1] = data_in; break;
+        case SD_BASE+5:   sd_scratch_register[2] = data_in; break;
+        case SD_BASE+6:   sd_scratch_register[3] = data_in; break;
+        case SD_BASE+7:   sd_scratch_register[4] = data_in; break;
       }
      
       //gpio9_int = GPIO9_DR;
