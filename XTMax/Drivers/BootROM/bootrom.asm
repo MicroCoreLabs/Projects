@@ -15,18 +15,27 @@ cpu 8086    ; ensure we remain compatible with 8086
 ; The base I/O port for the XTMAX SD Card.
 ;
 %define XTMAX_IO_BASE       (0x280)
-
-;
-; Whether we are going to rename the BIOS's 1st disk to be the second disk.
-; This is useful to allow booting from the second disk.
-;
-;%define TAKE_OVER_FIXED_DISK_0
+%define REG_DATA            (XTMAX_IO_BASE+0)
+%define REG_CS              (XTMAX_IO_BASE+1)   ; write-only
+%define REG_CONFIG          (XTMAX_IO_BASE+1)   ; read-only
+%define REG_SCRATCH_0       (XTMAX_IO_BASE+2)   ; fixed disk id
+%define REG_SCRATCH_1       (XTMAX_IO_BASE+3)   ; BIOS INT13h segment
+%define REG_SCRATCH_2       (XTMAX_IO_BASE+4)   ; BIOS INT13h segment
+%define REG_SCRATCH_3       (XTMAX_IO_BASE+5)   ; BIOS INT13h offset
+%define REG_SCRATCH_4       (XTMAX_IO_BASE+6)   ; BIOS INT13h offset
+%define REG_TIMEOUT         (XTMAX_IO_BASE+7)
 
 ;
 ; Whether we will try/force using our own bootstrap code instead of falling back to BASIC.
 ;
 %define USE_BOOTSTRAP
 ;%define FORCE_OWN_BOOTSTRAP
+
+;
+; Whether we are going to rename the BIOS's 1st disk to be the second disk.
+; This is useful to allow booting from the second disk.
+;
+;%define TAKE_OVER_FIXED_DISK_0
 
 ;
 ; The properties of our emulated disk.
@@ -38,13 +47,16 @@ cpu 8086    ; ensure we remain compatible with 8086
 %define NUM_SECTORS         (NUM_HEADS * (NUM_CYLINDERS - 1) * SECTORS_PER_TRACK)
 
 %if NUM_HEADS > 255
-%error NUM_HEADS is too large
+%error NUM_HEADS_ is too large
+%endif
+%if NUM_HEADS > 16
+%warning NUM_HEADS_ above 16 can cause compatibility issues
 %endif
 %if SECTORS_PER_TRACK > 63
-%error SECTORS_PER_TRACK is too large
+%error SECTORS_PER_TRACK_ is too large
 %endif
 %if NUM_CYLINDERS > 1024
-%error NUM_CYLINDERS is too large
+%error NUM_CYLINDERS_ is too large
 %endif
 
 %ifndef AS_COM_PROGRAM
@@ -93,23 +105,20 @@ entry:
 .install_13h_vector:
     mov ax, old_13h_msg
     call print_string
-
     xor ax, ax              ; INT vector segment
     mov es, ax
-
     mov ax, es:[0x13*4+2]
-    mov dx, XTMAX_IO_BASE+3 ; scratch register 0-1
+    mov dx, REG_SCRATCH_1
     out dx, ax              ; save segment
     call print_hex
     mov ax, colon
     call print_string
     mov ax, es:[0x13*4]
-    mov dx, XTMAX_IO_BASE+5 ; scratch register 2-3
+    mov dx, REG_SCRATCH_3
     out dx, ax              ; save offset
     call print_hex
     mov ax, newline
     call print_string
-
     mov ax, ROM_SEGMENT
     mov es:[0x13*4+2], ax   ; store segment
     mov ax, int13h_entry
@@ -123,21 +132,49 @@ entry:
 %endif
 
 ;
+; Determine our fixed disk ID.
+;
+.identify_fixed_disk:
+    mov ax, disk_id_msg
+    call print_string
+    mov ax, 0x40            ; BIOS data area
+    mov es, ax
+%ifndef TAKE_OVER_FIXED_DISK_0
+    mov al, es:[0x75]       ; HDNUM
+    add al, 0x80
+%else
+    mov al, 0x80
+%endif
+    mov dx, REG_SCRATCH_0   ; save fixed disk id
+    out dx, al
+    push ax
+    call print_hex
+    mov ax, newline
+    call print_string
+%if !(%isdef(USE_BOOTSTRAP) && %isdef(FORCE_OWN_BOOTSTRAP))
+.update_bda:
+;
+; Increment the number of fixed disks in the BIOS Data Area.
+;
+    mov ax, num_drives_msg
+    call print_string
+    inc byte es:[0x75]      ; HDNUM
+    mov al, es:[0x75]
+    xor ah, ah
+    call print_hex
+    mov ax, newline
+    call print_string
+%endif
+    pop ax
+
+;
 ; Install our fixed disk parameter table.
 ; For the 1st disk, it is stored in the interrupt vector table, at vector 41h.
 ; For the 2nd disk, it is stored in the interrupt vector table, at vector 46h.
 ;
 .install_fixed_disk_parameters_table:
-    mov ax, disk_id_msg
-    call print_string
-    mov dx, XTMAX_IO_BASE+2 ; fixed disk id
-    in al, dx
-    xor ah, ah
-    push ax
-    call print_hex
-    mov ax, newline
-    call print_string
-    pop ax
+    xor cx, cx              ; INT vector segment
+    mov es, cx
     cmp al, 0x80
     jne .second_disk
     mov ax, ROM_SEGMENT
@@ -153,7 +190,6 @@ entry:
 .end_fdpt:
 
 %ifdef USE_BOOTSTRAP
-.update_bda:
 ;
 ; Install our BIOS INT18h hook into the interrupt vector table.
 ;
@@ -162,21 +198,6 @@ entry:
     mov es:[0x18*4+2], ax   ; store segment
     mov ax, int18h_entry
     mov es:[0x18*4], ax     ; store offset
-%endif
-
-%if !(%isdef(USE_BOOTSTRAP) && %isdef(FORCE_OWN_BOOTSTRAP))
-;
-; Increment the number of fixed disks in the BIOS Data Area.
-;
-    mov ax, num_drives_msg
-    call print_string
-    mov ax, 0x40            ; BIOS data area
-    mov es, ax
-    inc byte es:[0x75]      ; HDNUM
-    mov al, es:[0x75]
-    call print_hex
-    mov ax, newline
-    call print_string
 %endif
 
 .skip:
@@ -216,15 +237,21 @@ entry:
 ; INT 13h entry point.
 ;
 int13h_entry:
-    sti
 %ifdef EXTRA_DEBUG
+    push TEMP0
+    mov TEMP0, sp
+    mov TEMP0, [TEMP0+6]        ; grab the flags for iret
+    push TEMP0
+    popf
+    pop TEMP0
     call dump_regs
 %endif
+    sti
     push TEMP0
     push TEMP1
     push ax
     push dx
-    mov dx, XTMAX_IO_BASE+2     ; fixed disk id
+    mov dx, REG_SCRATCH_0
     in al, dx
     pop dx
     cmp dl, al                  ; is this our drive?
@@ -236,9 +263,9 @@ int13h_entry:
 ;
 .forward_to_bios:
 %ifdef TAKE_OVER_FIXED_DISK_0
-    cmp dl, 0x80+FIXED_DISK_1   ; is this the other fixed drive?
+    cmp dl, 0x81                ; is this the other fixed drive?
     jne .no_fixed_disk_take_over
-    mov dl, 0x80+FIXED_DISK_0
+    mov dl, 0x80
     call swap_fixed_disk_parameters_tables
 .no_fixed_disk_take_over:
 %endif
@@ -252,32 +279,33 @@ int13h_entry:
 ;
 ; Simulate INT 13h with the original vector.
 ;
-    pushf                       ; setup for iret below
-    mov dx, XTMAX_IO_BASE+3     ; scratch register 0-1
+    mov dx, REG_SCRATCH_1
 %ifndef AS_COM_PROGRAM
     in ax, dx
 %else
     mov ax, cs
 %endif
-    push ax                     ; setup for iret below
-    mov dx, XTMAX_IO_BASE+5     ; scratch register 2-3
+    push ax                     ; setup for retf below
+    mov dx, REG_SCRATCH_3
 %ifndef AS_COM_PROGRAM
     in ax, dx
 %else
     mov ax, fake_int13h_entry
 %endif
-    push ax                     ; setup for iret below
+    push ax                     ; setup for retf below
     mov ax, TEMP0               ; restore ax
     mov dx, TEMP1               ; restore dx
-    iret                        ; call the INT 13h handler
+    cli                         ; INT inhibits interrupts
+    retf                        ; call the INT 13h handler
 .return_from_int13h:
+    sti                         ; just in case
     pushf
     push ax
     mov ax, TEMP1               ; original dx
     cmp al, 0x80                ; is fixed fixed?
     jb .skip_update_hdnum
 %ifdef TAKE_OVER_FIXED_DISK_0
-    mov dl, 0x80+FIXED_DISK_1
+    mov dl, 0x81
     call swap_fixed_disk_parameters_tables
 %endif
     mov ax, TEMP0               ; original ax
@@ -297,7 +325,7 @@ int13h_entry:
 ; This is an operation for the SD Card. Use our own INT 13h logic.
 ;
 .check_function:
-    cmp ah, 0x15                ; is valid function?
+    cmp ah, 0x19                ; is valid function?
     jle .prepare_call
     call func_unsupported
     jmp .update_bda
@@ -392,6 +420,10 @@ func_table:
     dw  func_unsupported            ; diagnostics
     dw  func_10_is_ready            ; diagnostics
     dw  func_15_read_size
+    dw  func_unsupported            ; detect_change
+    dw  func_unsupported            ; set_media_type
+    dw  func_unsupported            ; set_media_type
+    dw  func_10_is_ready            ; park_heads
 
 func_unsupported:
 %ifdef DEBUG
@@ -496,7 +528,7 @@ func_02_read_sector:
 %endif
     mov di, bx              ; setup use of movsw
 .assert_cs:
-    mov dx, XTMAX_IO_BASE+2 ; chip select port
+    mov dx, REG_CS
     mov al, 0               ; assert chip select
     out dx, al
 .cmd17:
@@ -515,15 +547,15 @@ func_02_read_sector:
     mov ax, wait_msg
     call print_string
 %endif
-    mov dx, XTMAX_IO_BASE+7 ; timeout port
+    mov dx, REG_TIMEOUT
     mov al, 10              ; 100 ms
     out dx, al
 .receive_token:
-    mov dx, XTMAX_IO_BASE+0 ; data port
+    mov dx, REG_DATA
     in al, dx
     cmp al, 0xfe
     je .got_token
-    mov dx, XTMAX_IO_BASE+7 ; timeout port
+    mov dx, REG_TIMEOUT
     in al, dx
     test al, al
     jnz .error
@@ -539,16 +571,16 @@ func_02_read_sector:
     cld
 .receive_block:
     rep movsw
-    pop si
 .receive_crc:
-    in ax, dx               ; discard CRC
+    lodsw                   ; discard CRC
+    pop si
     add TEMP_LO, 1          ; next block
     adc TEMP_HI, 0          ; carry
     pop cx                  ; number of sectors left to read
     loop .cmd17
 .success:
 .deassert_cs1:
-    mov dx, XTMAX_IO_BASE+2 ; chip select port
+    mov dx, REG_CS
     mov al, 1               ; deassert chip select
     out dx, al
 .return1:
@@ -561,7 +593,7 @@ func_02_read_sector:
     jmp succeeded
 .error:
 .deassert_cs2:
-    mov dx, XTMAX_IO_BASE+2 ; chip select port
+    mov dx, REG_CS
     mov al, 1               ; deassert chip select
     out dx, al
 .return2:
@@ -625,7 +657,7 @@ func_03_write_sector:
     mov es, ax
 %endif
 .assert_cs:
-    mov dx, XTMAX_IO_BASE+2 ; chip select port
+    mov dx, REG_CS
     mov al, 0               ; assert chip select
     out dx, al
 .cmd24:
@@ -640,7 +672,7 @@ func_03_write_sector:
     mov cl, 0x58            ; CMD24
     call send_sd_read_write_cmd
     jc .error
-    mov dx, XTMAX_IO_BASE+0 ; data port
+    mov dx, REG_DATA
     mov al, 0xfe            ; send token
     out dx, al
     mov cx, 256             ; block size (in words)
@@ -656,15 +688,15 @@ func_03_write_sector:
     mov ax, wait_msg
     call print_string
 %endif
-    mov dx, XTMAX_IO_BASE+7 ; timeout port
+    mov dx, REG_TIMEOUT
     mov al, 25              ; 250 ms
     out dx, al
 .receive_status:
-    mov dx, XTMAX_IO_BASE+0 ; data port
+    mov dx, REG_DATA
     in al, dx
     cmp al, 0xff
     jne .got_status
-    mov dx, XTMAX_IO_BASE+7 ; timeout port
+    mov dx, REG_TIMEOUT
     in al, dx
     test al, al
     jnz .error
@@ -689,15 +721,15 @@ func_03_write_sector:
     mov ax, wait_msg
     call print_string
 %endif
-    mov dx, XTMAX_IO_BASE+7 ; timeout port
+    mov dx, REG_TIMEOUT
     mov al, 25              ; 250 ms
     out dx, al
 .receive_finish:
-    mov dx, XTMAX_IO_BASE+0 ; data port
+    mov dx, REG_DATA
     in al, dx
     test al, al
     jnz .got_finish
-    mov dx, XTMAX_IO_BASE+7 ; timeout port
+    mov dx, REG_TIMEOUT
     in al, dx
     test al, al
     jnz .error
@@ -718,7 +750,7 @@ func_03_write_sector:
 %endif
 .success:
 .deassert_cs1:
-    mov dx, XTMAX_IO_BASE+2 ; chip select port
+    mov dx, REG_CS
     mov al, 1               ; deassert chip select
     out dx, al
 .return1:
@@ -733,7 +765,7 @@ func_03_write_sector:
     jmp succeeded
 .error:
 .deassert_cs2:
-    mov dx, XTMAX_IO_BASE+2 ; chip select port
+    mov dx, REG_CS
     mov al, 1               ; deassert chip select
     out dx, al
 .return2:
@@ -906,9 +938,10 @@ int18h_entry:
     mov di, 0x7c00
     rep stosw
 .read_boot_sector:
-    mov dx, XTMAX_IO_BASE+2 ; fixed disk id
+    mov dx, REG_SCRATCH_0
     in al, dx
     mov dl, al
+    xor dh, dh
     mov ax, 0x201           ; read 1 sector
     mov cx, 1               ; sector 1
     mov bx, 0x7c00
@@ -955,14 +988,14 @@ swap_fixed_disk_parameters_tables:
     push es
     push ax
     push bx
-    xor ax, ax
+    xor ax, ax              ; INT vector segment
     mov es, ax
-    mov ax, es:[(0x41+FIXED_DISK_0*5)*4+2]
-    xchg es:[(0x41+FIXED_DISK_1*5)*4+2], ax
-    mov es:[(0x41+FIXED_DISK_0*5)*4+2], ax
-    mov ax, es:[(0x41+FIXED_DISK_0*5)*4]
-    xchg es:[(0x41+FIXED_DISK_1*5)*4], ax
-    mov es:[(0x41+FIXED_DISK_0*5)*4], ax
+    mov ax, es:[0x41*4+2]
+    xchg es:[0x46*4+2], ax
+    mov es:[0x41*4+2], ax
+    mov ax, es:[0x41*4+0]
+    xchg es:[0x46*4+0], ax
+    mov es:[0x41*4+0], ax
     pop bx
     pop ax
     pop es
@@ -1064,7 +1097,7 @@ init_sd:
     mov ax, ROM_SEGMENT
     mov ds, ax
 %endif
-    mov dx, XTMAX_IO_BASE+2 ; chip select port
+    mov dx, REG_CS
     mov al, 1               ; deassert chip select
 .power_up_delay:
     out dx, al
@@ -1073,14 +1106,14 @@ init_sd:
     mov ah, 0x86            ; wait
     int 0x15
 .dummy_cycles:
-    mov dx, XTMAX_IO_BASE+0 ; data port
+    mov dx, REG_DATA
     mov al, 0xff
     mov cx, 10              ; send 80 clock cycles
 .synchronize:
     out dx, al
     loop .synchronize
 .assert_cs:
-    mov dx, XTMAX_IO_BASE+2 ; chip select port
+    mov dx, REG_CS
     mov al, 0               ; assert chip select
     out dx, al
 .cmd0:
@@ -1115,7 +1148,7 @@ init_sd:
     call send_sd_init_cmd
     jc .exit
 .acmd41:
-    mov dx, XTMAX_IO_BASE+7 ; timeout port
+    mov dx, REG_TIMEOUT
     mov al, 250             ; 2.5 s
     out dx, al
 .retry_acmd41:
@@ -1133,7 +1166,7 @@ init_sd:
     mov ah, 0               ; expect ready state
     call send_sd_init_cmd
     jnc .exit
-    mov dx, XTMAX_IO_BASE+7 ; timeout port
+    mov dx, REG_TIMEOUT
     in al, dx
     test al, al
     jz .retry_acmd41
@@ -1170,7 +1203,7 @@ init_sd:
 ;      FL = <TRASH>
 ;
 send_sd_init_cmd:
-    mov dx, XTMAX_IO_BASE+0 ; data port
+    mov dx, REG_DATA
 .settle_before:
     mov al, 0xff
     out dx, al
@@ -1226,14 +1259,18 @@ send_sd_read_write_cmd:
     out dx, al
 .send_cmd:
     mov al, cl              ; command byte
-    mov ah, bh              ; address byte 1
-    out dx, ax
-    pop ax                  ; address byte 3
-    xchg al, bl             ; address byte 2
-    out dx, ax
-    xchg al, bl             ; address byte 4
-    mov ah, 0x1             ; crc (dummy)
-    out dx, ax
+    out dx, al
+    mov al, bh              ; address byte 1
+    out dx, al
+    mov al, bl              ; address byte 2
+    out dx, al
+    pop ax
+    xchg al, ah             ; address byte 3
+    out dx, al
+    xchg al, ah             ; address byte 4
+    out dx, al
+    mov al, 0x1             ; crc (dummy)
+    out dx, al
     mov cx, 8               ; retries
 .receive_r1:
     in al, dx
