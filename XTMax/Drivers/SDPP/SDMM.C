@@ -27,8 +27,9 @@
 /* Platform dependent macros and functions needed to be modified           */
 /*-------------------------------------------------------------------------*/
 
+DWORD VIRT_BUFFER=0xCE000000+2048;
 WORD DATAPORT=0x280;
-WORD CONTROLPORT=0x282;
+WORD CONTROLPORT=0x280+1;
 
 #if 1
 #define TOUTCHR(x)
@@ -177,30 +178,17 @@ void xmit_mmc (
    // NOTE: Callers always use buffer sizes multiple of two.
    bc >>= 1;
 
-#ifndef USE186
    _asm {
       mov   cx,bc
-      mov   dx,DATAPORT
       push  ds
+      push  es
+      les   di,VIRT_BUFFER
       lds   si,dword ptr buff
-   }
-   repeat:
-   _asm {
-      lodsw
-      out   dx, ax
-      loop  repeat
+      cld
+      rep   movsw
+      pop   es
       pop   ds
    }
-#else
-   _asm {
-      mov   cx,bc
-      mov   dx,DATAPORT
-      push  ds
-      lds   si,dword ptr buff
-      rep   outsw
-      pop   ds
-   }
-#endif
 }
 
 
@@ -218,30 +206,17 @@ void rcvr_mmc (
    // NOTE: Callers always use buffer sizes multiple of two.
    bc >>= 1;
 
-#ifndef USE186
    _asm {
       mov   cx,bc
-      mov   dx,DATAPORT
+      push  ds
       push  es
       les   di,dword ptr buff
-   }
-   repeat:
-   _asm {
-      in    ax, dx
-      stosw
-      loop  repeat
+      lds   si,VIRT_BUFFER
+      cld
+      rep   movsw
       pop   es
+      pop   ds
    }
-#else
-   _asm {
-      mov   cx,bc
-      mov   dx,DATAPORT
-      push  es
-      les   di,dword ptr buff
-      rep   insw
-      pop   es
-   }
-#endif
 }
 
 /*-----------------------------------------------------------------------*/
@@ -254,11 +229,11 @@ int wait_ready (void)   /* 1:OK, 0:Timeout */
    BYTE d;
    UINT tmr;
 
-   outp(DATAPORT+15, 50);
+   outp(DATAPORT+7, 50);
    do {   /* Wait for ready in timeout of 500ms */
       d = inp(DATAPORT);
       if (d == 0xFF) break;
-   } while(!inp(DATAPORT+15));
+   } while(!inp(DATAPORT+7));
 
    return d == 0xFF;
 }
@@ -309,11 +284,11 @@ int rcvr_datablock ( /* 1:OK, 0:Failed */
    UINT tmr;
 
 
-   outp(DATAPORT+15, 10);
+   outp(DATAPORT+7, 10);
    do {   /* Wait for data packet in timeout of 100ms */
       d = inp(DATAPORT);
       if (d != 0xFF) break;
-   } while(!inp(DATAPORT+15));
+   } while(!inp(DATAPORT+7));
    if (d != 0xFE) {
     return 0;      /* If not valid data token, return with error */
    }
