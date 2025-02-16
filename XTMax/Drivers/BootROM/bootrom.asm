@@ -16,22 +16,11 @@ cpu 8086    ; ensure we remain compatible with 8086
 ;
 %define XTMAX_IO_BASE       (0x280)
 
-
-%define FIXED_DISK_0        (0)
-%define FIXED_DISK_1        (1)
-
-;
-; Whether we will emulate the 1st or 2nd disk.
-;
-%define DISK_NUMBER         FIXED_DISK_0
-
-%if DISK_NUMBER == FIXED_DISK_0
 ;
 ; Whether we are going to rename the BIOS's 1st disk to be the second disk.
 ; This is useful to allow booting from the second disk.
 ;
 ;%define TAKE_OVER_FIXED_DISK_0
-%endif
 
 ;
 ; Whether we will try/force using our own bootstrap code instead of falling back to BASIC.
@@ -97,57 +86,6 @@ entry:
     jc .skip
 %endif
 
-;
-; Detecting 80186-compatible so we can use REP INSW/OUTSW.
-; Based on https://cosmodoc.org/topics/processor-detection/
-;
-.cpuid:
-    ; Push a zero value to the stack, then immediately pop that zero
-    ; value into the FLAGS register. Depending on the CPU, some bits will
-    ; refuse this change and remain on.
-    xor ax, ax
-    push ax
-    popf
-    ; Push the current state of FLAGS to the stack, then immediately pop
-    ; the flag state into AX for further analysis.
-    pushf
-    pop ax
-    ; Consider only flag bits 12..15, and see if they all remained on.
-    and ax, 0xf000
-    cmp ax, 0xf000
-    jne .support_string_io    ; at least 80286
-    ; Perform "FFh >> 33" then check for a zero or nonzero result.
-    mov al, 0xff
-    mov cl, 0x21
-    shr al, cl
-    jnz .support_string_io    ; at least 80186/80188
-    ; Ensure interrupts are enabled, then save SI's value on the stack.
-    sti
-    ; Here, ES is pointing to some unspecified place in memory. Below is
-    ; a busy loop that reads 64 KiB of memory from ES:SI, loading each
-    ; byte into AL and doing nothing further with it. After each
-    ; iteration, SI is incremented and CX is decremented. The loop ends
-    ; when CX reaches zero. Or does it?
-    mov si, 0
-    mov cx, 0xffff
-    rep lodsb
-    ; See if the value in CX made it all the way to zero. If it did, the
-    ; CPU is a V30 or V20.
-    or cx, cx
-    cli
-    jz .support_string_io    ; at least V20
-.not_support_string_io:
-    xor dl, dl
-    jmp .store_string_io
-.support_string_io:
-    mov dl, 1
-    mov ax, string_io_msg
-    call print_string
-.store_string_io:
-    mov ax, XTMAX_IO_BASE+3 ; scratch register 0
-    xchg ax, dx
-    out dx, al              ; save capability
-
 %ifndef AS_COM_PROGRAM
 ;
 ; Install our BIOS INT13h hook into the interrupt vector table.
@@ -160,31 +98,22 @@ entry:
     mov es, ax
 
     mov ax, es:[0x13*4+2]
-    mov dx, XTMAX_IO_BASE+4 ; scratch register 1-2
+    mov dx, XTMAX_IO_BASE+3 ; scratch register 0-1
     out dx, ax              ; save segment
     call print_hex
     mov ax, colon
     call print_string
     mov ax, es:[0x13*4]
-    mov dx, XTMAX_IO_BASE+6 ; scratch register 3-4
+    mov dx, XTMAX_IO_BASE+5 ; scratch register 2-3
     out dx, ax              ; save offset
     call print_hex
     mov ax, newline
     call print_string
 
-    mov ax, new_13h_msg
-    call print_string
-
     mov ax, ROM_SEGMENT
     mov es:[0x13*4+2], ax   ; store segment
-    call print_hex
-    mov ax, colon
-    call print_string
     mov ax, int13h_entry
     mov es:[0x13*4], ax     ; store offset
-    call print_hex
-    mov ax, newline
-    call print_string
 
 ;
 ; Move fixed disk 0 to fixed disk 1.
@@ -199,19 +128,29 @@ entry:
 ; For the 2nd disk, it is stored in the interrupt vector table, at vector 46h.
 ;
 .install_fixed_disk_parameters_table:
-    mov ax, new_fdpt_msg
+    mov ax, disk_id_msg
     call print_string
-
-    mov ax, ROM_SEGMENT
-    mov es:[(0x41+DISK_NUMBER*5)*4+2], ax   ; store segment
-    call print_hex
-    mov ax, colon
-    call print_string
-    mov ax, fixed_disk_parameters_table
-    mov es:[(0x41+DISK_NUMBER*5)*4], ax     ; store offset
+    mov dx, XTMAX_IO_BASE+2 ; fixed disk id
+    in al, dx
+    xor ah, ah
+    push ax
     call print_hex
     mov ax, newline
     call print_string
+    pop ax
+    cmp al, 0x80
+    jne .second_disk
+    mov ax, ROM_SEGMENT
+    mov es:[0x41*4+2], ax   ; store segment
+    mov ax, fixed_disk_parameters_table
+    mov es:[0x41*4+0], ax   ; store offset
+    jmp .end_fdpt
+.second_disk:
+    mov ax, ROM_SEGMENT
+    mov es:[0x46*4+2], ax   ; store segment
+    mov ax, fixed_disk_parameters_table
+    mov es:[0x46*4+0], ax   ; store offset
+.end_fdpt:
 
 %ifdef USE_BOOTSTRAP
 .update_bda:
@@ -219,19 +158,10 @@ entry:
 ; Install our BIOS INT18h hook into the interrupt vector table.
 ;
 .install_18h_vector:
-    mov ax, new_18h_msg
-    call print_string
-
     mov ax, ROM_SEGMENT
     mov es:[0x18*4+2], ax   ; store segment
-    call print_hex
-    mov ax, colon
-    call print_string
     mov ax, int18h_entry
     mov es:[0x18*4], ax     ; store offset
-    call print_hex
-    mov ax, newline
-    call print_string
 %endif
 
 %if !(%isdef(USE_BOOTSTRAP) && %isdef(FORCE_OWN_BOOTSTRAP))
@@ -292,7 +222,13 @@ int13h_entry:
 %endif
     push TEMP0
     push TEMP1
-    cmp dl, 0x80+DISK_NUMBER    ; is this our drive?
+    push ax
+    push dx
+    mov dx, XTMAX_IO_BASE+2     ; fixed disk id
+    in al, dx
+    pop dx
+    cmp dl, al                  ; is this our drive?
+    pop ax
     je .check_function
 
 ;
@@ -317,14 +253,14 @@ int13h_entry:
 ; Simulate INT 13h with the original vector.
 ;
     pushf                       ; setup for iret below
-    mov dx, XTMAX_IO_BASE+4     ; scratch register 1-2
+    mov dx, XTMAX_IO_BASE+3     ; scratch register 0-1
 %ifndef AS_COM_PROGRAM
     in ax, dx
 %else
     mov ax, cs
 %endif
     push ax                     ; setup for iret below
-    mov dx, XTMAX_IO_BASE+6     ; scratch register 3-4
+    mov dx, XTMAX_IO_BASE+5     ; scratch register 2-3
 %ifndef AS_COM_PROGRAM
     in ax, dx
 %else
@@ -546,6 +482,7 @@ func_02_read_sector:
     jc error_sector_not_found
     ; TODO: (robustness) check buffer boundaries
 .setup:
+    push ds
     push bx
     push cx
     push dx
@@ -553,7 +490,11 @@ func_02_read_sector:
     push ax
     mov cx, ax              ; number of sectors to read
     xor ch, ch
-    mov di, bx              ; setup use of stosw
+%ifndef AS_COM_PROGRAM
+    mov ax, ROM_SEGMENT
+    mov ds, ax
+%endif
+    mov di, bx              ; setup use of movsw
 .assert_cs:
     mov dx, XTMAX_IO_BASE+2 ; chip select port
     mov al, 0               ; assert chip select
@@ -574,7 +515,7 @@ func_02_read_sector:
     mov ax, wait_msg
     call print_string
 %endif
-    mov dx, XTMAX_IO_BASE+15; timeout port
+    mov dx, XTMAX_IO_BASE+7 ; timeout port
     mov al, 10              ; 100 ms
     out dx, al
 .receive_token:
@@ -582,7 +523,7 @@ func_02_read_sector:
     in al, dx
     cmp al, 0xfe
     je .got_token
-    mov dx, XTMAX_IO_BASE+15; timeout port
+    mov dx, XTMAX_IO_BASE+7 ; timeout port
     in al, dx
     test al, al
     jnz .error
@@ -593,22 +534,12 @@ func_02_read_sector:
     call print_string
 %endif
     mov cx, 256             ; block size (in words)
-    push dx
-    mov dx, XTMAX_IO_BASE+3 ; scratch register 0
-    in al, dx
-    pop dx
-    test al, al             ; supports insw?
+    push si
+    mov si, end_of_rom      ; virtual buffer
     cld
-    jz .receive_block
-.receive_block_fast:
-cpu 186
-    rep insw
-cpu 8086
-    jmp .receive_crc
 .receive_block:
-    in ax, dx
-    stosw
-    loop .receive_block
+    rep movsw
+    pop si
 .receive_crc:
     in ax, dx               ; discard CRC
     add TEMP_LO, 1          ; next block
@@ -626,6 +557,7 @@ cpu 8086
     pop dx
     pop cx
     pop bx
+    pop ds
     jmp succeeded
 .error:
 .deassert_cs2:
@@ -640,6 +572,7 @@ cpu 8086
     pop dx
     pop cx
     pop bx
+    pop ds
     jmp error_drive_not_ready
 
 ;
@@ -686,7 +619,11 @@ func_03_write_sector:
     xor ch, ch
     mov di, bx              ; destination address
     mov ax, es
-    mov ds, ax
+    mov ds, ax              ; save es and setup for movsw
+%ifndef AS_COM_PROGRAM
+    mov ax, ROM_SEGMENT
+    mov es, ax
+%endif
 .assert_cs:
     mov dx, XTMAX_IO_BASE+2 ; chip select port
     mov al, 0               ; assert chip select
@@ -707,30 +644,19 @@ func_03_write_sector:
     mov al, 0xfe            ; send token
     out dx, al
     mov cx, 256             ; block size (in words)
-    xchg di, si             ; save si (aka TEMP1)
-    push dx
-    mov dx, XTMAX_IO_BASE+3 ; scratch register 0
-    in al, dx
-    pop dx
-    test al, al             ; supports outsw?
+    push si                 ; save si (aka TEMP1)
+    mov si, di
+    mov di, end_of_rom      ; virtual buffer
     cld
-    jz .send_block
-.send_block_fast:
-cpu 186
-    rep outsw
-cpu 8086
-    jmp .end_send_block
 .send_block:
-    lodsw
-    out dx, ax
-    loop .send_block
-.end_send_block:
-    xchg si, di             ; restore si (aka TEMP1)
+    rep movsw
+    mov di, si
+    pop si                  ; restore si (aka TEMP1)
 %ifdef DEBUG_IO
     mov ax, wait_msg
     call print_string
 %endif
-    mov dx, XTMAX_IO_BASE+15; timeout port
+    mov dx, XTMAX_IO_BASE+7 ; timeout port
     mov al, 25              ; 250 ms
     out dx, al
 .receive_status:
@@ -738,7 +664,7 @@ cpu 8086
     in al, dx
     cmp al, 0xff
     jne .got_status
-    mov dx, XTMAX_IO_BASE+15; timeout port
+    mov dx, XTMAX_IO_BASE+7 ; timeout port
     in al, dx
     test al, al
     jnz .error
@@ -763,7 +689,7 @@ cpu 8086
     mov ax, wait_msg
     call print_string
 %endif
-    mov dx, XTMAX_IO_BASE+15; timeout port
+    mov dx, XTMAX_IO_BASE+7 ; timeout port
     mov al, 25              ; 250 ms
     out dx, al
 .receive_finish:
@@ -771,7 +697,7 @@ cpu 8086
     in al, dx
     test al, al
     jnz .got_finish
-    mov dx, XTMAX_IO_BASE+15; timeout port
+    mov dx, XTMAX_IO_BASE+7 ; timeout port
     in al, dx
     test al, al
     jnz .error
@@ -796,6 +722,8 @@ cpu 8086
     mov al, 1               ; deassert chip select
     out dx, al
 .return1:
+    mov ax, ds
+    mov es, ax              ; restore es
     pop ax
     pop di
     pop dx
@@ -810,6 +738,8 @@ cpu 8086
     out dx, al
 .return2:
     pop cx                  ; number of sectors not written successfully
+    mov ax, ds
+    mov es, ax              ; restore es
     pop ax
     sub al, cl              ; number of sectors written successfully
     pop di
@@ -971,12 +901,15 @@ int18h_entry:
     xor ax, ax
     mov ds, ax
     mov es, ax
-.read_boot_sector:
+.clear_memory:
     mov cx, 256
     mov di, 0x7c00
     rep stosw
+.read_boot_sector:
+    mov dx, XTMAX_IO_BASE+2 ; fixed disk id
+    in al, dx
+    mov dl, al
     mov ax, 0x201           ; read 1 sector
-    mov dx, 0x80+DISK_NUMBER
     mov cx, 1               ; sector 1
     mov bx, 0x7c00
     int 0x13
@@ -1182,7 +1115,7 @@ init_sd:
     call send_sd_init_cmd
     jc .exit
 .acmd41:
-    mov dx, XTMAX_IO_BASE+15; timeout port
+    mov dx, XTMAX_IO_BASE+7 ; timeout port
     mov al, 250             ; 2.5 s
     out dx, al
 .retry_acmd41:
@@ -1200,7 +1133,7 @@ init_sd:
     mov ah, 0               ; expect ready state
     call send_sd_init_cmd
     jnc .exit
-    mov dx, XTMAX_IO_BASE+15; timeout port
+    mov dx, XTMAX_IO_BASE+7 ; timeout port
     in al, dx
     test al, al
     jz .retry_acmd41
@@ -1340,16 +1273,13 @@ debug_handler:
 
 welcome_msg     db 'BootROM for XTMax v1.0', 0xD, 0xA
                 db 'Copyright (c) 2025 Matthieu Bucchianeri', 0xD, 0xA, 0
-string_io_msg   db 'CPU supports INS/OUTS instructions', 0xD, 0xA, 0
-old_13h_msg     db 'Old INT13h Vector = ', 0
-new_13h_msg     db 'New INT13h Vector = ', 0
-new_fdpt_msg    db 'New Fixed Disk Parameter Table = ', 0
+old_13h_msg     db 'Old INT13h Vector       = ', 0
 init_ok_msg     db 'SD Card initialized successfully', 0xD, 0xA, 0
 init_error_msg  db 'SD Card failed to initialize', 0xD, 0xA, 0
+disk_id_msg     db 'Fixed Disk ID           = ', 0
 num_drives_msg  db 'Total Fixed Disk Drives = ', 0
 unsupported_msg db 'Unsupported INT13h Function ', 0
 %ifdef USE_BOOTSTRAP
-new_18h_msg     db 'New INT18h Vector = ', 0
 boot_msg        db 'Booting from SD Card...', 0xD, 0xA, 0
 no_boot_msg     db 'Not bootable', 0xD, 0xA, 0
 %endif
@@ -1381,3 +1311,8 @@ sd_idle_msg     db 'Received idle', 0xD, 0xA, 0
 times 2047-($-$$) db 0
 db 0    ; will be used to complete the checksum.
 %endif
+
+;
+; The virtual buffer for I/O follows the ROM immediately.
+;
+end_of_rom:

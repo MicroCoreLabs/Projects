@@ -172,7 +172,8 @@
 
 #define EMS_TOTAL_SIZE     (16*1024*1024)
 
-#define SD_BASE            0x280  // Must be a multiple of 16.
+#define SD_BASE            0x280  // Must be a multiple of 8.
+#define SD_FIXED_DISK_ID   0x80   // or 0x81 for 2nd disk.
 
     
 // --------------------------------------------------------------------------------------------------
@@ -197,7 +198,7 @@ uint8_t   spi_shift_out =0;
 uint8_t   sd_spi_datain =0;
 uint32_t  sd_spi_cs_n = 0x0;
 uint32_t  sd_spi_dataout =0;
-uint8_t   sd_scratch_register[5] = {0, 0, 0, 0, 0};
+uint8_t   sd_scratch_register[4] = {0, 0, 0, 0};
 uint16_t  sd_requested_timeout = 0;
 elapsedMillis sd_timeout;
 
@@ -542,15 +543,15 @@ inline void Mem_Read_Cycle() {
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
     }
 
-  /*
-    XTMax_MEM_Response_Array
-    - Array holds value 0,1,2
-    0 = unitiailzed - add wait states and snoop
-    1 = No wait states and no response
-    2 = No wait states and yes respond
+    /*
+      XTMax_MEM_Response_Array
+      - Array holds value 0,1,2
+      0 = unitiailzed - add wait states and snoop
+      1 = No wait states and no response
+      2 = No wait states and yes respond
 
-  */
-  else if (isa_address<0xA0000)   {        // "Conventional" RAM
+    */
+    else if (isa_address<0xA0000)   {        // "Conventional" RAM
       isa_data_out = Internal_RAM_Read();
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
 
@@ -586,6 +587,19 @@ inline void Mem_Read_Cycle() {
       isa_data_out = BOOTROM[isa_address-BOOTROM_ADDR];
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;
+
+      while ( (gpio9_int&0xF0) != 0xF0 ) { gpio9_int = GPIO9_DR; }  // Wait here until cycle is complete
+
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
+    }
+    else if (isa_address>=BOOTROM_ADDR+sizeof(BOOTROM) && isa_address<BOOTROM_ADDR+sizeof(BOOTROM)+512) {   // SD Card virtual buffer
+      GPIO7_DR = MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_LOW + DATA_OE_n_LOW ;  // Assert CHRDY_n=0 to begin wait states
+
+      // Alias to IO port SD_BASE
+      sd_spi_dataout = 0xff; SD_SPI_Cycle(); isa_data_out = sd_spi_datain;
+      GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;  // Output data
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;  // De-assert CHRDY
 
       while ( (gpio9_int&0xF0) != 0xF0 ) { gpio9_int = GPIO9_DR; }  // Wait here until cycle is complete
 
@@ -645,6 +659,27 @@ inline void Mem_Write_Cycle() {
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
     }
+    else if (isa_address>=BOOTROM_ADDR+sizeof(BOOTROM) && isa_address<BOOTROM_ADDR+sizeof(BOOTROM)+512) {   // SD Card virtual buffer
+      GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_LOW + DATA_OE_n_HIGH;    // Steer data mux to Data[7:0] and Assert CHRDY_n=0 to begin wait states
+
+      delayNanoseconds(10);  // Wait some time for buffers to switch from address to data
+
+      gpio6_int = GPIO6_DR;
+      data_in = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
+
+      // Alias to IO port SD_BASE
+      sd_spi_dataout = data_in;  SD_SPI_Cycle();
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;  // De-assert CHRDY
+
+      while ( (gpio9_int&0xF0) != 0xF0 ) {   // Wait here until cycle is complete
+        gpio6_int = GPIO6_DR;
+        gpio9_int = GPIO9_DR;
+        }
+
+      GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
+    }
     return;
 }
 
@@ -678,18 +713,17 @@ inline void IO_Read_Cycle() {
     }
    
        
-    else if ((isa_address&0x0FF0)==SD_BASE )  {   // Location of SD Card registers
+    else if ((isa_address&0x0FF8)==SD_BASE )  {   // Location of SD Card registers
  
       switch (isa_address)  {
         case SD_BASE:     // First two registers serve the same function (to allow use of Word I/O)
         case SD_BASE+1:   sd_spi_dataout = 0xff; SD_SPI_Cycle(); isa_data_out = sd_spi_datain; break;
-        case SD_BASE+2:   break; // Write only
+        case SD_BASE+2:   isa_data_out = SD_FIXED_DISK_ID; break;
         case SD_BASE+3:   isa_data_out = sd_scratch_register[0]; break;
         case SD_BASE+4:   isa_data_out = sd_scratch_register[1]; break;
         case SD_BASE+5:   isa_data_out = sd_scratch_register[2]; break;
         case SD_BASE+6:   isa_data_out = sd_scratch_register[3]; break;
-        case SD_BASE+7:   isa_data_out = sd_scratch_register[4]; break;
-        case SD_BASE+15:  isa_data_out = sd_timeout >= sd_requested_timeout; break;
+        case SD_BASE+7:   isa_data_out = sd_timeout >= sd_requested_timeout; break;
         default:          isa_data_out = 0xff; break;
         }
      
@@ -739,7 +773,7 @@ inline void IO_Write_Cycle() {
     }
    
    
-    else if ((isa_address&0x0FF0)==SD_BASE )  {   // Location of SD Card registers
+    else if ((isa_address&0x0FF8)==SD_BASE )  {   // Location of SD Card registers
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
    
@@ -755,8 +789,7 @@ inline void IO_Write_Cycle() {
         case SD_BASE+4:   sd_scratch_register[1] = data_in; break;
         case SD_BASE+5:   sd_scratch_register[2] = data_in; break;
         case SD_BASE+6:   sd_scratch_register[3] = data_in; break;
-        case SD_BASE+7:   sd_scratch_register[4] = data_in; break;
-        case SD_BASE+15:  sd_timeout = 0; sd_requested_timeout = data_in * 10; break;
+        case SD_BASE+7:   sd_timeout = 0; sd_requested_timeout = data_in * 10; break;
       }
      
       //gpio9_int = GPIO9_DR;
