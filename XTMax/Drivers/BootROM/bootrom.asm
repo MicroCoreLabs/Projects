@@ -83,7 +83,6 @@ entry:
     push ax
     push cx
     push dx
-    push si
     cli
 %endif
 
@@ -202,7 +201,6 @@ entry:
 
 .skip:
     sti
-    pop si
     pop dx
     pop cx
     pop ax
@@ -389,6 +387,7 @@ int13h_entry:
 .return_with_flags:
     pop TEMP1
     pop TEMP0
+    sti                         ; workaround - MS-DOS does not properly propagate IF
 %ifdef EXTRA_DEBUG
     call dump_regs
 %endif
