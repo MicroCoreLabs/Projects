@@ -59,6 +59,7 @@ cpu 8086    ; ensure we remain compatible with 8086
 %error NUM_CYLINDERS_ is too large
 %endif
 
+beginning_of_rom:
 %ifndef AS_COM_PROGRAM
 ;
 ; BIOS will look for the AA55 signature between C8000-DFFFF in 2KB increments.
@@ -89,6 +90,17 @@ entry:
     mov ax, welcome_msg
     call print_string
 
+    mov ax, rom_base_msg
+    call print_string
+    mov ax, cs
+    call print_hex
+    mov ax, colon
+    call print_string
+    mov ax, beginning_of_rom
+    call print_hex
+    mov ax, newline
+    call print_string
+
 ;
 ; Initialize the SD Card.
 ;
@@ -102,23 +114,15 @@ entry:
 ; Install our BIOS INT13h hook into the interrupt vector table.
 ;
 .install_13h_vector:
-    mov ax, old_13h_msg
-    call print_string
     xor ax, ax              ; INT vector segment
     mov es, ax
     mov ax, es:[0x13*4+2]
     mov dx, REG_SCRATCH_1
     out dx, ax              ; save segment
-    call print_hex
-    mov ax, colon
-    call print_string
     mov ax, es:[0x13*4]
     mov dx, REG_SCRATCH_3
     out dx, ax              ; save offset
-    call print_hex
-    mov ax, newline
-    call print_string
-    mov ax, ROM_SEGMENT
+    mov ax, cs
     mov es:[0x13*4+2], ax   ; store segment
     mov ax, int13h_entry
     mov es:[0x13*4], ax     ; store offset
@@ -176,13 +180,13 @@ entry:
     mov es, cx
     cmp al, 0x80
     jne .second_disk
-    mov ax, ROM_SEGMENT
+    mov ax, cs
     mov es:[0x41*4+2], ax   ; store segment
     mov ax, fixed_disk_parameters_table
     mov es:[0x41*4+0], ax   ; store offset
     jmp .end_fdpt
 .second_disk:
-    mov ax, ROM_SEGMENT
+    mov ax, cs
     mov es:[0x46*4+2], ax   ; store segment
     mov ax, fixed_disk_parameters_table
     mov es:[0x46*4+0], ax   ; store offset
@@ -193,7 +197,7 @@ entry:
 ; Install our BIOS INT18h hook into the interrupt vector table.
 ;
 .install_18h_vector:
-    mov ax, ROM_SEGMENT
+    mov ax, cs
     mov es:[0x18*4+2], ax   ; store segment
     mov ax, int18h_entry
     mov es:[0x18*4], ax     ; store offset
@@ -521,10 +525,8 @@ func_02_read_sector:
     push ax
     mov cx, ax              ; number of sectors to read
     xor ch, ch
-%ifndef AS_COM_PROGRAM
-    mov ax, ROM_SEGMENT
+    mov ax, cs
     mov ds, ax
-%endif
     mov di, bx              ; setup use of movsw
 .assert_cs:
     mov dx, REG_CS
@@ -651,10 +653,8 @@ func_03_write_sector:
     mov di, bx              ; destination address
     mov ax, es
     mov ds, ax              ; save es and setup for movsw
-%ifndef AS_COM_PROGRAM
-    mov ax, ROM_SEGMENT
+    mov ax, cs
     mov es, ax
-%endif
 .assert_cs:
     mov dx, REG_CS
     mov al, 0               ; assert chip select
@@ -1092,10 +1092,8 @@ init_sd:
     push cx
     push dx
     push si
-%ifndef AS_COM_PROGRAM
-    mov ax, ROM_SEGMENT
+    mov ax, cs
     mov ds, ax
-%endif
     mov dx, REG_CS
     mov al, 1               ; deassert chip select
 .power_up_delay:
@@ -1309,7 +1307,7 @@ debug_handler:
 
 welcome_msg     db 'BootROM for XTMax v1.0', 0xD, 0xA
                 db 'Copyright (c) 2025 Matthieu Bucchianeri', 0xD, 0xA, 0
-old_13h_msg     db 'Old INT13h Vector       = ', 0
+rom_base_msg    db 'ROM Base Address        = ', 0
 init_ok_msg     db 'SD Card initialized successfully', 0xD, 0xA, 0
 init_error_msg  db 'SD Card failed to initialize', 0xD, 0xA, 0
 disk_id_msg     db 'Fixed Disk ID           = ', 0

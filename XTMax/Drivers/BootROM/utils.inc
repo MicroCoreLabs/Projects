@@ -9,10 +9,8 @@ print_string:
     push bx
     push si
     mov si, ax
-%ifndef AS_COM_PROGRAM
-    mov ax, ROM_SEGMENT
+    mov ax, cs
     mov ds, ax
-%endif
     mov ah, 0xe
     xor bx, bx
     cld
@@ -42,10 +40,8 @@ print_hex:
     push dx
     push si
     mov dx, ax
-%ifndef AS_COM_PROGRAM
-    mov ax, ROM_SEGMENT
+    mov ax, cs
     mov ds, ax
-%endif
     xor bx, bx
     cld
 .nibble1:

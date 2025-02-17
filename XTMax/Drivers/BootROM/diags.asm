@@ -308,10 +308,8 @@ print_hex_byte:
     push si
     mov dl, al
     xor ah, ah
-%ifndef AS_COM_PROGRAM
-    mov ax, ROM_SEGMENT
+    mov ax, cs
     mov ds, ax
-%endif
     xor bx, bx
     cld
 .nibble1:
