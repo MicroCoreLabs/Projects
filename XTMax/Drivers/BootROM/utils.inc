@@ -9,10 +9,8 @@ print_string:
     push bx
     push si
     mov si, ax
-%ifndef AS_COM_PROGRAM
-    mov ax, ROM_SEGMENT
+    mov ax, cs
     mov ds, ax
-%endif
     mov ah, 0xe
     xor bx, bx
     cld
@@ -42,10 +40,8 @@ print_hex:
     push dx
     push si
     mov dx, ax
-%ifndef AS_COM_PROGRAM
-    mov ax, ROM_SEGMENT
+    mov ax, cs
     mov ds, ax
-%endif
     xor bx, bx
     cld
 .nibble1:
@@ -130,10 +126,19 @@ dump_regs:
     call print_hex
     mov ax, space
     call print_string
+    pushf
+    pop ax
+    call print_hex
+    mov ax, space
+    call print_string
     mov ax, newline
     call print_string
     pop ax
     ret
 
-registers_msg   db ' AX   BX   CX   DX   DS   SI   ES   DI   BP', 0xD, 0xA, 0
+registers_msg   db ' AX   BX   CX   DX   DS   SI   ES   DI   BP  FLAGS', 0xD, 0xA, 0
 %endif
+
+colon           db ':', 0
+space           db ' ', 0
+newline         db 0xD, 0xA, 0

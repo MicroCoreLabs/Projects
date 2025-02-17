@@ -8,6 +8,7 @@
 
     xor ax, ax
     lahf
+    sti
     mov ax, 0x1122
     mov bx, 0x3344
     mov cx, 0x5566
@@ -114,6 +115,8 @@ do_int13h:
 
     ; dump registers
 %ifdef DUMP_REGS
+    popf
+    pushf
     call dump_regs
     pop ax
     call print_hex
@@ -145,6 +148,11 @@ fake_int13h_entry:
     mov al, ah
     xor ah, ah
     call print_hex
+    mov ax, drive_msg
+    call print_string
+    mov ax, dx
+    xor ah, ah
+    call print_hex
     mov ax, newline
     call print_string
     pop ax
@@ -162,6 +170,7 @@ buf_write           db 1, 2, 3, 4, 5, 6, 7, 8
 buf_read            times 1024 db 0
 
 fake_handler_msg    db 'BIOS INT13h Function ', 0
+drive_msg           db ' Drive ', 0
 test_success_msg    db 'Call succeeded ', 0
 test_failed_msg     db 'Call failed ', 0
 
