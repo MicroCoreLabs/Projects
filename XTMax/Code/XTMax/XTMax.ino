@@ -558,6 +558,7 @@ inline void Internal_RAM_Write() {
 // --------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------
 
+__attribute__((always_inline))
 inline void Mem_Read_Cycle()
 {
   isa_address = ADDRESS_DATA_GPIO6_UNSCRAMBLE;
@@ -653,6 +654,7 @@ inline void Mem_Read_Cycle()
 // --------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------
 
+__attribute__((always_inline))
 inline void Mem_Write_Cycle()
 {
   isa_address = ADDRESS_DATA_GPIO6_UNSCRAMBLE;
@@ -732,48 +734,53 @@ inline void Mem_Write_Cycle()
 // --------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------
 
+__attribute__((always_inline))
 inline void IO_Read_Cycle()
 {
   isa_address = 0xFFFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
 
-  if ((isa_address&0x0FF8)==EMS_BASE_IO) {   // Location of 16 KB Expanded Memory page frame pointers
-    switch (isa_address)  {
-      case EMS_BASE_IO  :  isa_data_out = ems_frame_pointer[0]; break;
-      case EMS_BASE_IO+1:  isa_data_out = ems_frame_pointer[0] >> 8; break;
-      case EMS_BASE_IO+2:  isa_data_out = ems_frame_pointer[1]; break;
-      case EMS_BASE_IO+3:  isa_data_out = ems_frame_pointer[1] >> 8; break;
-      case EMS_BASE_IO+4:  isa_data_out = ems_frame_pointer[2]; break;
-      case EMS_BASE_IO+5:  isa_data_out = ems_frame_pointer[2] >> 8; break;
-      case EMS_BASE_IO+6:  isa_data_out = ems_frame_pointer[3]; break;
-      case EMS_BASE_IO+7:  isa_data_out = ems_frame_pointer[3] >> 8; break;
-    }
+  uint16_t base_address = isa_address&0x0FF8;
+  switch (base_address) {
+    case EMS_BASE_IO:
+      switch (isa_address)  {
+        case EMS_BASE_IO  :  isa_data_out = ems_frame_pointer[0]; break;
+        case EMS_BASE_IO+1:  isa_data_out = ems_frame_pointer[0] >> 8; break;
+        case EMS_BASE_IO+2:  isa_data_out = ems_frame_pointer[1]; break;
+        case EMS_BASE_IO+3:  isa_data_out = ems_frame_pointer[1] >> 8; break;
+        case EMS_BASE_IO+4:  isa_data_out = ems_frame_pointer[2]; break;
+        case EMS_BASE_IO+5:  isa_data_out = ems_frame_pointer[2] >> 8; break;
+        case EMS_BASE_IO+6:  isa_data_out = ems_frame_pointer[3]; break;
+        case EMS_BASE_IO+7:  isa_data_out = ems_frame_pointer[3] >> 8; break;
+      }
 
-    GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
-    GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;
+      GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;
 
-    while ( (gpio9_int&0xF0) != 0xF0 ) { gpio9_int = GPIO9_DR; }  // Wait here until cycle is complete
+      while ( (gpio9_int&0xF0) != 0xF0 ) { gpio9_int = GPIO9_DR; }  // Wait here until cycle is complete
 
-    GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
-  }
-  else if ((isa_address&0x0FF8)==SD_BASE) {   // Location of SD Card registers
-    switch (isa_address)  {
-      case SD_BASE+0:  sd_spi_dataout = 0xff; SD_SPI_Cycle(); isa_data_out = sd_spi_datain; break;
-      case SD_BASE+1:  isa_data_out = SD_CONFIG_BYTE; break;
-      case SD_BASE+2:  isa_data_out = sd_scratch_register[0]; break;
-      case SD_BASE+3:  isa_data_out = sd_scratch_register[1]; break;
-      case SD_BASE+4:  isa_data_out = sd_scratch_register[2]; break;
-      case SD_BASE+5:  isa_data_out = sd_scratch_register[3]; break;
-      case SD_BASE+6:  isa_data_out = sd_scratch_register[4]; break;
-      case SD_BASE+7:  isa_data_out = sd_timeout >= sd_requested_timeout; break;
-      default:         isa_data_out = 0xff; break;
-    }
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
+      break;
 
-    GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
-    GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;
+    case SD_BASE:
+      switch (isa_address)  {
+        case SD_BASE+0:  sd_spi_dataout = 0xff; SD_SPI_Cycle(); isa_data_out = sd_spi_datain; break;
+        case SD_BASE+1:  isa_data_out = SD_CONFIG_BYTE; break;
+        case SD_BASE+2:  isa_data_out = sd_scratch_register[0]; break;
+        case SD_BASE+3:  isa_data_out = sd_scratch_register[1]; break;
+        case SD_BASE+4:  isa_data_out = sd_scratch_register[2]; break;
+        case SD_BASE+5:  isa_data_out = sd_scratch_register[3]; break;
+        case SD_BASE+6:  isa_data_out = sd_scratch_register[4]; break;
+        case SD_BASE+7:  isa_data_out = sd_timeout >= sd_requested_timeout; break;
+        default:         isa_data_out = 0xff; break;
+      }
 
-    while ( (gpio9_int&0xF0) != 0xF0 ) { gpio9_int = GPIO9_DR; }  // Wait here until cycle is complete
+      GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;
 
-    GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
+      while ( (gpio9_int&0xF0) != 0xF0 ) { gpio9_int = GPIO9_DR; }  // Wait here until cycle is complete
+
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
+      break;
   }
 }
    
@@ -781,64 +788,68 @@ inline void IO_Read_Cycle()
 // --------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------
 
+__attribute__((always_inline))
 inline void IO_Write_Cycle()
 {
   isa_address = 0xFFFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
 
-  if ((isa_address&0x0FF8)==EMS_BASE_IO) {   // Location of 16 KB Expanded Memory page frame pointers
-    GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
-    GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
+  uint16_t base_address = isa_address&0x0FF8;
+  switch (base_address) {
+    case EMS_BASE_IO:
+      GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
 
-    while ( (gpio9_int&0xF0) != 0xF0 ) {   // Wait here until cycle is complete
+      while ( (gpio9_int&0xF0) != 0xF0 ) {   // Wait here until cycle is complete
+        gpio6_int = GPIO6_DR;
+        gpio9_int = GPIO9_DR;
+      }
+
+      data_in = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
+
+      switch (isa_address)  {
+        case EMS_BASE_IO  :  ems_frame_pointer[0] = (ems_frame_pointer[0] & 0xFF00) | data_in; break;
+        case EMS_BASE_IO+1:  ems_frame_pointer[0] = (ems_frame_pointer[0] & 0x00FF) | ((uint16_t)data_in << 8); break;
+        case EMS_BASE_IO+2:  ems_frame_pointer[1] = (ems_frame_pointer[1] & 0xFF00) | data_in; break;
+        case EMS_BASE_IO+3:  ems_frame_pointer[1] = (ems_frame_pointer[1] & 0x00FF) | ((uint16_t)data_in << 8); break;
+        case EMS_BASE_IO+4:  ems_frame_pointer[2] = (ems_frame_pointer[2] & 0xFF00) | data_in; break;
+        case EMS_BASE_IO+5:  ems_frame_pointer[2] = (ems_frame_pointer[2] & 0x00FF) | ((uint16_t)data_in << 8); break;
+        case EMS_BASE_IO+6:  ems_frame_pointer[3] = (ems_frame_pointer[3] & 0xFF00) | data_in; break;
+        case EMS_BASE_IO+7:  ems_frame_pointer[3] = (ems_frame_pointer[3] & 0x00FF) | ((uint16_t)data_in << 8); break;
+      }
+
+      GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
+      break;
+
+    case SD_BASE:
+      GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
+
+      delayNanoseconds(50); // Give some time for write data to be available after IOWR_n goes low
       gpio6_int = GPIO6_DR;
-      gpio9_int = GPIO9_DR;
-    }
+      data_in = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
 
-    data_in = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
+      switch (isa_address)  {
+        case SD_BASE+0:  sd_spi_dataout = data_in;  SD_SPI_Cycle(); break;
+        case SD_BASE+1:  sd_spi_cs_n    = data_in&0x1; break;
+        case SD_BASE+2:  sd_scratch_register[0] = data_in; break;
+        case SD_BASE+3:  sd_scratch_register[1] = data_in; break;
+        case SD_BASE+4:  sd_scratch_register[2] = data_in; break;
+        case SD_BASE+5:  sd_scratch_register[3] = data_in; break;
+        case SD_BASE+6:  sd_scratch_register[4] = data_in; break;
+        case SD_BASE+7:  sd_timeout = 0; sd_requested_timeout = data_in * 10; break;
+      }
 
-    switch (isa_address)  {
-      case EMS_BASE_IO  :  ems_frame_pointer[0] = (ems_frame_pointer[0] & 0xFF00) | data_in; break;
-      case EMS_BASE_IO+1:  ems_frame_pointer[0] = (ems_frame_pointer[0] & 0x00FF) | ((uint16_t)data_in << 8); break;
-      case EMS_BASE_IO+2:  ems_frame_pointer[1] = (ems_frame_pointer[1] & 0xFF00) | data_in; break;
-      case EMS_BASE_IO+3:  ems_frame_pointer[1] = (ems_frame_pointer[1] & 0x00FF) | ((uint16_t)data_in << 8); break;
-      case EMS_BASE_IO+4:  ems_frame_pointer[2] = (ems_frame_pointer[2] & 0xFF00) | data_in; break;
-      case EMS_BASE_IO+5:  ems_frame_pointer[2] = (ems_frame_pointer[2] & 0x00FF) | ((uint16_t)data_in << 8); break;
-      case EMS_BASE_IO+6:  ems_frame_pointer[3] = (ems_frame_pointer[3] & 0xFF00) | data_in; break;
-      case EMS_BASE_IO+7:  ems_frame_pointer[3] = (ems_frame_pointer[3] & 0x00FF) | ((uint16_t)data_in << 8); break;
-    }
+      while ( (gpio9_int&0xF0) != 0xF0 ) {   // Wait here until cycle is complete
+        gpio6_int = GPIO6_DR;
+        gpio9_int = GPIO9_DR;
+      }
 
-    GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
-    GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
-  }
-  else if ((isa_address&0x0FF8)==SD_BASE) {   // Location of SD Card registers
-    GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
-    GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
+      sd_pin_outputs = (sd_spi_cs_n<<17);   // SD_CS_n - SD_CLK - SD_MOSI
 
-    delayNanoseconds(50); // Give some time for write data to be available after IOWR_n goes low
-    gpio6_int = GPIO6_DR;
-    data_in = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
-
-    switch (isa_address)  {
-      case SD_BASE+0:  sd_spi_dataout = data_in;  SD_SPI_Cycle(); break;
-      case SD_BASE+1:  sd_spi_cs_n    = data_in&0x1; break;
-      case SD_BASE+2:  sd_scratch_register[0] = data_in; break;
-      case SD_BASE+3:  sd_scratch_register[1] = data_in; break;
-      case SD_BASE+4:  sd_scratch_register[2] = data_in; break;
-      case SD_BASE+5:  sd_scratch_register[3] = data_in; break;
-      case SD_BASE+6:  sd_scratch_register[4] = data_in; break;
-      case SD_BASE+7:  sd_timeout = 0; sd_requested_timeout = data_in * 10; break;
-    }
-
-    //gpio9_int = GPIO9_DR;
-    while ( (gpio9_int&0xF0) != 0xF0 ) {   // Wait here until cycle is complete
-      gpio6_int = GPIO6_DR;
-      gpio9_int = GPIO9_DR;
-    }
-
-    sd_pin_outputs = (sd_spi_cs_n<<17);   // SD_CS_n - SD_CLK - SD_MOSI
-
-    GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
-    GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
+      GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
+      GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
+      break;
   }
 }
 
@@ -849,23 +860,22 @@ inline void IO_Write_Cycle()
 // Main loop
 //
 // -------------------------------------------------
-void loop() {
 
-
-  // Give Teensy 4.1 a moment
-  //
-  //delay (1000);
- 
+void loop()
+{
   PSRAM_Configure();
 
   while (1) {
-     
-      gpio6_int = GPIO6_DR;
-      gpio9_int = GPIO9_DR;
-     
-           if ((gpio9_int&0x80000010)==0)  IO_Read_Cycle();  // Isolate and check AEN and IO Rd/Wr
-      else if ((gpio9_int&0x80000020)==0)  IO_Write_Cycle();
-      else if ((gpio9_int&0x00000040)==0)  Mem_Read_Cycle();
-      else if ((gpio9_int&0x00000080)==0)  Mem_Write_Cycle();     
+    gpio6_int = GPIO6_DR;
+    gpio9_int = GPIO9_DR;
+
+    switch (gpio9_int&0x800000F0) {
+      case 0x000000E0:  IO_Read_Cycle(); break;   // ~AEN + ~IORD
+      case 0x000000D0:  IO_Write_Cycle(); break;  // ~AEN + ~IOWR
+      case 0x000000B0:
+      case 0x800000B0:  Mem_Read_Cycle(); break;  // ~MEMRD
+      case 0x00000070:
+      case 0x80000070:  Mem_Write_Cycle(); break; // ~MEMWR
+    }
   }
 }
