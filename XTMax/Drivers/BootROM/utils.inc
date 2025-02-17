@@ -142,3 +142,7 @@ dump_regs:
 
 registers_msg   db ' AX   BX   CX   DX   DS   SI   ES   DI   BP  FLAGS', 0xD, 0xA, 0
 %endif
+
+colon           db ':', 0
+space           db ' ', 0
+newline         db 0xD, 0xA, 0

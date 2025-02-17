@@ -1320,9 +1320,6 @@ unsupported_msg db 'Unsupported INT13h Function ', 0
 boot_msg        db 'Booting from SD Card...', 0xD, 0xA, 0
 no_boot_msg     db 'Not bootable', 0xD, 0xA, 0
 %endif
-colon           db ':', 0
-space           db ' ', 0
-newline         db 0xD, 0xA, 0
 
 %ifdef DEBUG
 handler_msg     db 'INT13h Function ', 0
