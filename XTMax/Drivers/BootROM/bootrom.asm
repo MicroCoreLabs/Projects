@@ -102,22 +102,14 @@ entry:
 ; Install our BIOS INT13h hook into the interrupt vector table.
 ;
 .install_13h_vector:
-    mov ax, old_13h_msg
-    call print_string
     xor ax, ax              ; INT vector segment
     mov es, ax
     mov ax, es:[0x13*4+2]
     mov dx, REG_SCRATCH_1
     out dx, ax              ; save segment
-    call print_hex
-    mov ax, colon
-    call print_string
     mov ax, es:[0x13*4]
     mov dx, REG_SCRATCH_3
     out dx, ax              ; save offset
-    call print_hex
-    mov ax, newline
-    call print_string
     mov ax, ROM_SEGMENT
     mov es:[0x13*4+2], ax   ; store segment
     mov ax, int13h_entry
@@ -937,10 +929,7 @@ int18h_entry:
     mov di, 0x7c00
     rep stosw
 .read_boot_sector:
-    mov dx, REG_SCRATCH_0
-    in al, dx
-    mov dl, al
-    xor dh, dh
+    mov dx, 0x80
     mov ax, 0x201           ; read 1 sector
     mov cx, 1               ; sector 1
     mov bx, 0x7c00
@@ -1309,7 +1298,6 @@ debug_handler:
 
 welcome_msg     db 'BootROM for XTMax v1.0', 0xD, 0xA
                 db 'Copyright (c) 2025 Matthieu Bucchianeri', 0xD, 0xA, 0
-old_13h_msg     db 'Old INT13h Vector       = ', 0
 init_ok_msg     db 'SD Card initialized successfully', 0xD, 0xA, 0
 init_error_msg  db 'SD Card failed to initialize', 0xD, 0xA, 0
 disk_id_msg     db 'Fixed Disk ID           = ', 0
