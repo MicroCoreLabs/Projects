@@ -937,10 +937,7 @@ int18h_entry:
     mov di, 0x7c00
     rep stosw
 .read_boot_sector:
-    mov dx, REG_SCRATCH_0
-    in al, dx
-    mov dl, al
-    xor dh, dh
+    mov dx, 0x80            ; MBR can only boot from 1st fixed disk
     mov ax, 0x201           ; read 1 sector
     mov cx, 1               ; sector 1
     mov bx, 0x7c00
