@@ -238,17 +238,7 @@ Install:
 		mov		ah, 9
 		mov		dx, s$Hello1
 		int		21h
-		mov		dx, s$Hello2
-		int		21h
-		mov		dx, s$Empty
-		int		21h
-		mov		dx, s$Hello3
-		int		21h
-		mov		dx, s$Empty
-		int		21h
 		mov		dx, s$Author
-		int		21h
-		mov		dx, s$Empty
 		int		21h
 
 		; Is there an XMS handler already?
@@ -272,8 +262,6 @@ Install:
 		; Tell the user we found an existing handler
 		mov		ah, 9
 		mov		dx, s$XMMfound
-		int		21h
-		mov		dx, s$Empty
 		int		21h
 
 		; Check if it services UMBs by trying to allocate far too much
@@ -451,15 +439,10 @@ Install:
 		jmp		Return
 
 
-s$Hello1		db	0Dh,0Ah,'ีออออออออออออออต   Use!UMBs   ฦอออออออออออออธ',0Dh,0Ah
-s$Empty			db			'ณ                                           ณ',0Dh,0Ah,'$'
-s$Hello2		db			'ณ        Upper Memory Block - Manager       ณ',0Dh,0Ah,'$'
-s$Hello3		db			'ณ   Works on any PC/XT/AT, either with or   ณ',0Dh,0Ah
-				db			'ณ    without Extended or Expanded Memory!   ณ',0Dh,0Ah,'$'
-s$XMMfound		db			'ณ     * found extended memory manager *     ณ',0Dh,0Ah,'$'
-s$Author		db			'ณ        Author: Marco van Zwetselaar       ณ',0Dh,0Ah
-				db			'ณ   dedicated it to the Public Domain 1991  ณ',0Dh,0Ah,'$'
-s$Installed		db			'ิออต Version 2.2 ฦออออออออออต Installed! ฦออพ',0Dh,0Ah,0Ah,'$'
-s$NotInstalled	db			'ิอต Not Installed!  UMBs Managed Already! ฦอพ',0Dh,0Ah,0Ah,'$'
-s$ParamError	db			'ิอต Not Installed!  Invalid Command Line! ฦอพ',0Dh,0Ah,0Ah,'$'
-
+s$Hello1		db	"XTUMBS: UMB Manager for XTMax v2.2",0Dh,0Ah,'$'
+s$Author		db	"     Based on rewritten USE!UMBS by Krister Nordvall",0Dh,0Ah
+				db	"     Based on original work by Marco van Zwetselaar",0Dh,0Ah,'$'
+s$XMMfound		db	"Found XMS Manager.",0Dh,0Ah,'$'
+s$Installed		db	"UMB Manager Installed.",0Dh,0Ah,0Ah,'$'
+s$NotInstalled	db	"Not Installed: UMB is already managed!",0Dh,0Ah,0Ah,'$'
+s$ParamError	db	"Not Installed: Invalid Command Line!",0Dh,0Ah,0Ah,'$'
