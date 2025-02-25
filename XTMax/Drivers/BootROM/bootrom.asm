@@ -26,10 +26,9 @@ cpu 8086    ; ensure we remain compatible with 8086
 %define REG_TIMEOUT         (XTMAX_IO_BASE+7)
 
 ;
-; Whether we will try/force using our own bootstrap code instead of falling back to BASIC.
+; Whether we will try to use our own bootstrap code.
 ;
 %define USE_BOOTSTRAP
-;%define FORCE_OWN_BOOTSTRAP
 
 ;
 ; Whether we are going to rename the BIOS's 1st disk to be the second disk.
@@ -154,7 +153,6 @@ entry:
     call print_hex
     mov ax, newline
     call print_string
-%if !(%isdef(USE_BOOTSTRAP) && %isdef(FORCE_OWN_BOOTSTRAP))
 .update_bda:
 ;
 ; Increment the number of fixed disks in the BIOS Data Area.
@@ -167,7 +165,6 @@ entry:
     call print_hex
     mov ax, newline
     call print_string
-%endif
     pop ax
 
 ;
@@ -194,13 +191,17 @@ entry:
 
 %ifdef USE_BOOTSTRAP
 ;
-; Install our BIOS INT18h hook into the interrupt vector table.
+; Install our BIOS INT18h and 19h hook into the interrupt vector table.
+; Their utility depends on the BIOS, some BIOS will not invoke INT19h and only invoke INT18h in case of fallback.
 ;
 .install_18h_vector:
     mov ax, cs
     mov es:[0x18*4+2], ax   ; store segment
+    mov es:[0x19*4+2], ax   ; store segment
     mov ax, int18h_entry
     mov es:[0x18*4], ax     ; store offset
+    mov ax, int19h_entry
+    mov es:[0x19*4], ax     ; store offset
 %endif
 
 .skip:
@@ -926,9 +927,58 @@ succeeded:
 
 %ifdef USE_BOOTSTRAP
 ;
+; INT 19h entry point.
+; Attempt to boot from floppy (single try for expediency).
+;
+int19h_entry:
+    mov ax, boot_floppy_msg
+    call print_string
+    xor dx, dx              ; 1st floppy drive
+    call read_sector
+.test_signature:            ; taken from IBM BIOS for XT 286
+    cmp byte [0x7c00], 0x06 ; check for first instruction invalid
+    jb int18h_entry
+    mov di, 0x7c00          ; check data pattern
+    mov cx, 8               ; check the next 8 words
+    mov ax, word [0x7c00]
+.test_byte:
+    add di, 2               ; point to next location
+    cmp ax, [di]            ; check data pattern for a fill pattern
+    loopz .test_byte
+    jz int18h_entry         ; boot not valid print message halt
+    jmp jump_to_boot
+
+;
 ; INT 18h entry point.
+; Attempt to boot from SD Card.
 ;
 int18h_entry:
+    mov bp, sp
+    mov ax, ss:[bp+2]
+    test ax, ax             ; caller is boot sector, must be no active partition
+    mov ax, no_part_msg
+    je no_boot
+    mov ax, boot_sd_msg
+    call print_string
+    mov dx, 0x80            ; MBR can only boot from 1st fixed disk
+    call read_sector
+.test_signature:
+    cmp word [0x7c00+510], 0xaa55
+    mov ax, no_boot_msg
+    jne no_boot
+
+;
+; Common code between INT18h and INT19h.
+;
+jump_to_boot:
+    jmp 0:0x7c00
+no_boot:
+    call print_string
+    sti
+.loop:
+    hlt
+    jmp .loop
+read_sector:
     xor ax, ax
     mov ds, ax
     mov es, ax
@@ -937,42 +987,11 @@ int18h_entry:
     mov di, 0x7c00
     rep stosw
 .read_boot_sector:
-    mov dx, 0x80            ; MBR can only boot from 1st fixed disk
     mov ax, 0x201           ; read 1 sector
     mov cx, 1               ; sector 1
     mov bx, 0x7c00
     int 0x13
-.test_signature:
-    cmp word [0x7c00+510], 0xaa55
-    jne .no_boot
-%if %isdef(USE_BOOTSTRAP) && %isdef(FORCE_OWN_BOOTSTRAP)
-.update_bda:
-;
-; Increment the number of fixed disks in the BIOS Data Area, since we did not do it earlier.
-;
-    mov ax, num_drives_msg
-    call print_string
-    mov ax, 0x40            ; BIOS data area
-    mov es, ax
-    inc byte es:[0x75]      ; HDNUM
-    mov al, es:[0x75]
-    call print_hex
-    mov ax, newline
-    call print_string
-%endif
-.jump_to_boot:
-    mov ax, boot_msg
-    call print_string
-    xor ax, ax
-    mov es, ax
-    jmp 0:0x7c00
-.no_boot:
-    mov ax, no_boot_msg
-    call print_string
-    sti
-.loop:
-    hlt
-    jmp .loop
+    ret
 %endif
 
 ;
@@ -1311,8 +1330,10 @@ disk_id_msg     db 'Fixed Disk ID           = ', 0
 num_drives_msg  db 'Total Fixed Disk Drives = ', 0
 unsupported_msg db 'Unsupported INT13h Function ', 0
 %ifdef USE_BOOTSTRAP
-boot_msg        db 'Booting from SD Card...', 0xD, 0xA, 0
-no_boot_msg     db 'Not bootable', 0xD, 0xA, 0
+boot_floppy_msg db 'Attempting boot from floppy...', 0xD, 0xA, 0
+boot_sd_msg     db 'Attempting boot from fixed disk...', 0xD, 0xA, 0
+no_boot_msg     db 'No bootable media found', 0xD, 0xA, 0
+no_part_msg     db 'No active partition found', 0xD, 0xA, 0
 %endif
 
 %ifdef DEBUG
