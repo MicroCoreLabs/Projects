@@ -49,6 +49,9 @@
 // Revision 10 02/17/2025
 // - Use a lookup table for the memory map
 //
+// Revision 11 03/01/2025
+// - Refactor lookup table and add support for UMBs
+//
 //------------------------------------------------------------------------
 //
 // Copyright (c) 2024 Ted Fried
@@ -170,12 +173,10 @@
 #define PSRAM_RESET_VALUE  0x01400000
 #define PSRAM_CLK_HIGH     0x02000000
 
-#define EMS_BASE_IO        0x260    // Must be a multiple of 8.
-#define EMS_BASE_MEM       0xD0000
+#define MMAN_BASE          0x260   // Must be a multiple of 16.
+#define EMS_MAX_SIZE       (16*1024*1024)
 
-#define EMS_TOTAL_SIZE     (16*1024*1024)
-
-#define SD_BASE            0x280  // Must be a multiple of 8.
+#define SD_BASE            0x280    // Must be a multiple of 8.
 #define SD_CONFIG_BYTE     0
 
     
@@ -196,7 +197,9 @@ uint8_t   isa_data_out = 0;
 uint8_t   nibble_in =0;
 uint8_t   nibble_out =0;
 uint8_t   read_byte =0;
-uint16_t  ems_frame_pointer[4] = {0, 0, 0, 0};
+uint32_t  umb_base_segment =0;
+uint16_t  ems_frame_pointer[4] = {0xffff, 0xffff, 0xffff, 0xffff};
+uint32_t  ems_base_segment =0;
 uint8_t   spi_shift_out =0;
 uint8_t   sd_spi_datain =0;
 uint32_t  sd_spi_cs_n = 0x0;
@@ -205,10 +208,36 @@ uint8_t   sd_scratch_register[6] = {0, 0, 0, 0, 0, 0};
 uint16_t  sd_requested_timeout = 0;
 elapsedMillis sd_timeout;
 
-uint8_t XTMax_MEM_Response_Array[16];
+enum MemResponse {
+  AutoDetect,
+  DontRespond,
+  Respond,
+};
 
-DMAMEM  uint8_t  internal_RAM1[0x60000];
-        uint8_t  internal_RAM2[0x40000];
+MemResponse XTMax_MEM_Response_Array[16] = {
+  /* 640KB conventional memory */
+    /* 00000 - 0FFFF */ AutoDetect,
+    /* 10000 - 1FFFF */ AutoDetect,
+    /* 20000 - 2FFFF */ AutoDetect,
+    /* 30000 - 3FFFF */ AutoDetect,
+    /* 40000 - 4FFFF */ AutoDetect,
+    /* 50000 - 5FFFF */ AutoDetect,
+    /* 60000 - 6FFFF */ AutoDetect,
+    /* 70000 - 7FFFF */ AutoDetect,
+    /* 80000 - 8FFFF */ AutoDetect,
+    /* 90000 - 9FFFF */ AutoDetect,
+  /* TBD - can be used for UMB */
+    /* A0000 - AFFFF */ Respond,
+    /* B0000 - BFFFF */ Respond,
+    /* C0000 - CFFFF */ Respond,
+    /* D0000 - DFFFF */ Respond,
+    /* E0000 - EFFFF */ Respond,
+  /* Reserved (BIOS) */
+    /* F0000 - FFFFF */ DontRespond,
+};
+
+DMAMEM  uint8_t  internal_RAM1[0x7A000];  /*   0 - 488KB */
+        uint8_t  internal_RAM2[0x76000];  /* 488 - 640KB + 320KB UMB */
 
 uint8_t psram_cs =0;
 
@@ -220,7 +249,38 @@ enum Region {
   SdCard
 };
 
-Region memmap[512];
+#define RAM_64K \
+  Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram, \
+  Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram,    Ram
+
+#define UNUSED_64K \
+  Unused, Unused, Unused, Unused, Unused, Unused, Unused, Unused, Unused, Unused, Unused, Unused, Unused, Unused, Unused, Unused, \
+  Unused, Unused, Unused, Unused, Unused, Unused, Unused, Unused, Unused, Unused, Unused, Unused, Unused, Unused, Unused, Unused
+
+// Uncomment to disable conventional memory
+//#define RAM_64K UNUSED_64K
+
+Region memmap[512] = {
+  /* 640KB conventional memory */
+    /* 00000 - 0FFFF */ RAM_64K,
+    /* 10000 - 1FFFF */ RAM_64K,
+    /* 20000 - 2FFFF */ RAM_64K,
+    /* 30000 - 3FFFF */ RAM_64K,
+    /* 40000 - 4FFFF */ RAM_64K,
+    /* 50000 - 5FFFF */ RAM_64K,
+    /* 60000 - 6FFFF */ RAM_64K,
+    /* 70000 - 7FFFF */ RAM_64K,
+    /* 80000 - 8FFFF */ RAM_64K,
+    /* 90000 - 9FFFF */ RAM_64K,
+  /* TBD - can be used for EMS or UMB */
+    /* A0000 - AFFFF */ UNUSED_64K,
+    /* B0000 - BFFFF */ UNUSED_64K,
+    /* C0000 - CFFFF */ UNUSED_64K,
+    /* D0000 - DFFFF */ UNUSED_64K,
+    /* E0000 - EFFFF */ UNUSED_64K,
+  /* Reserved (BIOS) */
+    /* F0000 - FFFFF */ UNUSED_64K,
+};
 
 // --------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------
@@ -305,25 +365,8 @@ void setup() {
  
   //Serial.begin(9600);
 
-  // Populate the memory map.
+  // Patch the memory map.
   unsigned int i;
-  for (i = 0; i < sizeof(memmap)/sizeof(memmap[0]); i++) {
-    memmap[i] = Unused;
-  }
-
-  for (i = 0;
-       i < (0xA0000 >> 11);
-       i++) {
-    memmap[i] = Ram;
-  }
-
-  static_assert((EMS_BASE_MEM & 0x7FF) == 0);
-  for (i = (EMS_BASE_MEM >> 11);
-       i < ((EMS_BASE_MEM+0x10000) >> 11);
-       i++) {
-    memmap[i] = EmsWindow;
-  }
-
   static_assert((BOOTROM_ADDR & 0x7FF) == 0);
   static_assert((sizeof(BOOTROM) % 2048) == 0, "BootROM must be in blocks of 2KB");
   for (i = (BOOTROM_ADDR >> 11);
@@ -331,7 +374,6 @@ void setup() {
        i++) {
     memmap[i] = BootRom;
   }
-
   memmap[(BOOTROM_ADDR+sizeof(BOOTROM)) >> 11] = SdCard;
 }
 
@@ -454,7 +496,7 @@ inline void PSRAM_Configure() {
 
 inline uint8_t PSRAM_Read(uint32_t address_in) {
     
-  if (address_in >= EMS_TOTAL_SIZE) {
+  if (address_in >= EMS_MAX_SIZE) {
       return 0xff;
   }  
   if (address_in >= 0x7FFFFF)  psram_cs=1; else psram_cs=0;  
@@ -502,7 +544,7 @@ inline uint8_t PSRAM_Read(uint32_t address_in) {
 // --------------------------------------------------------------------------------------------------
 
 inline void PSRAM_Write(uint32_t address_in , int8_t local_data) {
-  if (address_in >= EMS_TOTAL_SIZE) {
+  if (address_in >= EMS_MAX_SIZE) {
     return;
   }
   if (address_in >= 0x7FFFFF)  psram_cs=1; else psram_cs=0;  
@@ -539,20 +581,13 @@ inline void PSRAM_Write(uint32_t address_in , int8_t local_data) {
 // --------------------------------------------------------------------------------------------------
 
 inline uint8_t Internal_RAM_Read() {
-    uint8_t local_temp;
-   
-    if (isa_address<0x60000)    local_temp = internal_RAM1[isa_address];
-    else                        local_temp = internal_RAM2[isa_address-0x60000];
-   
-    return local_temp;
+    if (isa_address<sizeof(internal_RAM1))    return internal_RAM1[isa_address];
+    else                                      return internal_RAM2[isa_address-sizeof(internal_RAM1)];
 }
 
 inline void Internal_RAM_Write() {
-   
-    if (isa_address<0x60000)    internal_RAM1[isa_address]         = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
-    else                        internal_RAM2[isa_address-0x60000] = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
-   
-    return;
+    if (isa_address<sizeof(internal_RAM1))    internal_RAM1[isa_address]                       = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
+    else                                      internal_RAM2[isa_address-sizeof(internal_RAM1)] = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
 }
 
 // --------------------------------------------------------------------------------------------------
@@ -567,10 +602,10 @@ inline void Mem_Read_Cycle()
     case EmsWindow:
       page_base_address = (isa_address & 0xFC000);
 
-           if (page_base_address == (EMS_BASE_MEM | 0xC000)) { psram_address = (ems_frame_pointer[3]<<14) | (isa_address & 0x03FFF); }
-      else if (page_base_address == (EMS_BASE_MEM | 0x8000)) { psram_address = (ems_frame_pointer[2]<<14) | (isa_address & 0x03FFF); }
-      else if (page_base_address == (EMS_BASE_MEM | 0x4000)) { psram_address = (ems_frame_pointer[1]<<14) | (isa_address & 0x03FFF); }
-      else if (page_base_address == (EMS_BASE_MEM | 0x0000)) { psram_address = (ems_frame_pointer[0]<<14) | (isa_address & 0x03FFF); }
+           if (page_base_address == ((ems_base_segment<<4) | 0xC000)) { psram_address = (ems_frame_pointer[3]<<14) | (isa_address & 0x03FFF); }
+      else if (page_base_address == ((ems_base_segment<<4) | 0x8000)) { psram_address = (ems_frame_pointer[2]<<14) | (isa_address & 0x03FFF); }
+      else if (page_base_address == ((ems_base_segment<<4) | 0x4000)) { psram_address = (ems_frame_pointer[1]<<14) | (isa_address & 0x03FFF); }
+      else if (page_base_address == ((ems_base_segment<<4) | 0x0000)) { psram_address = (ems_frame_pointer[0]<<14) | (isa_address & 0x03FFF); }
 
       GPIO7_DR = MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_LOW + DATA_OE_n_LOW ;  // Assert CHRDY_n=0 to begin wait states
@@ -588,17 +623,11 @@ inline void Mem_Read_Cycle()
       isa_data_out = Internal_RAM_Read();
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
 
-      // XTMax_MEM_Response_Array
-      // - Array holds value 0,1,2
-      //   0 = unitiailzed - add wait states and snoop
-      //   1 = No wait states and no response
-      //   2 = No wait states and yes respond
-      //
       // If XTMax has not seen a read access to this 64 KB page yet, add wait states to give physical RAM (if present) a chance to respond
-      if (XTMax_MEM_Response_Array[(isa_address>>16)] == 2) {
+      if (XTMax_MEM_Response_Array[(isa_address>>16)] == Respond) {
         GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;   // Physical RAM is NOT present at this page so XTMax will respond
       }
-      else if (XTMax_MEM_Response_Array[(isa_address>>16)] == 0) {
+      else if (XTMax_MEM_Response_Array[(isa_address>>16)] == AutoDetect) {
         GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_LOW + DATA_OE_n_HIGH;   // Assert CHRDY_n=0 to begin wait states
         delayNanoseconds(800);
         GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;  // De-assert CHRDY
@@ -607,10 +636,10 @@ inline void Mem_Read_Cycle()
         data_in = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
 
         if (data_in == isa_data_out) {
-          XTMax_MEM_Response_Array[(isa_address>>16)] = 1;   // Physical RAM is present at this page so XTMax should not respond
+          XTMax_MEM_Response_Array[(isa_address>>16)] = DontRespond;   // Physical RAM is present at this page so XTMax should not respond
         }
         else {
-          XTMax_MEM_Response_Array[(isa_address>>16)] = 2;
+          XTMax_MEM_Response_Array[(isa_address>>16)] = Respond;
           GPIO8_DR = sd_pin_outputs + MUX_DATA_n_HIGH + CHRDY_OE_n_HIGH + DATA_OE_n_LOW;    // Physical RAM is NOT present at this page so XTMax will respond
         }
       }
@@ -662,10 +691,10 @@ inline void Mem_Write_Cycle()
     case EmsWindow:
       page_base_address = (isa_address & 0xFC000);
  
-           if (page_base_address == (EMS_BASE_MEM | 0xC000)) { psram_address = (ems_frame_pointer[3]<<14) | (isa_address & 0x03FFF); }
-      else if (page_base_address == (EMS_BASE_MEM | 0x8000)) { psram_address = (ems_frame_pointer[2]<<14) | (isa_address & 0x03FFF); }
-      else if (page_base_address == (EMS_BASE_MEM | 0x4000)) { psram_address = (ems_frame_pointer[1]<<14) | (isa_address & 0x03FFF); }
-      else if (page_base_address == (EMS_BASE_MEM | 0x0000)) { psram_address = (ems_frame_pointer[0]<<14) | (isa_address & 0x03FFF); }
+           if (page_base_address == ((ems_base_segment<<4) | 0xC000)) { psram_address = (ems_frame_pointer[3]<<14) | (isa_address & 0x03FFF); }
+      else if (page_base_address == ((ems_base_segment<<4) | 0x8000)) { psram_address = (ems_frame_pointer[2]<<14) | (isa_address & 0x03FFF); }
+      else if (page_base_address == ((ems_base_segment<<4) | 0x4000)) { psram_address = (ems_frame_pointer[1]<<14) | (isa_address & 0x03FFF); }
+      else if (page_base_address == ((ems_base_segment<<4) | 0x0000)) { psram_address = (ems_frame_pointer[0]<<14) | (isa_address & 0x03FFF); }
 
       GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
       GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_LOW + DATA_OE_n_HIGH;    // Steer data mux to Data[7:0] and Assert CHRDY_n=0 to begin wait states
@@ -736,16 +765,18 @@ inline void IO_Read_Cycle()
 {
   isa_address = 0xFFFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
 
-  if ((isa_address&0x0FF8)==EMS_BASE_IO) {   // Location of 16 KB Expanded Memory page frame pointers
+  if ((isa_address&0x0FF0)==MMAN_BASE) {   // Location of Memory MANager registers
     switch (isa_address)  {
-      case EMS_BASE_IO  :  isa_data_out = ems_frame_pointer[0]; break;
-      case EMS_BASE_IO+1:  isa_data_out = ems_frame_pointer[0] >> 8; break;
-      case EMS_BASE_IO+2:  isa_data_out = ems_frame_pointer[1]; break;
-      case EMS_BASE_IO+3:  isa_data_out = ems_frame_pointer[1] >> 8; break;
-      case EMS_BASE_IO+4:  isa_data_out = ems_frame_pointer[2]; break;
-      case EMS_BASE_IO+5:  isa_data_out = ems_frame_pointer[2] >> 8; break;
-      case EMS_BASE_IO+6:  isa_data_out = ems_frame_pointer[3]; break;
-      case EMS_BASE_IO+7:  isa_data_out = ems_frame_pointer[3] >> 8; break;
+      case MMAN_BASE+0 :  isa_data_out = ems_frame_pointer[0]; break;
+      case MMAN_BASE+1 :  isa_data_out = ems_frame_pointer[0] >> 8; break;
+      case MMAN_BASE+2 :  isa_data_out = ems_frame_pointer[1]; break;
+      case MMAN_BASE+3 :  isa_data_out = ems_frame_pointer[1] >> 8; break;
+      case MMAN_BASE+4 :  isa_data_out = ems_frame_pointer[2]; break;
+      case MMAN_BASE+5 :  isa_data_out = ems_frame_pointer[2] >> 8; break;
+      case MMAN_BASE+6 :  isa_data_out = ems_frame_pointer[3]; break;
+      case MMAN_BASE+7 :  isa_data_out = ems_frame_pointer[3] >> 8; break;
+      case MMAN_BASE+15:  isa_data_out = memmap[umb_base_segment >> 7]; break;   // Useful for debugging
+      default:            isa_data_out = 0xff; break;
     }
 
     GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
@@ -785,26 +816,51 @@ inline void IO_Write_Cycle()
 {
   isa_address = 0xFFFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
 
-  if ((isa_address&0x0FF8)==EMS_BASE_IO) {   // Location of 16 KB Expanded Memory page frame pointers
+  if ((isa_address&0x0FF0)==MMAN_BASE) {   // Location of Memory MANager registers
     GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_HIGH  + CHRDY_OUT_LOW + trigger_out;
     GPIO8_DR = sd_pin_outputs + MUX_DATA_n_LOW + CHRDY_OE_n_HIGH + DATA_OE_n_HIGH;
+
+    delayNanoseconds(50); // Give some time for write data to be available after IOWR_n goes low
+    gpio6_int = GPIO6_DR;
+    data_in = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
+
+    switch (isa_address)  {
+      case MMAN_BASE+0 :  ems_frame_pointer[0] = (ems_frame_pointer[0] & 0xFF00) | data_in; break;
+      case MMAN_BASE+1 :  ems_frame_pointer[0] = (ems_frame_pointer[0] & 0x00FF) | ((uint16_t)data_in << 8); break;
+      case MMAN_BASE+2 :  ems_frame_pointer[1] = (ems_frame_pointer[1] & 0xFF00) | data_in; break;
+      case MMAN_BASE+3 :  ems_frame_pointer[1] = (ems_frame_pointer[1] & 0x00FF) | ((uint16_t)data_in << 8); break;
+      case MMAN_BASE+4 :  ems_frame_pointer[2] = (ems_frame_pointer[2] & 0xFF00) | data_in; break;
+      case MMAN_BASE+5 :  ems_frame_pointer[2] = (ems_frame_pointer[2] & 0x00FF) | ((uint16_t)data_in << 8); break;
+      case MMAN_BASE+6 :  ems_frame_pointer[3] = (ems_frame_pointer[3] & 0xFF00) | data_in; break;
+      case MMAN_BASE+7 :  ems_frame_pointer[3] = (ems_frame_pointer[3] & 0x00FF) | ((uint16_t)data_in << 8); break;
+      case MMAN_BASE+10:  ems_base_segment = (ems_base_segment & 0xFF00) | data_in; break;
+      case MMAN_BASE+11:  ems_base_segment = (ems_base_segment & 0x00FF) | ((uint16_t)data_in << 8); break;
+      case MMAN_BASE+12:  // Num 16K pages + commit operation
+        if (ems_base_segment >= 0xA000 && ems_base_segment + (data_in << 10) <= 0xF000) {
+          const unsigned int base = ems_base_segment >> 7;  // 64K segment to 2KB offset
+          const unsigned int count = data_in << 3;  // 16KB pages to 2KB pages
+          for (unsigned int i = 0; i < count; i++) {
+            memmap[base + i] = EmsWindow;
+          }
+        }
+        break;
+      case MMAN_BASE+13:  umb_base_segment = (umb_base_segment & 0xFF00) | data_in; break;
+      case MMAN_BASE+14:  umb_base_segment = (umb_base_segment & 0x00FF) | ((uint16_t)data_in << 8); break;
+      case MMAN_BASE+15:  // Num 2K pages + commit operation
+        if (umb_base_segment >= 0xA000 && umb_base_segment + (data_in << 7) <= 0xF000) {
+          const unsigned int base = umb_base_segment >> 7;  // 64K segment to 2KB offset
+          for (unsigned int i = 0; i < data_in; i++) {
+            memmap[base + i] = Ram;
+          }
+        }
+        break;
+      default:
+        break;
+    }
 
     while ( (gpio9_int&0xF0) != 0xF0 ) {   // Wait here until cycle is complete
       gpio6_int = GPIO6_DR;
       gpio9_int = GPIO9_DR;
-    }
-
-    data_in = 0xFF & ADDRESS_DATA_GPIO6_UNSCRAMBLE;
-
-    switch (isa_address)  {
-      case EMS_BASE_IO  :  ems_frame_pointer[0] = (ems_frame_pointer[0] & 0xFF00) | data_in; break;
-      case EMS_BASE_IO+1:  ems_frame_pointer[0] = (ems_frame_pointer[0] & 0x00FF) | ((uint16_t)data_in << 8); break;
-      case EMS_BASE_IO+2:  ems_frame_pointer[1] = (ems_frame_pointer[1] & 0xFF00) | data_in; break;
-      case EMS_BASE_IO+3:  ems_frame_pointer[1] = (ems_frame_pointer[1] & 0x00FF) | ((uint16_t)data_in << 8); break;
-      case EMS_BASE_IO+4:  ems_frame_pointer[2] = (ems_frame_pointer[2] & 0xFF00) | data_in; break;
-      case EMS_BASE_IO+5:  ems_frame_pointer[2] = (ems_frame_pointer[2] & 0x00FF) | ((uint16_t)data_in << 8); break;
-      case EMS_BASE_IO+6:  ems_frame_pointer[3] = (ems_frame_pointer[3] & 0xFF00) | data_in; break;
-      case EMS_BASE_IO+7:  ems_frame_pointer[3] = (ems_frame_pointer[3] & 0x00FF) | ((uint16_t)data_in << 8); break;
     }
 
     GPIO7_DR = GPIO7_DATA_OUT_UNSCRAMBLE + MUX_ADDR_n_LOW  + CHRDY_OUT_LOW + trigger_out;
@@ -862,10 +918,9 @@ void loop() {
      
       gpio6_int = GPIO6_DR;
       gpio9_int = GPIO9_DR;
-     
            if ((gpio9_int&0x80000010)==0)  IO_Read_Cycle();  // Isolate and check AEN and IO Rd/Wr
       else if ((gpio9_int&0x80000020)==0)  IO_Write_Cycle();
       else if ((gpio9_int&0x00000040)==0)  Mem_Read_Cycle();
-      else if ((gpio9_int&0x00000080)==0)  Mem_Write_Cycle();     
+      else if ((gpio9_int&0x00000080)==0)  Mem_Write_Cycle();
   }
 }
