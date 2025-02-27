@@ -23,6 +23,7 @@
 ; Krister Nordvall
 ;
 
+[cpu 8086]
 
 ;--------------------------------------------------------------------
 ; Skips the immediately following 2 byte instruction by using it
@@ -295,7 +296,7 @@ Install:
 .SearchForWhiteSpace:
 		lodsb
 		cmp		al, CR
-		je		SHORT .EndOfLineEncountered
+		je		.EndOfLineEncountered
 		cmp		al, SPACE
 		je		SHORT .SearchForParameter
 		cmp		al, TAB
@@ -338,6 +339,27 @@ Install:
 		jc		SHORT .FirstWordOfParameter
 		sub		dx, [cs:bx-2]			; Convert end of range to length
 		jbe		SHORT .ParameterError	; End of range below or equal to start of range
+
+		; Program the range
+		push	ax
+		push	bx
+		push	cx
+		mov		ax, [cs:bx-2]
+		mov		bx, dx
+		mov		dx, 26dh				; UMB base register
+		out		dx, ax
+		mov		dx, 26fh				; UMB pages count register
+		mov		ax, bx
+		mov		cl, 7
+		shr		ax, cl					; bytes to 2K pages
+		out		dx, al
+		shl		ax, cl					; 2K pages (back) to bytes
+		mov		dx, ax
+		pop		cx
+		pop		bx
+		pop		ax
+		test	dx, dx
+		jz		SHORT .ParameterError	; Range was smaller than 2KB
 .FirstWordOfParameter:
 		mov		[cs:bx], dx
 		inc		bx
