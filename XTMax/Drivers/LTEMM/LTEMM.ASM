@@ -3077,7 +3077,6 @@ ramch14:
 		CALL	strdsp
 		IN	AL,I8042+1		;logical page test...
 		OR	AL,4			;system memory parity disable
-                and     al,0feh
 		OUT	I8042+1,AL
 		MOV	DI,OFFSET log_page
 		XOR	AX,AX
@@ -3121,7 +3120,6 @@ ramch16:
 		OUT	DX,AX
 		IN	AL,I8042+1		;enable system memory parity..
 		AND	AL,0FBH
-		or	AL,1
 		OUT	I8042+1,AL
 		CMP	total_pages,0		;total page zero?
 		JNZ	ramch7
@@ -3145,18 +3143,12 @@ imgchk		PROC	NEAR
 		POP	ES
 		test	dx,3
                 jnz     imgchk2
-		IN	AL,I8042+1
-		or	AL,2
-		OUT	I8042+1,AL
 imgchk2:
 		MOV	AX,DX
 		MOV	DI,OFFSET tstpage
 		CALL	dbinasc			;change binary -> ascii.
 		MOV	SI,OFFSET tstpage	;display message..
 		CALL	strdsp
-		IN	AL,I8042+1
-		and	AL,0fdh
-		OUT	I8042+1,AL
 		MOV	AX,page_frame_seg
 		MOV	ES,AX
 		MOV	ax,chkchr
