@@ -3027,18 +3027,25 @@ instmsg		PROC	NEAR
 		RET
 instmsg		ENDP
 ;--------------------------------------------------------------------
-; Check EMS i/o port.
+; Initialize EMS window and check EMS i/o port.
 ; output
-; for lo-tech EMS board, we cannot read from the page registers
-; hence we just return OK anyway.
 ;	cf = 0 : OK
 ;	cf = 1 : NG
 ;--------------------------------------------------------------------
 ckemsio		PROC	NEAR
 		MOV	DX,CS:EMSIO
-; JJP		IN	AL,DX
-; JJP		CMP	AL,255			;check TRS flag
-; JJP		JE	ckems3
+		ADD DX,10				; EMS segment register
+		MOV AX,CS:PAGE_FRAME_SEG
+		OUT DX,AX
+		ADD DX,3				; debug base register
+		OUT DX,AX
+		DEC DX					; EMS pages count register
+		MOV AL,PHYS_PAGES
+		OUT DX,AL
+		ADD DX,3				; debug register
+		IN AL,DX
+		CMP AL,2				; Region::EmsWindow
+		JNE ckems3
 ckems4:
 		CLC				;reset CF
 		RET
@@ -3520,9 +3527,9 @@ info:
 ;	EMM driver initial routine work data area
 ;--------------------------------------------------------------------
 start_msg       db      CR,LF
-                DB	'XTEMM: EMM Driver for XTMax r02',CR,LF
+                DB	'XTEMM: EMM Driver for XTMax r03',CR,LF
                 db	'     Based on Lo-tech EMM Driver for the Lo-tech 2MB EMS board.',CR,LF
-				db	'     Based on modifications by Michael Karcher.',CR,LF
+                db	'     Based on modifications by Michael Karcher.',CR,LF
                 db	'     Based on original works Copyright (c) 1988, Alex Tsourikov.',CR,LF
                 db	'     All rights reserved.',CR,LF
                 db	'Using EMS '

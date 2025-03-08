@@ -1,0 +1,24 @@
+==============================================================
+
+ Please read the manual. It's only 14 pages, several of which
+ you may skip.  It is included in this archive under the name
+ USE!UMBS.DOC.  If you want to print it out (which I strongly
+ recommend), simply type this command at the dos prompt: 
+ TYPE USE!UMBS.DOC >LPT1
+
+--------------------------------------------------------------
+
+ I dedicated all of this software to the  public domain. Feel
+ free to copy it and give it to anyone you wish. If you do so,
+ please copy the *entire* archive,  with all of the following
+ files included:
+
+--------------------------------------------------------------
+
+ README       : this file                Marco van.Zwetselaar
+ USE!UMBS.DOC : documentation                 Oorsprongpark 5
+ USE!UMBS.SYS : the device driver        3581 ES Utrecht (NL)
+ USE!UMBS.ASM : the source code        Fido NetMail 2:281/701
+ TEST!UMB.EXE : tests for UMBs               Phone 030-313128
+
+==============================================================

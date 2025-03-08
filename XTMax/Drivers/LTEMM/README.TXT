@@ -29,7 +29,6 @@ Syntax:    DEVICE=LTEMM.EXE [/switches]
  /i:nnn  - EMS i/o port base address (260)
  /h:nnn  - Maximal number of handles (64)
  /d:nn   - Depth of contest saves (5)
- /f:nnn  - First page number (0)
  /n      - Bypass memory test
  /x      - Perform long memory test
  /3      - Use only EMS 3.2 functions

@@ -1,0 +1,692 @@
+
+
+
+USE!UMBS Documentation                                 Page  1
+==============================================================
+
+DOCUMENTATION FOR USE!UMBS.SYS Ver 2.0      Utrecht, 21 Nov 91
+
+--------------------------------------------------------------
+
+PROGRAM   USE!UMBS.SYS 
+          Upper Memory Block Manager for PC/XT/ATs
+
+PURPOSE   This program is a device driver that will handle
+          calls for Upper Memory Blocks. In doing so, it gives
+          you the possibility to save conventional memory by
+          storing device drivers and resident programs in the
+          UMBs and hence save conventional memory. It takes up
+          only 256 bytes of your (conventional) memory and is
+          fully compatible with MS-DOS 5.0.
+
+REQUIRES  It will work on any PC/XT/AT or higher, either with
+          or without extended memory. What you obviously
+          *must* have are UMBs, and MS-DOS Version 5.0. It
+          will not be useful on 386sx or higher.
+
+EXTRA'S   Since Video-RAM is RAM in Upper Memory too, you can
+          use it just as well as other UMBs. You only have to
+          take care that you use an UNused part of Video memo-
+          ry.
+
+PROBLEMS  Since ExPANded Memory is remapped to the range of
+          addresses where UMBs would normally be, I think this
+          program will not cooperate with your expanded memory
+          manager. Since I could not test the program on many
+          different configurations, I kindly ask you to report
+          any problems to me. I don't expect many problems
+          though, since USE!UMBS is a `friendly' programme: it
+          complies completely with the rules of MS-DOS 5.0.
+
+AUTHOR    Marco van Zwetselaar               Phone: 030-313128
+          Oorsprongpark 5                 Email: zwets@rivm.nl
+          3581 ES Utrecht                 
+          The Netherlands
+
+==============================================================
+
+
+USE!UMBS Documentation                                 Page  2
+==============================================================
+
+I wrote this program for my own entertainment, not in order to
+make money. Therefore I dedicate it to the Public Domain. Feel
+free to copy it and pass it on to friends - just make sure
+this documentation file is included.
+
+If you find this program useful enough to reward me for writ-
+ing it, you may send me a donation anuwhere from 50 cents upto
+25 guilders. My giro number is 5636618, my snailmail address
+is displayed above.
+
+If you have any questions, just contact me via one of the
+above-mentioned addresses. I will be pleased to help you out -
+whether you are a donator or not. Also, if you find any incon-
+sistencies or mistakes in this documentation, please notify me
+of them, so that I can correct them in a possible next versi-
+on. Finally, if you think you can improve the driver, please
+do so. For this purpose I have included the asm-code code in
+the archive. But if you do so: keep it well documented.
+
+Marco van Zwetselaar.
+
+==============================================================
+
+CONTENTS
+
+1. General Introduction & Definitions                        3
+
+2. Preparations                                              6
+
+3. Using VideoRAM                                            7
+
+4. Patching in the Addresses                                 9
+
+5. Installation                                             12
+
+Appendix 1. Functional description of driver (freaks)       13
+
+Appendix 2. Detailed description of driver (utter freaks)   14
+
+==============================================================
+
+
+USE!UMBS Documentation                                 Page  3
+==============================================================
+
+1. General Introduction & Definition of Terms:
+
+In this first section I will explain how the memory on IBM-
+compatibles is organized, and what UMBs actually are. If you
+are not interested in `backgrounds', you may skip this section
+and move on to section 2 (page 6) rightaway. (I advise you to
+at least have a glance at this section though.)
+
+Conventional Memory
+     Conventional memory is the memory that is present on any
+     IBM or compatible. Its maximum size is 640K, and nearly
+     all IBM-compatible computers have exactly that amount.
+     Conventional memory is used in a conventional way, i.e.
+     any user program may make use of it, as may the operating
+     system. Actually, most user programs won't even use
+     anything except conventional memory (unless specifically
+     told to do so). Conventional memory resides in the first
+     640K of the adressable memory. That is, at the addresses
+     00000-9FFFF.
+
+Addressable Memory
+     The computer can address more than just 640K of conven-
+     tional memory. The maximum amount a specific computer can
+     address depends on the type of CPU it has (8086, 80286,
+     and so on). But whatever CPU it may have, it can *always*
+     address the first 1M of memory. (That's why it is called
+     Adressable Memory, I suppose.)
+     Addressable Memory consists of two parts: the first 640K
+     are Conventional Memory (adresses 00000-9FFFF), the
+     remaining 384K are Upper Memory (adresses A0000-FFFFF).
+
+Upper Memory
+     Upper Memory is the upper 384K of Adressable Memory,
+     which begins just beyond the 640K conventional memory
+     border. This implies that it is located at the addresses
+     A0000-FFFFF.
+
+     Since Upper Memory is normally addressable on any PC, you
+     might wonder why programs don't make use of it. The
+     reasons are the following:
+     (1)  The operating system and the hardware make use of
+          parts of it already. For example, anything you see
+          on the screen is stored in an area in UM - you can
+          probably imagine what will happen if you mess around
+          in that area. Also the computer itself will store
+          some of its vital data in UM - and we don't want to
+          embarrass MS-DOS, who's having hard times already.
+
+==============================================================
+
+
+USE!UMBS Documentation                                 Page  4
+==============================================================
+
+     (2)  Even if there are parts of Upper Memory that are not
+          in use already, these parts may not be RAM. What
+          this means is that one may *read* data from those
+          locations, but not *write* anything into them. (In
+          fact, you can try and write something into them, but
+          it will vanish mysteriously into thin air.)  
+          Most computers don't have RAM in these areas, first-
+          ly because that would make the computer more expen-
+          sive, and secondly because MS-DOS was not designed
+          to use anything above the 640K border anyway.
+     (3)  Even if there are unused parts of UM that do consist
+          of RAM (readable & writeable memory), dos will not
+          normally make them available as conventional memory.
+          This is precisely why I wrote this device driver:
+          since Version 5.0, Dos can use the UMBs to store
+          prog- rams, namely device drivers and TSRs. Device
+          drivers are the files that you install via the DEVI-
+          CE=... lines in your config.sys; they take care of
+          interfacing dos with your hardware. Dos usually
+          loads these devices in conventional memory. If you
+          have UMBs (or a 386) you can load the devices into
+          them using the DEVICEHIGH=... statement, instead of
+          the DEVICE=... statement. TSRs (Terminate and Stay
+          Resident) programs are programs that stay in memory
+          after they are executed. Some of these programs stay
+          resident so that you can invoke them during other
+          programs using a HotKey (sidekick for example),
+          others stay resident because they perform tasks in
+          the background (like screenblankers, autopark, dos-
+          key, fastopen, etc). Normally, TSRs will be loaded
+          into conventional memory. Dos 5.0 provides the com-
+          mand LOADHIGH (may be abbreviated to LH) to put them
+          into the UMBs. You do this by preceding the TSR's
+          invocation line in the autoexec.bat by LH (or LOAD-
+          HIGH). So, if you 'd normally use "FASTOPEN C:=200",
+          you now put "LH FASTOPEN C:=200" in the autoexec.
+
+Extended Memory
+     Extended Memory is, by definition, all memory that is
+     located beyond the 1MB border. So, its addresses start at
+     100000. Since a computer needs to have more than 20
+     address lines in order to address such large addresses,
+     PCs and XTs can't have extended memory (they have preci-
+     sely 20 lines). On an AT or higher one can access exten-
+     ded memory by enabling address lines A20 (and higher - if
+     you start counting at 0, that is the 21st line and hig-
+     her).
+
+==============================================================
+
+
+USE!UMBS Documentation                                 Page  5
+==============================================================
+
+     So in order to make use of extended memory, a program
+     must have a special design - more and more programs are
+     offering eXtended memory support. But since many programs
+     use eXtended memory in many different ways, conflicts may
+     arise. In order to resolve these, a standard way of
+     accessing extended memory was developed. 
+     This is specified in the XMS (eXtended Memory Specifica-
+     tion). MS-Dos 5.0 provides you with a manager for XM -
+     this manager will 'hand out' extended memory to programs
+     that make a request according to XMS specs. The problem
+     with dos's XMS-manager (HIMEM.SYS) is that it doesn't
+     handle requests for UMBs (they simply haven't implemented
+     that function, probably because most XTs and ATs don't
+     have UMBs anyway). What MicroSoft does provide is
+     EMM386.EXE, which is an exPANded memory manager that
+     handles UMB-requests as a side-effect. The problem is
+     that this manager can only be installed on 386s or hig-
+     her. The reason for this is that only a 386 has the
+     ability to 'remap' expanded memory to UMB locations, thus
+     providing RAM in Upper Memory locations.
+
+     So, what can you do if you have UMBs on an XT or AT?
+     Suppose you have extended memory - so you can install
+     HIMEM.SYS - then you still can't use the UMBs because
+     EMM386.EXE won't work on  your machine... Now say you
+     have no extended memory *at all* (which will always be
+     the case on an XT), then you can't load himem in the
+     first place! In both cases, USE!UMBS will be the right
+     thing to use.
+
+HMA - High Memory Area
+     The HMA is the first block of 64K of extended memory (so
+     with addresses 100000-10FFFF). Since Dos 5.0, it is
+     possible to load the system files into this area. (System
+     files are *not* the devices that you install: dos in-
+     stalls them at boot-time!) 
+     In order to highload these systemfiles, you must have
+     extended memory, and insert the lines DEVICE=HIMEM.SYS
+     and DOS=HIGH at the front of your config.sys file. If you
+     don't have an HMA, then you can not use dos=high. You can
+     use dos=umb though.
+
+Expanded Memory
+     Expanded memory can't be defined in terms of 'adresses',
+     since it is organized altogether differently. It resides
+     on a separate 'card' that you plug into a free slot in
+     your computer, and it cannot be accessed all at once but
+     in 'pages'. 
+
+==============================================================
+
+
+USE!UMBS Documentation                                 Page  6
+==============================================================
+
+What happens is that pages of say 16K are 'remapped' from the
+expanded memory board to addresses in Upper Memory. If the
+computers wants to find something in an area elsewhere on the
+card, an expanded memory manager must take care of storing the
+present page and making the new page active. As was the case
+with XMS, people have also devised a standard for access to
+expanded memory. This standard is the LIM/EMS specification
+(now at revision 4.0). Dos 5.0 provides a manager for it:
+EMM386.EXE. As said before, this manager will only work on a
+386, and since it takes care of the UMBs too, you are advised
+to rather use EMM386 when you have a 386 or higher. (USE!UMBS
+will, in fact, not install if it finds out that a UMB manager
+was installed already.)
+
+==============================================================
+
+2. Preparations
+
+This program will install a UMB manager on any PC, XT, AT or
+higher, whether it has extended or expanded memory or not. In
+order to be able use it, it must have UMBs, i.e. holes in the
+memory-area between 640k and 1M that are filled with RAM.
+
+How do you find out whether you have UMBs? Firstly, let me say
+that there are not many PC/XT/ATs that do have them (refer to
+section 1 if you want to find out why). One XT that I know of
+certainly has them, namely the Philips 31xx series XTs. I ori-
+ginally wrote the program for precisely that machine. Later on
+I found out it might be useful for other machines as well.
+
+If you want to find out whether you have UMBs, run the program
+TEST!UMB.EXE. This program will run through the upper memory
+and try if it can write information there. (By the way: don't
+worry. It won't destroy anything while doing that!) 
+
+The locations where TEST!UMB can succesfully change values are
+RAM locations. It will display a table with its findings, sta-
+ting:
+     "None      at paragraphs xxxx until xxxx" or
+     "Found RAM at paragraphs xxxx until xxxx"
+
+Don't be too optimistic if it displays a range of adresses
+where it finds RAM: it will always find at least one such
+range! That range is occupied with Video-RAM, and you can't
+simply use all of that as a UMB (refer to section 1 for de-
+tails).
+
+==============================================================
+
+
+USE!UMBS Documentation                                 Page  7
+==============================================================
+
+So now comes the tricky bit: which ranges can you use?
+First of all, if TEST!UMB shows that there is RAM in the range
+D000 until EFFF, then you have "true" UMBs. And you can use my
+device driver rightaway. These two blocks (the D and the E
+block) provide you with 128K of Upper Memory - probably by far
+enough to store all of your device drivers and TSRs.
+So, if you are in that lucky situation and don't want to
+complicate matters, you can move on to section 5 (Installa-
+tion, page 12) rightway.
+
+If you were less fortunate and TEST!UMB showed that there is
+no RAM in that range, or in only a part of that range, or if
+you don't want to use all of that range, or if you want to use
+more than one range, then you should read section 3 and/or
+section 4.
+
+==============================================================
+
+3. Using VideoRAM or other ranges as a UMB
+
+If you don't have RAM in the D000-EFFF range, or if you want
+to use a different range of memory, then you must make a small
+modification to the driver: you must `patch in' the addresses
+that it should manage.
+This may sound difficult, and yes, it is not simple... The
+point is that I had wanted to use command line parameters to
+specify the range(s) the driver should manage... but I don't
+know how to program that option. [So, If YOU are a proficient
+Assembly programmer, please change the source code and include
+that option!]
+
+Anyway, let's go for it:
+If TEST!UMB showed that you have RAM outside the D000-EFFF
+range, that RAM may be of three kinds:
+(1)  Completely free RAM - not used by the videocard or by any
+     other program. This is good news: you can use it as a UMB
+     without any problems - you only have to patch the addres-
+     ses into USE!UMBS.SYS.
+(2)  Graphics VideoRAM - this is only used by the video system
+     when you are working in graphics mode. If you don't use
+     graphics, you may use this RAM as a UMB. Beware to boot
+     your computer without USE!UMBS.SYS if you intend to use
+     graphics programs! (It won't damage anything, though,
+     your computer will simply hang once it switches to grap-
+     hics mode.)
+(3)  Text VideoRAM - sorry, but you really can't use this. If
+     you would, then how could you get anything on the screen?
+
+==============================================================
+
+
+USE!UMBS Documentation                                 Page  8
+==============================================================
+
+Finding out to which of the three categories your RAM belongs
+is complicated: it depends on your videocard. I will try and
+describe as well as I can what ranges each videocard uses. As
+said above: you can use any range as long as it doesn't inclu-
+de the Text Range; and you may use the Graphics Range, but
+only if you don't switch to graphics mode. Read the Advice
+carefully - but note that this doesn't guarantee anything!
+(Thanks to Eef Hartman for the information about addresses.)
+
+Monochrome Display Adapter (MDA)
+   TEXT     : B000-B0FF    (4K)
+   GRAPHICS : None         (0K)
+   ADVICE This is a very old-fashioned one. It was in the
+          original IBMs. It can't do any graphics, only text.
+          So if you appear to have *any* RAM outside the text
+          range specified above: use it.
+
+Color Graphics Adapter (CGA)
+   TEXT     : B800-B8FF    (4K)
+   GRAPHICS : B800-BBFF   (16K)
+   ADVICE If there is any RAM outside the graphics range
+          (B800-BBFF) then that RAM is not used by the CGA
+          adaptor, and you may problemlessly use it. 
+          If you want to use the graphics range, take care:
+          this may give problems since the CGA adapter often
+          uses it as 4 pages of text.
+
+Hercules Adapter
+   TEXT     : B000-B0FF    (4K)
+   GRAPHICS : B000-BFFF   (64K) full
+         or : B000-B7FF   (32K) half
+   ADVICE If there is any RAM outside the graphics range
+          (B000-BFFF) then that RAM is not used by the Hercu-
+          les adaptor, and you may problemlessly use it. 
+          If you want to use the graphics range, take care:
+          the hercules adapter may use the first half of its
+          RAM (B000-B7FF) to store several text pages. So if
+          you want to use the graphics range, use B800-BFFF.
+          If you have a half (1 page) hercules, then you don't
+          have that range.
+
+==============================================================
+
+
+USE!UMBS Documentation                                 Page  9
+==============================================================
+
+Enhanced Graphics Adapter (EGA)
+   TEXT     : B000-B0FF     (4K) mono mode
+            : B800-B8FF     (4K) color mode
+   GRAPHICS : A000-AFFF    (64K)
+   ADVICE As you see, you can use the A segment as a UMB if
+          you don't use graphics applications.
+          You may also use parts of the B segment, but notice
+          that the EGA card will use one of the two text are-
+          as: the lower one when it is in mode MONO, the upper
+          one when it is in mode CO80.
+
+V? Graphics Adapter (VGA)
+   TEXT     : same as EGA
+   GRAPHICS : same as EGA, but sometimes also the range
+              B000-BFFF    (64K)
+   ADVICE There is a large variety of VGA cards. I can't tell
+          you precisely what ranges you may use. What is sure
+          is that you can follow the advice of the EGA card:
+          as long as you don't use graphics, the A000-AFFF
+          range is at your disposal.
+                                     
+==============================================================
+
+4. Patching in the addresses
+
+This is the hardest bit. As I mentioned before, I wrote this
+driver for the Philips 35xx series, so it will by default only
+manage the block from D000 until EFFF. If you don't have that
+entire block at your disposal, you will have to change some
+code in the file. I will describe below how you can patch in
+the adresses using the DEBUG program, which you will have,
+since it came with the MS-DOS package.
+
+First of all, you need to know the addresses of the block(s)
+you want to patch in. The maximum number of separate blocks
+you can patch in is three. I don't think you will need more
+than that; if you think you do, contact me, and I can fix it
+for you. (As long as the RAM is contiguous, you can specify it
+in one block, however long the contiguous block is.)
+
+Once you know the starting and the ending address of a block,
+you should calculate its length (in paragraphs). How do you do
+that? You simply subtract the beginning address from the end
+adress, USING HEXADECIMAL CALCULATION. [Hex calculation goes
+just like decimal calculation, only that the numbers 10
+through 15 are changed to A through F]
+
+==============================================================
+
+
+USE!UMBS Documentation                                 Page 10
+==============================================================
+
+Some examples:
+
+  End address   :    AFFF   BFFF   BBFF   E7FF   EFFF   EFFF
+  Begin address :    A000   B800   B0FF   E000   D7FF   D000 
+  ------------- -    ----   ----   ----   ----   ----   ----
+  Length        :    0FFF   07FF   0B00   07FF   1800   1FFF
+
+So, what you do is (just as with decimal calculation): go from
+right to left and each time subtract two digits. If you have
+to `borrow' you can do so. Keep in mind that e.g. F-7=8 (bec-
+ause 15-7=8) and that 10-8=8, because 16-8=8.
+
+Ok, now you must patch the starting address and the length of
+each block into USE!UMBS.SYS. Only ... there is a twist now:
+both values have to be reversed bytewise before being patched
+in. It's best to explain this using an example: suppose you
+have a block, which starts at B800 and has length 07FF, then
+you reverse the bytes as follows:
+
+     Address  Length
+     B8 00    07 FF
+      \ /      \ /
+      / \      / \
+     00 B8    FF 07 
+
+So, the sequence B800 07FF becomes 00 B8 FF 07. And this is
+the sequence we will patch in. If you have more blocks, trans-
+pose them in the same way, and append them to this sequence.
+(But *never* more than three blocks in total!!!)
+
+Then startup the debug program with the following command:
+
+     DEBUG USE!UMBS.SYS
+
+and debug will report with its prompt:
+     -
+(if this doesn't happen: make sure debug is in the search path
+and use!umbs.sys is in the current directory. You can type Q
+to exit from debug).
+
+Now type:
+
+     -E153
+
+(don't type the hyphen, and finish with carriage return)
+and debug will say this
+
+     xxxx:0153  00._
+
+==============================================================
+
+
+USE!UMBS Documentation                                 Page 11
+==============================================================
+
+Now, type the first byte of your sequence, and finish with a
+SPACE, NOT A CARRIAGE RETURN!!!. So, if your first byte was
+(for example) AB, you will now see something like this:
+
+     xxxx:0153  00.AB  D0._
+
+Now, type the next byte, AGAIN FOLLOWED BY A SPACE, NOT A
+CARRIAGE RETURN! And keep on doing this until you have entered
+the whole sequence (which amounts to 4 bytes for one block, 8
+bytes for two blocks, 12 for three blocks). After having
+completed this, STILL DON'T PRESS CARRIAGE RETURN, but enter
+another four bytes, all with value 00, every time using the
+spacebar to move to the next. (These 00-bytes signal the end
+of the list.)
+
+If you have done that, you may now finally press RETURN to get
+back to the debug-prompt. If you made any mistakes, you can
+now press Q to quit without changes, but if everything went
+alright, press W to write away the changes. (And afterwards Q
+to exit the programme.)
+
+Well, that was it... Now you can continue to the next section
+and finally install USE!UMBS.SYS.
+
+==============================================================
+
+
+USE!UMBS Documentation                                 Page 12
+==============================================================
+
+5. Installation
+
+In order to install USE!UMBS.SYS, follow the following three
+steps carefully.
+
+STEP I: Tell DOS to install the device driver.
+You do this by adding this line to your config.sys:
+DEVICE=USE!UMBS.SYS
+(Provided USE!UMBS.SYS is in the root directory.) 
+The position at which this line is placed is important! If you
+have an extended or expanded memorymanager (like HIMEM.SYS),
+then the line DEVICE=USE!UMBS.SYS must come *after* the line
+specifying the other manager. On the other hand, it must come
+*before* any other line that starts with DEVICE=.
+On the whole: put it as much as possible toward the beginning
+of your config.sys, but never before the installation line of
+an XMS or EMS driver.
+
+STEP II: Tell DOS to actually use the UMBs
+You do this as follows: If there is a line saying DOS=HIGH in
+your config.sys, then change it to DOS=HIGH,UMB. If there is
+no such line, then add the line DOS=UMB to the config.sys.
+Also here, position is important: make sure the line is on the
+*very first* line of your config.sys. (And therefore comes
+somewhere before DEVICE=USE!UMBS.SYS)
+
+STEP III: Tell DOS which things to put in the UMBs
+There are two kinds of things that can be put in the UMBs:
+device drivers and TSRs. Device drivers are `highloaded' by
+changing their lines in the config.sys from DEVICE=... to
+DEVICEHIGH=.... The TSRs are highloaded by preceding their
+invocation line in the autoexec.bat with LOADHIGH (or LH). So:
+if there formerly was a line saying AUTOPARK in your auto-
+exec.bat, now it should become LH AUTOPARK.EXE or LOADHIGH
+AUTPARK.EXE.
+[NOTE: Some people load TSRs via the config.sys instead of the
+autoexec.bat by using the line INSTALL=.... If this is the
+case, you better remove them from the config.sys and LOADHIGH
+them via the autoexec.bat.]
+
+Well, that's all there is to it.
+Once you have made all the changes, try MEM to see how much
+memory you have left. Then reboot (and see USE!UMBS sign on),
+wait for the DOS-prompt and then run MEM again. Calculate the
+difference USE!UMBS makes. Now divide this difference by 2000.
+The result is - in my humble opinion - a reasonable donation
+for the author. (But, of course, it's up to you...)
+
+==============================================================
+
+
+USE!UMBS Documentation                                 Page 13
+==============================================================
+
+Appendix 1. Functional description of the driver 
+            (for the freaks).
+
+This program is a device driver that will install a routine
+that handles requests for UMBs. These requests are made by
+MS-Dos if it has read the statement DOS=[high,]UMB in the
+config.sys file and encounters a DEVICEHIGH or a LOADHIGH
+statement. (For more information about devicehigh and loadhigh
+see the MS-Dos 5.0 manual.)
+
+The UMB-requests are normally sent to the extended memory
+manager, which, in the case of Dos 5.0, is HIMEM.SYS. There
+are two problems here. Firstly, if you don't have extended
+memory, you cannot have Himem.sys installed. And since PCs and
+XTs can't even have extended memory, they can never install
+himem.sys. Secondly, even if you DO have extended memory AND
+install Himem.sys, you still have no access to the UMBs becau-
+se Himem doesn't implement a UMB manager, only an XMS handler.
+The UMB-handler is provided by a separate device driver,
+namely EMM386.SYS. And yes, as the name suggests, you can't
+install this on an AT (286). 
+
+So, what this USE!UMBS does is the following: it will install
+a routine that will intercept any requests to the extended
+memory manager. It then checks this request in order to see if
+it is a request for UMBs. If it is, then it will handle the
+request, otherwise it will pass them on to the XMS handler. If
+you don't have an XMS driver installed (which is quite fair if
+you don't have eXtended memory), USE!UMBS will not forward the
+request but answer it with a polite "no", so that nothing will
+hang or mess up. (So, in a way, USE!UMBS will install a HIMEM
+manager too - but since there is no high memory to manage, it
+won't have much to do anyway.) 
+
+==============================================================
+
+
+USE!UMBS Documentation                                 Page 14
+==============================================================
+
+Appendix 2. Technical description of the driver
+            (details for the real freaks)
+
+A request to the XMS manager goes in two steps. First, the
+caller will want to find out whether there is a manager and,
+if so, where it is. Second, it will call the manager with a
+specification of what it should do.
+
+The first step is done via interrupt 2Fh (the multiplexer).
+This interrupt handles a lot of very different requests, which
+it classifies by looking in the AH register. If this contains
+43h, the request is for the XMS manager. So what we do is
+chain a little bit of code to the front of the interrupt 2Fh
+handler - this added code will determine if AH=43h. If it is
+not, it gives control back to the old INT 2F handler, if it
+is, it will take over. 
+
+Once it has taken over, it will check the AL register. This
+register specifies the precise nature of the question. It can
+contain only two possible values: 00h and 10h. If it contains
+00h, this means that the question is "Hullo! Is there any
+XMS-manager installed?", and our response should be "Yo!"
+(because that's exactly what we are installing). We signal a
+yes by returning 80h in the AL register. If AL contains 10h
+upon entry, then the question is "Well then, where can I find
+that XMS manager?". So in this case we return its address in
+the registers ES:BX. The address we pass is, yes, the address
+of the XMS manager that we are installing.
+
+The second step. After the caller has used the interrupt
+described above to find out about the existence (4300) and the
+whereabouts (4310) of the XMS manager, it will at some point
+call it. It calls it by simply making a FAR JMP to the address
+that was previously specified in ES:BX. 
+
+Upon entering the XMS manager, we first have to check its AH
+register in order to find out whether the request is for UMBs
+or for extended memory. If it is anything else than 10h (= "I
+want a UMB"), our UMB-manager will do the following: (a) IF
+another XMS-manager (like MS-Dos's HIMEM.SYS) was loaded
+before, it will pass the request on to that manager, (b) IF
+NOT, it will return an errorcode saying that there is no XMS
+memory. If the request actually is for UMBs (AH=10h), then it
+will provide them as long as there are any. 
+
+[END OF DOCS]
+==============================================================
