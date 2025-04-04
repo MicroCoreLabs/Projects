@@ -1,0 +1,7 @@
+BUFFERS = 99
+FILES = 99
+device=sd.sys
+;devicehigh=a:\XTEMM.EXE /p:d000 /i:260 /n
+devicehigh=a:\LTEMM.EXE /p:e000 /i:260 /n
+;devicehigh=a:xtumbs.sys ca00-ce00 e000-f000 f000-f400
+devicehigh=a:\ramdrive.sys 2000 /a
