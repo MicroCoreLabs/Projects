@@ -147,9 +147,11 @@
 #define prefix_lock            ( (prefix_flags & 0x001)==0 ? 0 : 1 )
 #define prefix_repnz           ( (prefix_flags & 0x002)==0 ? 0 : 1 )
 #define prefix_repz            ( (prefix_flags & 0x004)==0 ? 0 : 1 )
-#define prefix_seg_override_es ( (prefix_flags & 0x010)==0 ? 0 : 1 )
-#define prefix_seg_override_cs ( (prefix_flags & 0x020)==0 ? 0 : 1 )
-#define prefix_seg_override_ss ( (prefix_flags & 0x040)==0 ? 0 : 1 )
+#define prefix_rep             ( (prefix_flags & 0x06)==0 ? 0 : 1 )
+#define prefix_seg_override_es ( (prefix_flags & 0x10)==0 ? 0 : 1 )
+#define prefix_seg_override_cs ( (prefix_flags & 0x20)==0 ? 0 : 1 )
+#define prefix_seg_override_ss ( (prefix_flags & 0x40)==0 ? 0 : 1 )
+#define prefix_seg_override_ds ( (prefix_flags & 0x80)==0 ? 0 : 1 )
 #define prefix_repnc           ( (prefix_flags & 0x100)==0 ? 0 : 1 )
 #define prefix_repc            ( (prefix_flags & 0x200)==0 ? 0 : 1 )
 
@@ -379,6 +381,7 @@ void setup() {
   digitalWriteFast(PIN_S0,1);
   
   digitalWriteFast(PIN_SD_CLK,0);
+  digitalWriteFast(PIN_SD_CS_n,1);
 
   //Serial.begin(9600);
 
@@ -807,10 +810,10 @@ inline uint8_t BIU_Bus_Cycle(uint8_t biu_operation, uint32_t local_address , uin
 // Calculate full address allowing for segment override
 // ------------------------------------------------------
  uint32_t Calculate_Full_Address(uint8_t segment_overridable , uint8_t local_segment , uint16_t local_address) {
-    uint32_t biu_full_address=0;
-    uint8_t  local_segment_override;
+      uint32_t biu_full_address=0;
+      uint8_t  local_segment_override;
     
-    local_segment_override = prefix_flags&0x0F0;
+    local_segment_override = prefix_flags&0xF0;
     
     if (segment_overridable==1 && local_segment_override!=0) {
         clock_counter=clock_counter+2;   // Add two additional clocks for segment override
@@ -830,6 +833,7 @@ inline uint8_t BIU_Bus_Cycle(uint8_t biu_operation, uint32_t local_address , uin
            case SEGMENT_CS: biu_full_address = ( (register_cs<<4) + local_address );  break;
        }
     }
+    biu_full_address = biu_full_address & 0xFFFFF; // R3
     return biu_full_address;
 }
 
@@ -1000,8 +1004,8 @@ void opcode_0xFD()  { clock_counter=2;  register_flags=(register_flags | 0x0400)
 void opcode_0xFA()  { clock_counter=2;  register_flags=(register_flags & 0xFDFF);  return;  }  // 0xFA - CLI - Clear Interrupt Flag  
 void opcode_0xFB()  { clock_counter=2;  register_flags=(register_flags | 0x0200);  last_instruction_set_a_prefix=1; pause_interrupts=1; return;  }  // 0xFB - STI - Set Interrupt Flag 
  
-void opcode_0x9F()  { clock_counter=4;  register_ax=((register_flags<<8)|(register_ax&0x00FF));              return;  }  // 0x9F - LAHF - Load 8080 Flags into AH Register 
-void opcode_0x9E()  { clock_counter=4;  register_flags=((register_flags&0xFF00)|((register_ax&0xD500)>>8));  return;  }  // 0x9E - SAHF - Store AH Register into 8080 Flags 
+void opcode_0x9F()  { clock_counter=4;  register_ax=((register_flags<<8)|(register_ax&0x00FF));  register_ax=register_ax|0x0200;            return;  }  // 0x9F - LAHF - Load 8080 Flags into AH Register 
+void opcode_0x9E()  { clock_counter=4;  register_flags=0x02| ((register_flags&0xFF00)|((register_ax&0xD500)>>8));  return;  }  // 0x9E - SAHF - 0 R3
 
 
 
@@ -1304,7 +1308,7 @@ void opcode_0x07()  {  clock_counter=clock_counter+8;  register_es=Pop();       
 //void opcode_0x0F()  {  clock_counter=clock_counter+8;  register_cs=Pop();              pause_interrupts=1;   return;  }   // 0x0F - POP CS - Set prefix so no interrupt on next instruction 
 void opcode_0x17()  {  clock_counter=clock_counter+8;  register_ss=Pop();              pause_interrupts=1;   return;  }   // 0x17 - POP SS - Set prefix so no interrupt on next instruction 
 void opcode_0x1F()  {  clock_counter=clock_counter+8;  register_ds=Pop();              pause_interrupts=1;   return;  }   // 0x1F - POP DS - Set prefix so no interrupt on next instruction 
-void opcode_0x9D()  {  clock_counter=clock_counter+8;  register_flags=(0x0FD5&Pop());  pause_interrupts=1;   return;  }   // 0x9D - POPF - POP Flags 
+void opcode_0x9D()  {  clock_counter=clock_counter+8;  register_flags=0xF000|(0x0FD5&Pop());  pause_interrupts=1;   return;  }   // 0x9D - POPF - POP Flags 
 
 void opcode_0x58()  {  clock_counter=clock_counter+8;  register_ax=Pop();                                     return;  }  // 0x58 - POP AX  
 void opcode_0x59()  {  clock_counter=clock_counter+8;  register_cx=Pop();                                     return;  }  // 0x59 - POP CX  
@@ -1762,7 +1766,7 @@ uint16_t Boolean_OR(uint16_t local_data_A , uint16_t local_data_B  )  {
     uint16_t  local_results;
     local_results = local_data_A | local_data_B;
     if (word_operation==1) Set_Flags_Word_SZP(local_results); else Set_Flags_Byte_SZP(local_results); 
-    register_flags = (register_flags & 0xF7FE);         // Zero out Flags: C, O  
+    register_flags = (register_flags & 0xF7EE);            // Zero out Flags: C, O, A  R3
     return local_results;
 }
 void opcode_0x08()  { Calculate_EA(); if (ea_is_a_register==1) clock_counter=clock_counter+3; else clock_counter=clock_counter+16; Writeback_EA(Boolean_OR(Fetch_EA(),Fetch_Register(REG_field_table)));                       return;  }  // 0x08  OR - REG8/MEM8,REG8
@@ -1781,7 +1785,7 @@ uint16_t Boolean_AND(uint16_t local_data_A , uint16_t local_data_B  )  {
     local_results = local_data_A & local_data_B;
       
     if (word_operation==1) Set_Flags_Word_SZP(local_results);  else  Set_Flags_Byte_SZP(local_results); 
-    register_flags = (register_flags & 0xF7FE);         // Zero out Flags: C, O  
+    register_flags = (register_flags & 0xF7EE);            // Zero out Flags: C, O, A  R3
     return local_results;
 }
 void opcode_0x20()  { Calculate_EA(); if (ea_is_a_register==1) clock_counter=clock_counter+3; else clock_counter=clock_counter+16; Writeback_EA(Boolean_AND(Fetch_EA(),Fetch_Register(REG_field_table)));                       return;  }  // 0x20  AND - REG8/MEM8,REG8
@@ -1799,7 +1803,7 @@ uint16_t Boolean_XOR(uint16_t local_data_A , uint16_t local_data_B  )  {
     uint16_t  local_results;
     local_results = local_data_A ^ local_data_B;
     if (word_operation==1) Set_Flags_Word_SZP(local_results); else Set_Flags_Byte_SZP(local_results); 
-    register_flags = (register_flags & 0xF7FE);         // Zero out Flags: C, O  
+    register_flags = (register_flags & 0xF7EE);            // Zero out Flags: C, O, A  R3
     return local_results;
 }
 void opcode_0x30()  { Calculate_EA(); if (ea_is_a_register==1) clock_counter=clock_counter+3; else clock_counter=clock_counter+16; Writeback_EA(Boolean_XOR(Fetch_EA(),Fetch_Register(REG_field_table)));                       return;  }  //  0x30  XOR - REG8/MEM8,REG8
@@ -2172,7 +2176,7 @@ void opcode_0xD0()  {
         case 0x3: Writeback_EA(RCR8(Fetch_EA(),0x1) );     break;  // # 0xD0 REG[3] - RCR REG8/MEM8 , 1
         case 0x4: Writeback_EA(SAL8(Fetch_EA(),0x1) );     break;  // # 0xD0 REG[4] - SAL REG8/MEM8 , 1
         case 0x5: Writeback_EA(SHR8(Fetch_EA(),0x1) );     break;  // # 0xD0 REG[5] - SHR REG8/MEM8 , 1
-        case 0x6: Writeback_EA(SHR8(Fetch_EA(),0x1) );     break;  // # 0xD0 REG[6] - SHR REG8/MEM8 , 1 ** Duplicate **
+        case 0x6: Writeback_EA(0xFF);                      break;  // # 0xD0 REG[6] - ** SETMO **  R3
         case 0x7: Writeback_EA(SAR8(Fetch_EA(),0x1) );     break;  // # 0xD0 REG[7] - SAR REG8/MEM8 , 1  
     }
     return;
@@ -2191,7 +2195,7 @@ void opcode_0xD1()  {
         case 0x3: Writeback_EA(RCR16(Fetch_EA(),0x1) );     break;  // # 0xD1 REG[3] - RCR REG16/MEM16 , 1
         case 0x4: Writeback_EA(SAL16(Fetch_EA(),0x1) );     break;  // # 0xD1 REG[4] - SAL REG16/MEM16 , 1
         case 0x5: Writeback_EA(SHR16(Fetch_EA(),0x1) );     break;  // # 0xD1 REG[5] - SHR REG16/MEM16 , 1
-        case 0x6: Writeback_EA(SHR16(Fetch_EA(),0x1) );     break;  // # 0xD1 REG[6] - SHR REG16/MEM16 , 1 ** Duplicate **
+        case 0x6: Writeback_EA(0xFFFF);                     break;  // # 0xD1 REG[6] - ** SETMO **  R3
         case 0x7: Writeback_EA(SAR16(Fetch_EA(),0x1) );     break;  // # 0xD1 REG[7] - SAR REG16/MEM16 , 1
     }
     return;
@@ -2204,14 +2208,14 @@ void opcode_0xD2()  {
     Calculate_EA();
     if (ea_is_a_register==1) clock_counter=clock_counter+8;  else  clock_counter=clock_counter+20;
     switch (REG_field)  {
-        case 0x0: Writeback_EA(ROL8(Fetch_EA(),(register_cx&0x1F)) );     break;  // # 0xD2 REG[0] - ROL REG8/MEM8 , CL
-        case 0x1: Writeback_EA(ROR8(Fetch_EA(),(register_cx&0x1F)) );     break;  // # 0xD2 REG[1] - ROR REG8/MEM8 , CL
-        case 0x2: Writeback_EA(RCL8(Fetch_EA(),(register_cx&0x1F)) );     break;  // # 0xD2 REG[2] - RCL REG8/MEM8 , CL
-        case 0x3: Writeback_EA(RCR8(Fetch_EA(),(register_cx&0x1F)) );     break;  // # 0xD2 REG[3] - RCR REG8/MEM8 , CL
-        case 0x4: Writeback_EA(SAL8(Fetch_EA(),(register_cx&0x1F)) );     break;  // # 0xD2 REG[4] - SAL REG8/MEM8 , CL
-        case 0x5: Writeback_EA(SHR8(Fetch_EA(),(register_cx&0x1F)) );     break;  // # 0xD2 REG[5] - SHR REG8/MEM8 , CL
-        case 0x6: Writeback_EA(SHR8(Fetch_EA(),(register_cx&0x1F)) );     break;  // # 0xD2 REG[6] - SHR REG8/MEM8 , CL ** Duplicate **
-        case 0x7: Writeback_EA(SAR8(Fetch_EA(),(register_cx&0x1F)) );     break;  // # 0xD2 REG[7] - SAR REG8/MEM8 , CL
+        case 0x0: Writeback_EA(ROL8(Fetch_EA(),(register_cx&0x00FF)) );     break;  // # 0xD2 REG[0] - ROL REG8/MEM8 , CL
+        case 0x1: Writeback_EA(ROR8(Fetch_EA(),(register_cx&0x00FF)) );     break;  // # 0xD2 REG[1] - ROR REG8/MEM8 , CL
+        case 0x2: Writeback_EA(RCL8(Fetch_EA(),(register_cx&0x00FF)) );     break;  // # 0xD2 REG[2] - RCL REG8/MEM8 , CL
+        case 0x3: Writeback_EA(RCR8(Fetch_EA(),(register_cx&0x00FF)) );     break;  // # 0xD2 REG[3] - RCR REG8/MEM8 , CL
+        case 0x4: Writeback_EA(SAL8(Fetch_EA(),(register_cx&0x00FF)) );     break;  // # 0xD2 REG[4] - SAL REG8/MEM8 , CL
+        case 0x5: Writeback_EA(SHR8(Fetch_EA(),(register_cx&0x00FF)) );     break;  // # 0xD2 REG[5] - SHR REG8/MEM8 , CL
+        case 0x6: Writeback_EA(0xFFFF);                                     break;  // # 0xD2 REG[6] - ** SETMO **  R3
+        case 0x7: Writeback_EA(SAR8(Fetch_EA(),(register_cx&0x00FF)) );     break;  // # 0xD2 REG[7] - SAR REG8/MEM8 , CL
     }
     return;
 }
@@ -2223,14 +2227,14 @@ void opcode_0xD3()  {
     Calculate_EA();
     if (ea_is_a_register==1) clock_counter=clock_counter+8;  else  clock_counter=clock_counter+28;
     switch (REG_field)  {
-        case 0x0: Writeback_EA(ROL16(Fetch_EA(),(register_cx&0x1F)) );    break;  // # 0xD3 REG[0] - ROL REG16/MEM16 , CL
-        case 0x1: Writeback_EA(ROR16(Fetch_EA(),(register_cx&0x1F)) );    break;  // # 0xD3 REG[1] - ROR REG16/MEM16 , CL
-        case 0x2: Writeback_EA(RCL16(Fetch_EA(),(register_cx&0x1F)) );    break;  // # 0xD3 REG[2] - RCL REG16/MEM16 , CL
-        case 0x3: Writeback_EA(RCR16(Fetch_EA(),(register_cx&0x1F)) );    break;  // # 0xD3 REG[3] - RCR REG16/MEM16 , CL
-        case 0x4: Writeback_EA(SAL16(Fetch_EA(),(register_cx&0x1F)) );    break;  // # 0xD3 REG[4] - SAL REG16/MEM16 , CL
-        case 0x5: Writeback_EA(SHR16(Fetch_EA(),(register_cx&0x1F)) );    break;  // # 0xD3 REG[5] - SHR REG16/MEM16 , CL
-        case 0x6: Writeback_EA(SHR16(Fetch_EA(),(register_cx&0x1F)) );    break;  // # 0xD3 REG[6] - SHR REG16/MEM16 , CL ** Duplicate **
-        case 0x7: Writeback_EA(SAR16(Fetch_EA(),(register_cx&0x1F)) );    break;  // # 0xD3 REG[7] - SAR REG16/MEM16 , CL
+        case 0x0: Writeback_EA(ROL16(Fetch_EA(),(register_cx&0x00FF)) );    break;  // # 0xD3 REG[0] - ROL REG16/MEM16 , CL
+        case 0x1: Writeback_EA(ROR16(Fetch_EA(),(register_cx&0x00FF)) );    break;  // # 0xD3 REG[1] - ROR REG16/MEM16 , CL
+        case 0x2: Writeback_EA(RCL16(Fetch_EA(),(register_cx&0x00FF)) );    break;  // # 0xD3 REG[2] - RCL REG16/MEM16 , CL
+        case 0x3: Writeback_EA(RCR16(Fetch_EA(),(register_cx&0x00FF)) );    break;  // # 0xD3 REG[3] - RCR REG16/MEM16 , CL
+        case 0x4: Writeback_EA(SAL16(Fetch_EA(),(register_cx&0x00FF)) );    break;  // # 0xD3 REG[4] - SAL REG16/MEM16 , CL
+        case 0x5: Writeback_EA(SHR16(Fetch_EA(),(register_cx&0x00FF)) );    break;  // # 0xD3 REG[5] - SHR REG16/MEM16 , CL
+        case 0x6: Writeback_EA(0xFFFF);                                     break;  // # 0xD3 REG[6] - ** SETMO **  R3
+        case 0x7: Writeback_EA(SAR16(Fetch_EA(),(register_cx&0x00FF)) );    break;  // # 0xD3 REG[7] - SAR REG16/MEM16 , CL
     }
     return;
 }
@@ -2266,10 +2270,10 @@ void opcode_0xA4() {
     uint8_t local_data;
     uint8_t interrupt_pending=0;
     
-    if (prefix_repz==0)  clock_counter=clock_counter+1;  else clock_counter=clock_counter+9;                            // Add initial clock counts
+    if (prefix_rep==0)  clock_counter=clock_counter+1;  else clock_counter=clock_counter+9;                            // Add initial clock counts
     
     do {
-        if (prefix_repz==1)  {  if (register_cx==0)                                         return;                     // Exit from loop if repeat prefix and CX=0
+        if (prefix_rep==1)  {  if (register_cx==0)                                         return;                     // Exit from loop if repeat prefix and CX=0
                                 if (interrupt_pending==1) { register_ip = register_ip - (prefix_count+1);  return; }                   // Exit from loop to service interrupt - adjusting IP to address of prefix
                                 register_cx--;
                              }
@@ -2283,7 +2287,7 @@ void opcode_0xA4() {
         else            { register_si=register_si - 1;  register_di=register_di - 1;  } 
     
         
-    } while (prefix_repz==1);
+    } while (prefix_rep==1);
 
     return;
 }
@@ -2295,10 +2299,10 @@ void opcode_0xA5() {
     uint16_t local_data;
     uint8_t interrupt_pending=0;
     
-    if (prefix_repz==0)  clock_counter=clock_counter+1;  else clock_counter=clock_counter+9;                            // Add initial clock counts
+    if (prefix_rep==0)  clock_counter=clock_counter+1;  else clock_counter=clock_counter+9;                            // Add initial clock counts
     
     do {
-        if (prefix_repz==1)  {  if (register_cx==0)                                         return;                     // Exit from loop if repeat prefix and CX=0
+        if (prefix_rep==1)  {  if (register_cx==0)                                         return;                     // Exit from loop if repeat prefix and CX=0
                                 if (interrupt_pending==1) { register_ip = register_ip -(prefix_count+1);  return; }                   // Exit from loop to service interrupt - adjusting IP to address of prefix
                                 register_cx--;
                              }
@@ -2312,7 +2316,7 @@ void opcode_0xA5() {
         else            { register_si=register_si - 2;  register_di=register_di - 2;  } 
     
         
-    } while (prefix_repz==1);
+    } while (prefix_rep==1);
 
     return;
 }
@@ -2389,10 +2393,10 @@ void opcode_0xA7() {
 void opcode_0xAA() { 
     uint8_t interrupt_pending=0;
     
-    if (prefix_repz==0)  clock_counter=clock_counter+1;  else clock_counter=clock_counter+9;                            // Add initial clock counts
+    if (prefix_rep==0)  clock_counter=clock_counter+1;  else clock_counter=clock_counter+9;                            // Add initial clock counts
     
     do {
-        if (prefix_repz==1)  {  if (register_cx==0)                                         return;                     // Exit from loop if repeat prefix and CX=0
+        if (prefix_rep==1)  {  if (register_cx==0)                                         return;                     // Exit from loop if repeat prefix and CX=0
                                 if (interrupt_pending==1) { register_ip = register_ip - (prefix_count+1);  return; }                   // Exit from loop to service interrupt - adjusting IP to address of prefix
                                 register_cx--;
                              }
@@ -2405,7 +2409,7 @@ void opcode_0xAA() {
         else            { register_di=register_di - 1; }
     
         
-    } while (prefix_repz==1);
+    } while (prefix_rep==1);
 
     return;
 }
@@ -2416,10 +2420,10 @@ void opcode_0xAA() {
 void opcode_0xAB() { 
     uint8_t interrupt_pending=0;
     
-    if (prefix_repz==0)  clock_counter=clock_counter+1;  else clock_counter=clock_counter+9;                            // Add initial clock counts
+    if (prefix_rep==0)  clock_counter=clock_counter+1;  else clock_counter=clock_counter+9;                            // Add initial clock counts
     
     do {
-        if (prefix_repz==1)  {  if (register_cx==0)                                         return;                     // Exit from loop if repeat prefix and CX=0
+        if (prefix_rep==1)  {  if (register_cx==0)                                         return;                     // Exit from loop if repeat prefix and CX=0
                                 if (interrupt_pending==1) { register_ip = register_ip - (prefix_count+1);  return; }                   // Exit from loop to service interrupt - adjusting IP to address of prefix
                                 register_cx--;
                              }
@@ -2432,7 +2436,7 @@ void opcode_0xAB() {
         else            { register_di=register_di - 2; }
     
         
-    } while (prefix_repz==1);
+    } while (prefix_rep==1);
 
     return;
 }
@@ -2444,10 +2448,10 @@ void opcode_0xAC() {
     uint8_t local_data;
     uint8_t interrupt_pending=0;
     
-    if (prefix_repz==0)  clock_counter=clock_counter+0;  else clock_counter=clock_counter+9;                            // Add initial clock counts
+    if (prefix_rep==0)  clock_counter=clock_counter+0;  else clock_counter=clock_counter+9;                            // Add initial clock counts
     
     do {
-        if (prefix_repz==1)  {  if (register_cx==0)                                         return;                     // Exit from loop if repeat prefix and CX=0
+        if (prefix_rep==1)  {  if (register_cx==0)                                         return;                     // Exit from loop if repeat prefix and CX=0
                                 if (interrupt_pending==1) { register_ip = register_ip - (prefix_count+1);  return; }                   // Exit from loop to service interrupt - adjusting IP to address of prefix
                                 register_cx--;
                              }
@@ -2461,7 +2465,7 @@ void opcode_0xAC() {
         else            { register_si=register_si - 1; }
     
         
-    } while (prefix_repz==1);
+    } while (prefix_rep==1);
 
     return;
 }
@@ -2473,10 +2477,10 @@ void opcode_0xAD() {
     uint16_t local_data;
     uint8_t interrupt_pending=0;
     
-    if (prefix_repz==0)  clock_counter=clock_counter+0;  else clock_counter=clock_counter+9;                            // Add initial clock counts
+    if (prefix_rep==0)  clock_counter=clock_counter+0;  else clock_counter=clock_counter+9;                            // Add initial clock counts
     
     do {
-        if (prefix_repz==1)  {  if (register_cx==0)                                         return;                     // Exit from loop if repeat prefix and CX=0
+        if (prefix_rep==1)  {  if (register_cx==0)                                         return;                     // Exit from loop if repeat prefix and CX=0
                                 if (interrupt_pending==1) { register_ip = register_ip - (prefix_count+1);  return; }                   // Exit from loop to service interrupt - adjusting IP to address of prefix
                                 register_cx--;
                              }
@@ -2490,7 +2494,7 @@ void opcode_0xAD() {
         else            { register_si=register_si - 2; }
     
         
-    } while (prefix_repz==1);
+    } while (prefix_rep==1);
 
     return;
 }
@@ -2512,7 +2516,7 @@ void opcode_0xAE() {
                                                       }
         
         clock_counter=clock_counter+15;                                                                                 // Add clocks per loop iteration        
-        local_data = Biu_Operation(MEM_READ_BYTE , SEGMENT_OVERRIDABLE_TRUE , SEGMENT_ES , register_di , 0x00 );        // Read data from source
+        local_data = Biu_Operation(MEM_READ_BYTE , SEGMENT_OVERRIDABLE_FALSE , SEGMENT_ES , register_di , 0x00 );         // Read data from source
         SUB_Bytes(( register_ax&0x00FF) , local_data );                                                                 // Perform comparison which sets Flags
         if ( (nmi_latched==1) || (direct_intr_raw!=0 && (flag_i)!=0) ) interrupt_pending=1; else interrupt_pending=0;
         
@@ -2542,7 +2546,7 @@ void opcode_0xAF() {
                                                       }
         
         clock_counter=clock_counter+15;                                                                                 // Add clocks per loop iteration        
-        local_data = Biu_Operation(MEM_READ_WORD , SEGMENT_OVERRIDABLE_TRUE , SEGMENT_ES , register_di , 0x00 );        // Read data from source
+        local_data = Biu_Operation(MEM_READ_BYTE , SEGMENT_OVERRIDABLE_FALSE , SEGMENT_ES , register_di , 0x00 );         // Read data from source
         SUB_Words(register_ax , local_data );                                                                           // Perform comparison which sets Flags
         if ( (nmi_latched==1) || (direct_intr_raw!=0 && (flag_i)!=0) ) interrupt_pending=1; else interrupt_pending=0;
         
@@ -2581,61 +2585,66 @@ void opcode_0x97()  {clock_counter=clock_counter+3; temp16=register_ax; register
 
 
 // ------------------------------------------------------
-// 0xF6 Opcodes
+// 0xF6 Opcodes  R3
 // ------------------------------------------------------
 void opcode_0xF6()  {   
     uint8_t local_divr;
-    uint8_t local_quo;
-    uint8_t local_rem;  
+    uint16_t local_quo;
+    uint8_t local_rem;   
     int8_t  signed_local_divr;
-    int8_t  signed_local_quo;
+    int16_t  signed_local_quo;
     int8_t  signed_local_rem;
-    
+   
     Calculate_EA();
     switch (REG_field)  {
-        case 0x0: if (ea_is_a_register==1) clock_counter=clock_counter+5; else  clock_counter=clock_counter+11;  Boolean_AND(Fetch_EA(),pfq_fetch_byte());         break;  // # 0xF6 REG[0] - TEST REG8/MEM8,IMM8
-        case 0x1: if (ea_is_a_register==1) clock_counter=clock_counter+5; else  clock_counter=clock_counter+11;  Boolean_AND(Fetch_EA(),pfq_fetch_byte());         break;  // # 0xF6 REG[1] - TEST REG8/MEM8,IMM8 ** Duplicate **
-        case 0x2: if (ea_is_a_register==1) clock_counter=clock_counter+3; else  clock_counter=clock_counter+16;  Writeback_EA( 0xFF ^ Fetch_EA() );                break;  // # 0xF6 REG[2] - NOT  REG8/MEM8
-        case 0x3: if (ea_is_a_register==1) clock_counter=clock_counter+3; else  clock_counter=clock_counter+16;  Writeback_EA( SUB_Bytes(0x00 , Fetch_EA() ));     break;  // # 0xF6 REG[3] - NEG  REG8/MEM8
-        
-        case 0x4: if (ea_is_a_register==1) clock_counter=clock_counter+65;  else  clock_counter=clock_counter+69;           // # 0xF6 REG[4] - MUL  REG8/MEM8
+        case 0x0: clock_counter=clock_counter+11;  Boolean_AND(Fetch_EA(),pfq_fetch_byte());         break;  // # 0xF6 REG[0] - TEST REG8/MEM8,IMM8
+        case 0x1: clock_counter=clock_counter+11;  Boolean_AND(Fetch_EA(),pfq_fetch_byte());         break;  // # 0xF6 REG[1] - TEST REG8/MEM8,IMM8 ** Duplicate **
+        case 0x2: clock_counter=clock_counter+16;  Writeback_EA( 0xFF ^ Fetch_EA() );                 break;  // # 0xF6 REG[2] - NOT  REG8/MEM8
+        case 0x3: clock_counter=clock_counter+16;  Writeback_EA( SUB_Bytes(0x00 , Fetch_EA() ));     break;  // # 0xF6 REG[3] - NEG  REG8/MEM8
+       
+        case 0x4: if (ea_is_a_register==1) clock_counter=clock_counter+75;  else  clock_counter=clock_counter+79;            // # 0xF6 REG[4] - MUL  REG8/MEM8
                   register_ax = Fetch_EA() * (register_ax&0x00FF);
                   if ( (register_ax&0xFF00) != 0)  {  register_flags=(register_flags|0x0801);  }  // Set O,C flags
                   else                             {  register_flags=(register_flags&0xF7FE);  }  // Clear O,C flags
-                  break;        
-        case 0x5: if (ea_is_a_register==1) clock_counter=clock_counter+79;  else  clock_counter=clock_counter+85;           // # 0xF6 REG[5] - IMUL  REG8/MEM8
+                  break;         
+        case 0x5: if (ea_is_a_register==1) clock_counter=clock_counter+89;  else  clock_counter=clock_counter+95;            // # 0xF6 REG[5] - IMUL  REG8/MEM8
                   register_ax = (int8_t)Fetch_EA() * (int8_t)(register_ax&0x00FF);
-                  if      ( ((register_ax&0xFF00)==0xFF00) && ((register_ax&0x0080)==0x0)) {  register_flags=(register_flags|0x0801);  }  // Set O,C flags
-                  else if ( ((register_ax&0xFF00)==0x0000) && ((register_ax&0x0080)!=0x0)) {  register_flags=(register_flags|0x0801);  }  // Set O,C flags
-                  else                             {  register_flags=(register_flags&0xF7FE);  }  // Clear O,C flags
-                  break;  
-        case 0x6: if (ea_is_a_register==1) clock_counter=clock_counter+75;  else  clock_counter=clock_counter+81;           // # 0xF6 REG[6] - DIV  REG8/MEM8
+                  if      ( ((register_ax&0xFF80)==0xFF80) || ((register_ax&0xFF80)==0x0000) ) { register_flags=(register_flags&0xF7FE);  }  // Clear O,C flags
+                  else                                                                         { register_flags=(register_flags|0x0801);  }  // Set O,C flags
+                  break; 
+        case 0x6: if (ea_is_a_register==1) clock_counter=clock_counter+85;  else  clock_counter=clock_counter+91;            // # 0xF6 REG[6] - DIV  REG8/MEM8
                   local_divr=Fetch_EA();
                   if (local_divr==0) DIV0_Handler();
                   else  {
                       local_quo = register_ax / local_divr;
                       local_rem = register_ax % local_divr;
+                      if (local_quo> 0xFF) { DIV0_Handler(); }
                       register_ax = local_rem << 8;
                       Write_Register(REG_AL , local_quo);
                   }
                   break;
-        case 0x7: if (ea_is_a_register==1) clock_counter=clock_counter+97;  else  clock_counter=clock_counter+1104;         // # 0xF6 REG[7] - IDIV  REG8/MEM8
+        case 0x7: if (ea_is_a_register==1) clock_counter=clock_counter+107;  else  clock_counter=clock_counter+114;            // # 0xF6 REG[7] - IDIV  REG8/MEM8
                   signed_local_divr=(int8_t)Fetch_EA();
                   if (signed_local_divr==0) DIV0_Handler();
                   else  {
                       signed_local_quo = (int16_t)register_ax / signed_local_divr;
                       signed_local_rem = (int16_t)register_ax % signed_local_divr;
+                      if (signed_local_quo> 0xFF) { DIV0_Handler(); }
                       register_ax = signed_local_rem << 8;
                       Write_Register(REG_AL , signed_local_quo);
                   }
-                  break;           
+                  break;
+
+                      
     }
     return;
 }
 
 
+
+
 // ------------------------------------------------------
-// 0xF7 Opcodes
+// 0xF7 Opcodes  R3
 // ------------------------------------------------------
 void opcode_0xF7()  {
     uint32_t local_data;
@@ -2643,46 +2652,52 @@ void opcode_0xF7()  {
     uint16_t local_divr;
     int32_t  signed_local_numr;
     int16_t  signed_local_divr;
+    uint64_t local_overflow_test;
 
 
     Calculate_EA();
     switch (REG_field)  {
-        case 0x0: if (ea_is_a_register==1) clock_counter=clock_counter+5; else  clock_counter=clock_counter+15;  Boolean_AND(Fetch_EA(),pfq_fetch_word());         break;  // # 0xF7 REG[0] - TEST REG16/MEM16 , IMM16
-        case 0x1: if (ea_is_a_register==1) clock_counter=clock_counter+5; else  clock_counter=clock_counter+15;  Boolean_AND(Fetch_EA(),pfq_fetch_word());         break;  // # 0xF7 REG[1] - TEST REG16/MEM16 , IMM16 ** Duplicate **
-        case 0x2: if (ea_is_a_register==1) clock_counter=clock_counter+3; else  clock_counter=clock_counter+24;  Writeback_EA( 0xFFFF ^ Fetch_EA() );              break;  // # 0xF7 REG[2] - NOT  REG16/MEM16
-        case 0x3: if (ea_is_a_register==1) clock_counter=clock_counter+3; else  clock_counter=clock_counter+24;  Writeback_EA( SUB_Words(0x00 , Fetch_EA() ));     break;  // # 0xF7 REG[3] - NEG  REG16/MEM16
-        
-        case 0x4:  if (ea_is_a_register==1) clock_counter=clock_counter+110;  else  clock_counter=clock_counter+121;       // # 0xF7 REG[4] - MUL  REG16/MEM16
+        case 0x0: clock_counter=clock_counter+11;  Boolean_AND(Fetch_EA(),pfq_fetch_word());         break;  // # 0xF7 REG[0] - TEST REG16/MEM16 , IMM16
+        case 0x1: clock_counter=clock_counter+11;  Boolean_AND(Fetch_EA(),pfq_fetch_word());         break;  // # 0xF7 REG[1] - TEST REG16/MEM16 , IMM16 ** Duplicate **
+        case 0x2: clock_counter=clock_counter+16;  Writeback_EA( 0xFFFF ^ Fetch_EA() );                 break;  // # 0xF7 REG[2] - NOT  REG16/MEM16
+        case 0x3: clock_counter=clock_counter+16;  Writeback_EA( SUB_Words(0x00 , Fetch_EA() ));     break;  // # 0xF7 REG[3] - NEG  REG16/MEM16
+       
+        case 0x4:  if (ea_is_a_register==1) clock_counter=clock_counter+120;  else  clock_counter=clock_counter+131;       // # 0xF7 REG[4] - MUL  REG16/MEM16
                   local_data = Fetch_EA() * register_ax;
-                  register_dx = (local_data >> 16);  
-                  register_ax = (local_data&0x0000FFFF);    
+                  register_dx = (local_data >> 16);    
+                  register_ax = (local_data&0x0000FFFF);   
                   if (register_dx != 0)  {  register_flags=(register_flags|0x0801);  }  // Set O,C flags
                   else                   {  register_flags=(register_flags&0xF7FE);  }  // Clear O,C flags
-                  break;    
-        case 0x5: if (ea_is_a_register==1) clock_counter=clock_counter+131;  else  clock_counter=clock_counter+137;         // # 0xF7 REG[5] - IMUL  REG16/MEM16
+                    break;     
+        case 0x5: if (ea_is_a_register==1) clock_counter=clock_counter+141;  else  clock_counter=clock_counter+147;            // # 0xF7 REG[5] - IMUL  REG16/MEM16
                   local_data = (int16_t)Fetch_EA() * (int16_t)register_ax;
-                  register_dx = (local_data >> 16);  
-                  register_ax = (local_data&0x0000FFFF);    
-                  if      ( (register_dx==0xFFFF) && ((register_ax&0x8000)==0x0)) {  register_flags=(register_flags|0x0801);  }  // Set O,C flags
-                  else if ( (register_dx==0x0000) && ((register_ax&0x8000)!=0x0)) {  register_flags=(register_flags|0x0801);  }  // Set O,C flags
-                  else                             {  register_flags=(register_flags&0xF7FE);  }  // Clear O,C flags
-                  break;    
-        case 0x6: if (ea_is_a_register==1) clock_counter=clock_counter+143;  else  clock_counter=clock_counter+157;         // # 0xF7 REG[6] - DIV  REG16/MEM16
+                  register_dx = (local_data >> 16);    
+                  register_ax = (local_data&0x0000FFFF);   
+                  if      ( (register_dx==0xFFFF) && ((register_ax&0x8000)==0x8000)) {  register_flags=(register_flags&0xF7FE);  }  // Clear O,C flags
+                  else if ( (register_dx==0x0000) && ((register_ax&0x8000)==0x0000)) {  register_flags=(register_flags&0xF7FE);  }  // Clear O,C flags
+                  else                             {  register_flags=(register_flags|0x0801);  }  // Set O,C flags
+                  break;     
+        case 0x6: if (ea_is_a_register==1) clock_counter=clock_counter+153;  else  clock_counter=clock_counter+167;            // # 0xF7 REG[6] - DIV  REG16/MEM16
                   local_numr = (register_dx<<16) | register_ax;
                   local_divr=Fetch_EA();
                   if (local_divr==0) DIV0_Handler();
                   else  {
+                      local_overflow_test = local_numr / local_divr;
                       register_ax = local_numr / local_divr;
                       register_dx = local_numr % local_divr;
+                      if (local_overflow_test> 0xFFFF) { DIV0_Handler(); }
+
                   }
-                  break;        
-        case 0x7: if (ea_is_a_register==1) clock_counter=clock_counter+175;  else  clock_counter=clock_counter+181;         // # 0xF7 REG[7] - IDIV  REG16/MEM16
+                  break;       
+        case 0x7: if (ea_is_a_register==1) clock_counter=clock_counter+175;  else  clock_counter=clock_counter+181;            // # 0xF7 REG[7] - IDIV  REG16/MEM16
                   signed_local_numr = (int32_t)(register_dx<<16) | (int32_t)register_ax;
                   signed_local_divr=(int16_t)Fetch_EA();
                   if (signed_local_divr==0) DIV0_Handler();
                   else  {
+                      local_overflow_test = signed_local_numr / signed_local_divr; 
                       register_ax = signed_local_numr / signed_local_divr;
                       register_dx = signed_local_numr % signed_local_divr;
+                      if (local_overflow_test> 0xFFFF) { DIV0_Handler(); }
                   }
                   break;                  
     }
