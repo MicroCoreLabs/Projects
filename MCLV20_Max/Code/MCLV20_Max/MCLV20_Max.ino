@@ -2746,54 +2746,76 @@ void opcode_0xF7()  {
     return;
 }
 
-
 // ------------------------------------------------------
 // 0x27 - DAA - Decimal Adjust for Addition
 // ------------------------------------------------------
 void opcode_0x27()  {
-    uint16_t local_temp = (register_ax&0x00FF);
+    uint8_t old_af=0;
+    uint8_t old_cf=0;
+    uint8_t old_al=0;
+    uint8_t al_check=0;
+
+     if (flag_a != 0) old_af=1;
+     if (flag_c != 0) old_cf=1;
+     old_al = (register_ax&0x00FF);
+
+     register_flags=(register_flags&0xFFFE); // Clear C Flag
+
+     if ((old_af) == 0x00) al_check=0x99; else al_check=0x9F;
 
 
     if ( ((register_ax&0x000F) > 0x9) || (flag_a==1) )  { temp16 = (register_ax&0x00FF) + 0x6;
-                                                       Write_Register(REG_AL, temp16);
-                                                       register_flags=(register_flags|0x0010); // Set A Flag
-                                                       if ( (flag_c==1) || (temp16&0x100) )    register_flags=(register_flags|0x0001);  // Set C Flag
+                                                          Write_Register(REG_AL, temp16);
+                                                          register_flags=(register_flags|0x0010); // Set A Flag
+                                                       }
+                                                   
+                                                    else {
+                                                       register_flags=(register_flags&0xFFEF); // Clear A Flag
                                                      }
 
-    if ( ((local_temp&0x00FF) > 0x9F) || (flag_c==1) ) 
-                                                       { temp16=(register_ax&0x00FF)+0x60;
-                                                           Write_Register(REG_AL, temp16);
+    if ( (old_al > al_check) || (old_cf==1) )        {  temp16=(register_ax&0x00FF)+0x60;
+                                                        Write_Register(REG_AL, temp16);
                                                         register_flags=(register_flags|0x0001); // Set C Flag
                                                      }
     Set_Flags_Byte_SZP(register_ax);
     return;
 }
-
 
 
 // ------------------------------------------------------
 // 0x2F - DAS - Decimal Adjust for Subtraction
 // ------------------------------------------------------
 void opcode_0x2F()  {
-    uint16_t local_al;
-    uint16_t local_al1;
+    uint8_t old_af=0;
+    uint8_t old_cf=0;
+    uint8_t old_al=0;
+    uint8_t al_check=0;
 
-    local_al = register_ax&0x00FF;
-    local_al1 = register_ax&0x00FF;
+     if (flag_a != 0) old_af=1;
+     if (flag_c != 0) old_cf=1;
+     old_al = (register_ax&0x00FF);
 
-    if ( ((local_al&0x000F) > 0x9) || (flag_a==1) )  { local_al=local_al-0x6;
-                                                        //if ((flag_c==1) || (flag_a==1))    register_flags=(register_flags|0x0001); // Set C Flag
-                                                        register_flags=(register_flags|0x0010); // Set A Flag
+     register_flags=(register_flags&0xFFFE); // Clear C Flag
+
+     if ((old_af) == 0x00) al_check=0x99; else al_check=0x9F;
+
+
+    if ( ((register_ax&0x000F) > 0x9) || (flag_a==1) )  { temp16 = (register_ax&0x00FF) - 0x6;
+                                                          Write_Register(REG_AL, temp16);
+                                                          register_flags=(register_flags|0x0010); // Set A Flag
+                                                       }
+                                                   
+                                                    else {
+                                                       register_flags=(register_flags&0xFFEF); // Clear A Flag
                                                      }
 
-    if ( ((local_al1&0x00FF) > 0x9F) || (flag_c==1) )  { local_al=local_al-0x60;
+    if ( (old_al > al_check) || (old_cf==1) )        {  temp16=(register_ax&0x00FF)-0x60;
+                                                        Write_Register(REG_AL, temp16);
                                                         register_flags=(register_flags|0x0001); // Set C Flag
                                                      }
-    Write_Register(REG_AL, local_al);
     Set_Flags_Byte_SZP(register_ax);
     return;
 }
-
    
 // ------------------------------------------------------
 // 0x37 - AAA - ASCII Adjust for Addition
