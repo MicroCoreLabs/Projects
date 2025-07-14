@@ -21,6 +21,9 @@
 // Revision 2 7/9/2025
 // Fixed a number of bugs found when running core against the MartyPC 8086 test suite.
 //
+// Revision 3 7/9/2025
+// Added BootROM to allow booting from the MicroSD
+//
 //
 //------------------------------------------------------------------------
 //
@@ -48,6 +51,9 @@
                                                   
 
 #include <stdint.h>
+#include <stdio.h>
+
+#include "bootrom.h"
 
 
 // Teensy 4.1 pin assignments
@@ -182,7 +188,7 @@
 #define PSRAM_RESET_VALUE  0x01000000
 #define PSRAM_CLK_HIGH     0x02000000
 
-#define SD_LPT_BASE        0x378     
+#define SD_LPT_BASE        0x280    
 
 // --------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------
@@ -259,6 +265,11 @@ DMAMEM  uint8_t  internal_RAM1[0x60000];
         uint8_t  internal_RAM2[0x40000];
 uint8_t   local_array_data = 0;
 uint8_t   acceleration_mode = 0;
+
+uint8_t   sd_scratch_register[6] = {0, 0, 0, 0, 0, 0};
+uint16_t  sd_requested_timeout = 0;
+elapsedMillis sd_timeout;
+#define SD_CONFIG_BYTE     0
 
 
 // Pre-calculated 8-bit parity array
@@ -386,7 +397,7 @@ void setup() {
   digitalWriteFast(PIN_SD_CLK,0);
   digitalWriteFast(PIN_SD_CS_n,1);
 
-  //Serial.begin(9600);
+  Serial.begin(9600);
 
 }
 
@@ -644,46 +655,72 @@ inline uint8_t BIU_Bus_Cycle(uint8_t biu_operation, uint32_t local_address , uin
     uint32_t local_address_low=0;
     uint32_t new_sbits=0;
     uint32_t local_read_data;
+    uint8_t biu_operation_type;
+    uint32_t local_address16;
     
+    
+    biu_operation_type = biu_operation&0xF;   // Strips off byte/word nibble
+    local_address16 = local_address&0xFFFF;
+
 
     if (acceleration_mode==3) {
     
-           if (( (biu_operation&0xF)==0x4) && (local_address<0xA0000) ) {wait_for_CLK_falling_edge();  return (Internal_RAM_Read(local_address)); }                     // Internal Code RAM Reads
-      else if (( (biu_operation&0xF)==0x5) && (local_address<0xA0000) ) { wait_for_CLK_falling_edge();  return (Internal_RAM_Read(local_address)); }                    // Internal Memory RAM Reads
-      else if (( (biu_operation&0xF)==0x6) && (local_address<0xA0000) ) { Internal_RAM_Write(local_address,local_data);  wait_for_CLK_falling_edge(); return 0xEE;  }   // Internal RAM Writes
+           if (( biu_operation_type==0x4) && (local_address<0xA0000) ) { wait_for_CLK_falling_edge();  return (Internal_RAM_Read(local_address)); }                    // Internal Code RAM Reads
+      else if (( biu_operation_type==0x5) && (local_address<0xA0000) ) { wait_for_CLK_falling_edge();  return (Internal_RAM_Read(local_address)); }                    // Internal Memory RAM Reads
+      else if (( biu_operation_type==0x6) && (local_address<0xA0000) ) { Internal_RAM_Write(local_address,local_data);  wait_for_CLK_falling_edge(); return 0xEE;  }   // Internal RAM Writes
      
 
       // Internal BIOS ROM Selector
       // ----------------------------
       //
-      //if ( ((biu_operation&0xF)>=0x4) && (local_address >= 0xF0000) ) return (Test_Image[local_address-0xF0000]);     // 64KB ROMs
-      //if ( ((biu_operation&0xF)>=0x4) && (local_address >= 0xF8000) ) return (Test_Image[local_address-0xF8000]);     // 32KB ROMs
-      //if ( ((biu_operation&0xF)>=0x4) && (local_address >= 0xFC000) ) return (Test_Image[local_address-0xFC000]);     // 16KB ROMs
-        if ( ((biu_operation&0xF)>=0x4) && (local_address >= 0xFE000) ) return (Test_Image[local_address-0xFE000]);     // 8K ROMs 
-    
+      //if ( (biu_operation_type>=0x4) && (local_address >= 0xF0000) ) return (Test_Image[local_address-0xF0000]);     // 64KB ROMs
+      //if ( (biu_operation_type>=0x4) && (local_address >= 0xF8000) ) return (Test_Image[local_address-0xF8000]);     // 32KB ROMs
+      //if ( (biu_operation_type>=0x4) && (local_address >= 0xFC000) ) return (Test_Image[local_address-0xFC000]);     // 16KB ROMs
+        if ( (biu_operation_type>=0x4) && (local_address >= 0xFE000) ) return (Test_Image[local_address-0xFE000]);     // 8K ROMs 
 
     }
 
-    // Support for on-chip I/O and memory emulations    
-    //
-    if ( (biu_operation==IO_READ_BYTE)  && ((local_address&0xFFFF)==SD_LPT_BASE)   ) { sd_spi_dataout = 0xff;               SD_SPI_Cycle();       return sd_spi_datain;  }
-    if ( (biu_operation==IO_WRITE_BYTE) && ((local_address&0xFFFF)==SD_LPT_BASE)   ) { sd_spi_dataout = (local_data&0xFF);  SD_SPI_Cycle();       return 0xEE;           }
-    if ( (biu_operation==IO_WRITE_BYTE) && ((local_address&0xFFFF)==SD_LPT_BASE+1) ) { digitalWriteFast(PIN_SD_CS_n,(local_data&0x1));            return 0xEE;           }
-        
-    if ( (biu_operation==IO_WRITE_BYTE) && ((local_address&0xFFFF)==0x260) ) { reg_0x260 = local_data;  return 0xEE; }
-    if ( (biu_operation==IO_WRITE_BYTE) && ((local_address&0xFFFF)==0x261) ) { reg_0x261 = local_data;  return 0xEE; }
-    if ( (biu_operation==IO_WRITE_BYTE) && ((local_address&0xFFFF)==0x262) ) { reg_0x262 = local_data;  return 0xEE; }
-    if ( (biu_operation==IO_WRITE_BYTE) && ((local_address&0xFFFF)==0x263) ) { reg_0x263 = local_data;  return 0xEE; }
 
-    if ( (biu_operation==IO_READ_BYTE)  && ((local_address&0xFFFF)==0x260) ) {  return reg_0x260;  }
-    if ( (biu_operation==IO_READ_BYTE)  && ((local_address&0xFFFF)==0x261) ) {  return reg_0x261;  }
-    if ( (biu_operation==IO_READ_BYTE)  && ((local_address&0xFFFF)==0x262) ) {  return reg_0x262;  }
-    if ( (biu_operation==IO_READ_BYTE)  && ((local_address&0xFFFF)==0x263) ) {  return reg_0x263;  }
+    // Support for EMS and MicroSD    
+    //
+    // IO Reads
+    if (biu_operation_type==0x1) {
+        if (local_address16==SD_LPT_BASE+0) { sd_spi_dataout = 0xff;      SD_SPI_Cycle();       return sd_spi_datain;  }
+        if (local_address16==SD_LPT_BASE+1) { return SD_CONFIG_BYTE;                      }
+        if (local_address16==SD_LPT_BASE+2) { return sd_scratch_register[0];              }
+        if (local_address16==SD_LPT_BASE+3) { return sd_scratch_register[1];              }
+        if (local_address16==SD_LPT_BASE+4) { return sd_scratch_register[2];              }
+        if (local_address16==SD_LPT_BASE+5) { return sd_scratch_register[3];              }
+        if (local_address16==SD_LPT_BASE+6) { return sd_scratch_register[4];              }
+        if (local_address16==SD_LPT_BASE+7) { return sd_timeout >= sd_requested_timeout;  }
+        
+        if (local_address16==0x260) {  return reg_0x260;  }
+        if (local_address16==0x261) {  return reg_0x261;  }
+        if (local_address16==0x262) {  return reg_0x262;  }
+        if (local_address16==0x263) {  return reg_0x263;  }
+
+    }
+                                    
+
+    // IO Writes
+    if (biu_operation_type==0x2) {
+        if (local_address16==SD_LPT_BASE+0) { sd_spi_dataout = (local_data&0xFF);  SD_SPI_Cycle();       return 0xEE;           }
+        if (local_address16==SD_LPT_BASE+1) { digitalWriteFast(PIN_SD_CS_n,(local_data&0x1));            return 0xEE;           }
+        if (local_address16==SD_LPT_BASE+2) { sd_scratch_register[0] = local_data;                       return 0xEE;           }
+        if (local_address16==SD_LPT_BASE+3) { sd_scratch_register[1] = local_data;                       return 0xEE;           }
+        if (local_address16==SD_LPT_BASE+4) { sd_scratch_register[2] = local_data;                       return 0xEE;           }
+        if (local_address16==SD_LPT_BASE+5) { sd_scratch_register[3] = local_data;                       return 0xEE;           }
+        if (local_address16==SD_LPT_BASE+6) { sd_scratch_register[4] = local_data;                       return 0xEE;           }
+        if (local_address16==SD_LPT_BASE+7) { sd_timeout = 0; sd_requested_timeout = local_data * 10;    return 0xEE;           }
+        
+        if (local_address16==0x260) { reg_0x260 = local_data;  return 0xEE; }
+        if (local_address16==0x261) { reg_0x261 = local_data;  return 0xEE; }
+        if (local_address16==0x262) { reg_0x262 = local_data;  return 0xEE; }
+        if (local_address16==0x263) { reg_0x263 = local_data;  return 0xEE; }
+        
+        // Set the acceleration mode
+        if ( (local_address16==0x267) && ( (local_data&0xF0)==0x90) ) {  acceleration_mode = (0x0F&local_data);   return 0xEE;   }
     
-    // Set the acceleration mode
-    if ( (biu_operation==IO_WRITE_BYTE) && ((local_address&0xFFFF)==0x267) && ((local_data&0xF0)==0x90) ) { 
-      acceleration_mode = (0x0F&local_data);  
-      return 0xEE; 
     }
 
 
@@ -777,6 +814,10 @@ inline uint8_t BIU_Bus_Cycle(uint8_t biu_operation, uint32_t local_address , uin
     interrupts();                       // Re-enable Teensy's interrupts so the UART and downloading works
 
     if (read_cycle==0) {
+        
+        if ( (local_address >= (BOOTROM_ADDR+0x800) ) && (local_address < (BOOTROM_ADDR+0x1000) )) {
+            sd_spi_dataout = (local_data&0xFF);  SD_SPI_Cycle();
+        }
         return 0xEE; 
     }
     else
@@ -790,7 +831,9 @@ inline uint8_t BIU_Bus_Cycle(uint8_t biu_operation, uint32_t local_address , uin
    //if ( ((biu_operation&0xF)>=0x4) && (local_address >= 0xF0000) ) return (Test_Image[local_address-0xF0000]);   else return local_read_data;    // 64KB ROMs
    //if ( ((biu_operation&0xF)>=0x4) && (local_address >= 0xF8000) ) return (Test_Image[local_address-0xF8000]);   else return local_read_data;    // 32KB ROMs
    //if ( ((biu_operation&0xF)>=0x4) && (local_address >= 0xFC000) ) return (Test_Image[local_address-0xFC000]);   else return local_read_data;    // 16KB ROMs
-   if ( ((biu_operation&0xF)>=0x4) && (local_address >= 0xFE000) ) return (Test_Image[local_address-0xFE000]);   else return local_read_data;     // 8K ROMs  
+   if ( ((biu_operation&0xF)>=0x4) && (local_address >= 0xFE000) ) return (Test_Image[local_address-0xFE000]);      // 8K ROMs  
+   if ( ((biu_operation&0xF)>=0x4) && (local_address >= BOOTROM_ADDR) && (local_address < (BOOTROM_ADDR+0x800)) ) return (BOOTROM[local_address-BOOTROM_ADDR]);   
+   if ( ((biu_operation&0xF)>=0x4) && (local_address >= (BOOTROM_ADDR+0x800)) && (local_address < ((BOOTROM_ADDR+0x1000))) ) { sd_spi_dataout = 0xff;      SD_SPI_Cycle();       return sd_spi_datain;   }
 
   return  local_read_data;
     
@@ -2413,7 +2456,6 @@ void opcode_0xAA() {
    
     do {
         if ( (prefix_repz==1) || (prefix_repnz==1) || (prefix_repc==1) || (prefix_repnc==1) )  {
-            printf("prefix_repnz: %x   register_cx: %x \n,",prefix_repnz,register_cx);
           if (register_cx==0)                                         return;                     // Exit from loop if repeat prefix and CX=0
                                 if (interrupt_pending==1) { register_ip = register_ip - (prefix_count+1);  return; }                   // Exit from loop to service interrupt - adjusting IP to address of prefix
                                 register_cx--;
@@ -2638,15 +2680,11 @@ void opcode_0xF6()  {
                   break;
          case 0x6: if (ea_is_a_register==1) clock_counter=clock_counter+85;  else  clock_counter=clock_counter+91;            // # 0xF6 REG[6] - DIV  REG8/MEM8
                   local_divr=Fetch_EA();
-                  printf("\nDIVISOR %x \n",local_divr);
                   if (local_divr==0) DIV0_Handler();
                   else  {
                       local_quo = register_ax / local_divr;
                       local_rem = register_ax % local_divr;
                       if (local_quo> 0xFF) { DIV0_Handler(); }
-                      printf("register_ax %x \n",register_ax);
-                      printf("local_quo %x \n",local_quo);
-                   printf("local_rem %x \n",local_rem);
 
                       register_ax = local_rem << 8;
                       Write_Register(REG_AL , local_quo);
@@ -2654,16 +2692,13 @@ void opcode_0xF6()  {
                   break;
         case 0x7: if (ea_is_a_register==1) clock_counter=clock_counter+107;  else  clock_counter=clock_counter+114;            // # 0xF6 REG[7] - IDIV  REG8/MEM8
                   signed_local_divr=(int8_t)Fetch_EA();
-                  printf("signed_local_divr %x \n",signed_local_divr);
                   if (signed_local_divr==0) DIV0_Handler();
                   else  {
                       signed_local_quo = (int16_t)register_ax / signed_local_divr;
                       signed_local_rem = (int16_t)register_ax % signed_local_divr;
                   if ( (signed_local_divr>0) && (signed_local_divr>0x7F) )      {DIV0_Handler(); }
                   if ( (signed_local_divr<0) && (signed_local_divr<(0x7F-1) ))  {DIV0_Handler(); }                      
-                      printf("register_ax %x \n",register_ax);
-                      printf("local_quo %x \n",signed_local_quo);
-                   printf("local_rem %x \n",signed_local_rem);
+
                       register_ax = signed_local_rem << 8;
                       Write_Register(REG_AL , signed_local_quo);
                   }
@@ -2689,7 +2724,7 @@ void opcode_0xF7()  {
     uint64_t local_overflow_test;
 
 
-    Calculate_EA();    printf("REG_field: %x  ",REG_field);
+    Calculate_EA();  
 
     switch (REG_field)  {
         case 0x0: clock_counter=clock_counter+11;  Boolean_AND(Fetch_EA(),pfq_fetch_word());         break;  // # 0xF7 REG[0] - TEST REG16/MEM16 , IMM16
@@ -3238,7 +3273,6 @@ void opcode_0x6C() {
    
     if (prefix_repz==0)  clock_counter=clock_counter+0;  else clock_counter=clock_counter+9;                            // Add initial clock counts
     do {
-   printf("prefix_repc: %x  prefix_repnc: %x  flag_z: %x  flag_c: %x  register_cx: %x  \n",prefix_repc,prefix_repnc,flag_z,flag_c,register_cx);
       if ( (prefix_repz==1) || (prefix_repnz==1) || (prefix_repc==1)  || (prefix_repnc==1)  )  {
           if (register_cx==0)                                         return;                     // Exit from loop if repeat prefix and CX=0
           if (interrupt_pending==1) { register_ip = register_ip - (prefix_count+1); return; }     // Exit from loop to service interrupt - adjusting IP to address of prefix
@@ -3368,8 +3402,6 @@ void opcode_0xC0()  {
 
     Calculate_EA();
     local_byte = pfq_fetch_byte();
-
-    printf("REG_FIELD  %x", REG_field);
  
     if (ea_is_a_register==1) clock_counter=clock_counter-2;  else  clock_counter=clock_counter+13;
     switch (REG_field)  {
@@ -3393,8 +3425,6 @@ void opcode_0xC1()  {
 
     Calculate_EA();
     local_byte = pfq_fetch_byte();
-
-    printf("REG_FIELD  %x", REG_field);
 
     if (ea_is_a_register==1) clock_counter=clock_counter-2;  else  clock_counter=clock_counter+21;
     switch (REG_field)  {
@@ -3550,7 +3580,6 @@ void opcode_0x0F()  {
                           register_flags = (register_flags & 0xFFFE);                                                    // Zero out Flags: C
                         if (local_carry == 0x1)  register_flags=(register_flags | 0x0001);                   // Set C Flag
                         if (local_sum   != 0x0)  register_flags = (register_flags & 0xFFBF);                    // Zero out Flags: Z
-                        printf("local_sum %x  \n",local_sum);
                         Biu_Operation(MEM_WRITE_BYTE , SEGMENT_OVERRIDABLE_FALSE , SEGMENT_ES , temp_di , local_sum );
                           temp_si++;
                           temp_di++;
@@ -3960,6 +3989,8 @@ return;
 
 
   while(1) {
+
+
     
       if (direct_reset_raw!=0) reset_sequence();
       
