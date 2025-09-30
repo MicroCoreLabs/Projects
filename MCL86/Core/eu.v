@@ -22,6 +22,9 @@
 // Revision 2.0 11/6/22 
 // Changed overflow flag calculation into rtl instead of microcode
 //
+// Revision 3.0 9/29/2025 
+// For DIV overflow AX and DX are restored to initial values
+//
 //
 //------------------------------------------------------------------------
 //
@@ -126,9 +129,11 @@ wire eu_jump_boolean;
 reg  [12:0] eu_rom_address;
 reg  [51:0] eu_calling_address;
 reg  [15:0] eu_register_ax;
+reg  [15:0] initial_ax;
 reg  [15:0] eu_register_bx;
 reg  [15:0] eu_register_cx;
 reg  [15:0] eu_register_dx;
+reg  [15:0] initial_dx;
 reg  [15:0] eu_register_sp;
 reg  [15:0] eu_register_bp;
 reg  [15:0] eu_register_si;
@@ -175,7 +180,7 @@ wire [15:0] sbb_total;
 //
 //------------------------------------------------------------------------                                    
 
-eu_rom      EU_4Kx32 (
+EU4Kx32      EU_4Kx32_i (
   
   .clka     (CORE_CLK_INT),
   .addra    (eu_rom_address[11:0]),
@@ -249,12 +254,15 @@ assign  eu_operand1 = (eu_opcode_op1_sel==4'h0) ? BIU_REGISTER_ES     :
 
 
 // JUMP condition codes
-assign eu_jump_boolean = (eu_opcode_jump_cond==4'h0)                               ? 1'b1 : // unconditional jump
+assign eu_jump_boolean = ( (eu_rom_address == 'h0E76) && (eu_register_ax[15:7]!='h0)) ? 1'b1 :
+                         ( (eu_rom_address == 'h0F02) && ( (eu_register_dx!='h0) || (eu_register_ax[15]!='h0) )) ? 1'b1 :
+                         (eu_opcode_jump_cond==4'h0)                               ? 1'b1 : // unconditional jump
                          (eu_opcode_jump_cond==4'h1 && eu_alu_last_result!=16'h0)  ? 1'b1 : 
                          (eu_opcode_jump_cond==4'h2 && eu_alu_last_result==16'h0)  ? 1'b1 : 
                                                                                      1'b0 ;
 
-
+	  
+	  
                                                   
 // Consolidated system signals
 assign system_signals[13]   = eu_add_carry8;      
@@ -567,8 +575,14 @@ else
   
   
     // Debounce the overflow flag override when microcode returns to the main loop
+	// Store initial values of AX and DX
 	//
-    if (eu_rom_address == 16'h0011) eu_overflow_override <= 1'b0;
+	if (eu_rom_address == 'h0011)
+	  begin
+	    eu_overflow_override <= 1'b0;
+	    initial_ax <= eu_register_ax;
+	    initial_dx <= eu_register_dx;
+	  end
   
   
            
@@ -607,7 +621,15 @@ else
           default :  ;
         endcase
     end
-
+	
+	// Restore initial values of AX and DX upon entering overflow DIV0 microcode
+	//
+	if (eu_rom_address == 'h0F11)
+	  begin
+	    eu_register_ax <= initial_ax;
+	    eu_register_dx <= initial_dx;
+	  end
+  
 
     // JUMP Opcode
     if (eu_stall_pipeline==1'b0 && eu_opcode_type==3'h1 && eu_jump_boolean==1'b1)
