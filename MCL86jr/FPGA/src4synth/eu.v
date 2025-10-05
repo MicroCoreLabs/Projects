@@ -108,6 +108,7 @@ reg  intr_enable_delayed;
 reg  eu_overflow_override;
 reg  eu_add_overflow8_fixed;
 reg  eu_add_overflow16_fixed;
+reg  idiv_opcode;
 wire eu_prefix_rep;
 wire eu_prefix_repnz;
 wire eu_tf_debounce;
@@ -254,8 +255,8 @@ assign  eu_operand1 = (eu_opcode_op1_sel==4'h0) ? BIU_REGISTER_ES     :
 
 
 // JUMP condition codes
-assign eu_jump_boolean = ( (eu_rom_address == 'h0E76) && (eu_register_ax[15:7]!='h0)) ? 1'b1 :
-                         ( (eu_rom_address == 'h0F02) && ( (eu_register_dx!='h0) || (eu_register_ax[15]!='h0) )) ? 1'b1 :
+assign eu_jump_boolean = ( (idiv_opcode=='h1) && (eu_rom_address == 'h0E76) && (eu_register_ax[15:7]!='h0)) ? 1'b1 :
+                         ( (idiv_opcode=='h1) && (eu_rom_address == 'h0F02) && ( (eu_register_dx!='h0) || (eu_register_ax[15]!='h0) )) ? 1'b1 :
                          (eu_opcode_jump_cond==4'h0)                               ? 1'b1 : // unconditional jump
                          (eu_opcode_jump_cond==4'h1 && eu_alu_last_result!=16'h0)  ? 1'b1 : 
                          (eu_opcode_jump_cond==4'h2 && eu_alu_last_result==16'h0)  ? 1'b1 : 
@@ -396,6 +397,7 @@ begin : EU_MICROSEQUENCER
       eu_rom_address <= 13'h0020;
       eu_calling_address <= 'h0;
       intr_enable_delayed <= 1'b0;
+	  idiv_opcode <= 'h0;
     end
     
 else    
@@ -582,9 +584,14 @@ else
 	    eu_overflow_override <= 1'b0;
 	    initial_ax <= eu_register_ax;
 	    initial_dx <= eu_register_dx;
+		idiv_opcode <= 'h0;
 	  end
   
-  
+  	if ( (eu_rom_address=='h0E54) || (eu_rom_address=='h0ED0) )
+	  begin
+	    idiv_opcode <= 'h1;
+	  end
+
            
     // Generate and store flags for addition
     if (eu_stall_pipeline==1'b0 && eu_opcode_type==3'h2)
