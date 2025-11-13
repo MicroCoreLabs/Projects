@@ -2304,7 +2304,7 @@ void opcode_0xF6()  {
                   else  {
                       signed_local_quo = (int16_t)register_ax / signed_local_divr;
                       signed_local_rem = (int16_t)register_ax % signed_local_divr;
-                      if (signed_local_quo> 0xFF) { DIV0_Handler(); }
+                      if ( (signed_local_quo<-128)||(signed_local_quo>127)) { DIV0_Handler(); }
                       register_ax = signed_local_rem << 8;
                       Write_Register(REG_AL , signed_local_quo);
                   }
@@ -2369,12 +2369,12 @@ void opcode_0xF7()  {
                   signed_local_divr=(int16_t)Fetch_EA();
                   if (signed_local_divr==0) DIV0_Handler();
                   else  {
-                      local_overflow_test = signed_local_numr / signed_local_divr; 
+                      local_overflow_test2 = signed_local_numr / signed_local_divr; 
+                      if ( (local_overflow_test2<-32768)||(local_overflow_test2>32767) ) { DIV0_Handler(); }
                       register_ax = signed_local_numr / signed_local_divr;
                       register_dx = signed_local_numr % signed_local_divr;
-                      if (local_overflow_test> 0xFFFF) { DIV0_Handler(); }
                   }
-                  break;                  
+                  break;                   
     }
     return;
 }
