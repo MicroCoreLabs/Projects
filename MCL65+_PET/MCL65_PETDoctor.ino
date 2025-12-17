@@ -649,13 +649,13 @@ void test_7() {
     if (signal_toggle > 100) printf ("YES\n"); else  printf ("NO\n"); 
                 
     printf("6502 RESET level ...........");
-    if (digitalRead(PIN_RESET) == 0) printf ("LOW\n"); else  printf ("HIGH\n");
+    if (digitalRead(PIN_RESET) != 0) printf ("LOW\n"); else  printf ("HIGH\n");
                 
     printf("6502 IRQ_n level............");
-    if (digitalRead(PIN_IRQ) == 0) printf ("LOW\n"); else  printf ("HIGH\n");
+    if (digitalRead(PIN_IRQ) != 0) printf ("LOW\n"); else  printf ("HIGH\n");
                 
     printf("6502 NMI_n level............");
-    if (digitalRead(PIN_NMI) == 0) printf ("LOW\n"); else  printf ("HIGH\n");
+    if (digitalRead(PIN_NMI) != 0) printf ("LOW\n"); else  printf ("HIGH\n");
 
   
     return;
