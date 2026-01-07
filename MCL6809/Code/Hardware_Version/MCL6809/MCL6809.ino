@@ -18,6 +18,9 @@
 // Revision 1 6/18/2024
 // Initial revision
 //
+// Revision 2 1/6/2026
+// Made correction to PULU to pop the flags from the correct stack
+//
 //------------------------------------------------------------------------
 //
 // Copyright (c) 2024 Ted Fried
@@ -879,7 +882,7 @@ void opcode_0x37 ()   {                         // PULU
     
     postbyte = Fetch_Opcode_Byte();
     VMA_Cycle(2,0xFFFF);
-    if ( (postbyte & 0x01) != 0)  UpdateFlags(PopS8());
+    if ( (postbyte & 0x01) != 0)  UpdateFlags(PopU8());
     if ( (postbyte & 0x02) != 0)  register_A   = PopU8();
     if ( (postbyte & 0x04) != 0)  register_B   = PopU8();
     if ( (postbyte & 0x08) != 0)  register_DP  = PopU8();
