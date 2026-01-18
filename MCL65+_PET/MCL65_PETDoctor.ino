@@ -540,10 +540,16 @@ void test_3() {
     uint32_t addr=0;
     
     printf("Dumping the ROMs..........\n\n");
-    printf("0xB000: \n");   for (addr=0xB000; addr<=0xBFFF; addr++)  { printf("0x%x,",read_byte(addr)); } printf("\n\n");
-    printf("0xC000: \n");   for (addr=0xc000; addr<=0xCFFF; addr++)  { printf("0x%x,",read_byte(addr)); } printf("\n\n");
-    printf("0xD000: \n");   for (addr=0xd000; addr<=0xDFFF; addr++)  { printf("0x%x,",read_byte(addr)); } printf("\n\n");
-    printf("0xF000: \n");   for (addr=0xf000; addr<=0xEFFF; addr++)  { printf("0x%x,",read_byte(addr)); } printf("\n\n");
+	
+    printf("0xC800: \n");   for (addr=0xC800; addr<=0xCFFF; addr++)  { printf("0x%x,",read_byte(addr)); } printf("\n\n");
+	
+    printf("0xD000: \n");   for (addr=0xD000; addr<=0xD7FF; addr++)  { printf("0x%x,",read_byte(addr)); } printf("\n\n");
+    printf("0xD800: \n");   for (addr=0xD800; addr<=0xDFFF; addr++)  { printf("0x%x,",read_byte(addr)); } printf("\n\n");
+	
+    printf("0xE000: \n");   for (addr=0xE000; addr<=0xE7FF; addr++)  { printf("0x%x,",read_byte(addr)); } printf("\n\n");
+	
+    printf("0xF000: \n");   for (addr=0xf000; addr<=0xF7FF; addr++)  { printf("0x%x,",read_byte(addr)); } printf("\n\n");
+    printf("0xF800: \n");   for (addr=0xf800; addr<=0xFFFF; addr++)  { printf("0x%x,",read_byte(addr)); } printf("\n\n");
     
     return;
 }
