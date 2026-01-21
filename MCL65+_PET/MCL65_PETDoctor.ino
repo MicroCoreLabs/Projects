@@ -176,6 +176,7 @@ void setup() {
   pinMode(PIN_DATAOUT7,    OUTPUT);
   pinMode(PIN_DATAOUT_OE_n,  OUTPUT); 
   digitalWriteFast(PIN_RDWR_n,  0x1);
+  digitalWriteFast(PIN_DATAOUT_OE_n,  0x1);
 
   Serial.begin(9600);
 }
