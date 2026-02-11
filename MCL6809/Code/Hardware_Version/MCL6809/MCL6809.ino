@@ -21,6 +21,9 @@
 // Revision 2 1/6/2026
 // Made correction to PULU to pop the flags from the correct stack
 //
+// Revision 3 2/11/2026
+// Made correction ANCC and ORCC
+//
 //------------------------------------------------------------------------
 //
 // Copyright (c) 2024 Ted Fried
@@ -1347,7 +1350,7 @@ void opcode_0xD5 ()  {  ea_address=Calculate_EA(DIRECT);    ea_data8=Read_Byte(e
 void opcode_0xE5 ()  {  ea_address=Calculate_EA(INDEXED);   ea_data8=Read_Byte(ea_address);  temp8 = AND_Common(register_B,ea_data8);          return;  }   // BITB Indexed         
 void opcode_0xF5 ()  {  ea_address=Calculate_EA(EXTENDED);  ea_data8=Read_Byte(ea_address);  temp8 = AND_Common(register_B,ea_data8);          return;  }   // BITB Extended  
 
-void opcode_0x1C ()  {                                      ea_data8=Fetch_Opcode_Byte();    UpdateFlags( AND_Common(REGISTER_CC,ea_data8) );  return;  }   // ANDCC Immediate          
+void opcode_0x1C ()  {                                      ea_data8=Fetch_Opcode_Byte();    UpdateFlags( REGISTER_CC & ea_data8 );  return;  }   // ANDCC Immediate          
 
 
 uint8_t OR_Common(uint8_t local_byte1, uint8_t local_byte2)   {
@@ -1366,7 +1369,7 @@ void opcode_0xDA ()  {  ea_address=Calculate_EA(DIRECT);    ea_data8=Read_Byte(e
 void opcode_0xEA ()  {  ea_address=Calculate_EA(INDEXED);   ea_data8=Read_Byte(ea_address);  register_B = OR_Common(register_B,ea_data8);     return;  }   // ORB Indexed         
 void opcode_0xFA ()  {  ea_address=Calculate_EA(EXTENDED);  ea_data8=Read_Byte(ea_address);  register_B = OR_Common(register_B,ea_data8);     return;  }   // ORB Extended  
                                                                                  
-void opcode_0x1A ()  {                                      ea_data8=Fetch_Opcode_Byte();    UpdateFlags( OR_Common(REGISTER_CC,ea_data8) );  return;  }   // ORCC Immediate          
+void opcode_0x1A ()  {                                      ea_data8=Fetch_Opcode_Byte();    UpdateFlags( REGISTER_CC | ea_data8 );  return;  }   // ORCC Immediate          
 
 
 
