@@ -50,6 +50,9 @@
                                                     
 // Need for Command-line Code
 #include <stdio.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
 
 
 
@@ -201,7 +204,274 @@ uint32_t GPIO6_raw_data=0;
 // Internal RAM for acceleration
 uint8_t   internal_RAM[65536];
 
+
 char opcodebuf[24];
+
+
+// Generic address/range notify watch support
+#define MAX_ADDR_WATCHES 8
+#define WATCH_CMD_BUF_SIZE 64
+
+enum WatchFlags : uint8_t {
+  WATCH_READ   = 0x01,
+  WATCH_WRITE  = 0x02,
+  WATCH_FETCH  = 0x04,
+  WATCH_ENABLE = 0x80
+};
+
+typedef struct {
+  uint16_t start;
+  uint16_t end;
+  uint8_t flags;
+} AddrWatch;
+
+AddrWatch addr_watches[MAX_ADDR_WATCHES];
+char watch_cmd_buf[WATCH_CMD_BUF_SIZE];
+uint8_t watch_cmd_pos = 0;
+
+void init_addr_watches() {
+  for (int i = 0; i < MAX_ADDR_WATCHES; i++) {
+    addr_watches[i].start = 0;
+    addr_watches[i].end = 0;
+    addr_watches[i].flags = 0;
+  }
+  watch_cmd_pos = 0;
+  watch_cmd_buf[0] = '\0';
+}
+
+void clear_addr_watches() {
+  init_addr_watches();
+}
+
+bool delete_addr_watch(uint8_t index) {
+  if (index >= MAX_ADDR_WATCHES) return false;
+  addr_watches[index].start = 0;
+  addr_watches[index].end = 0;
+  addr_watches[index].flags = 0;
+  return true;
+}
+
+bool add_addr_watch(uint16_t start, uint16_t end, uint8_t flags) {
+  for (int i = 0; i < MAX_ADDR_WATCHES; i++) {
+    if ((addr_watches[i].flags & WATCH_ENABLE) == 0) {
+      addr_watches[i].start = start;
+      addr_watches[i].end = end;
+      addr_watches[i].flags = flags | WATCH_ENABLE;
+      return true;
+    }
+  }
+  return false;
+}
+
+bool address_matches_watch(uint16_t address, uint8_t access_flag) {
+  for (int i = 0; i < MAX_ADDR_WATCHES; i++) {
+    if ((addr_watches[i].flags & WATCH_ENABLE) == 0) continue;
+    if ((addr_watches[i].flags & access_flag) == 0) continue;
+    if (address >= addr_watches[i].start && address <= addr_watches[i].end) return true;
+  }
+  return false;
+}
+
+void print_hex16_4(uint16_t value) {
+  if (value < 0x1000) Serial.print('0');
+  if (value < 0x0100) Serial.print('0');
+  if (value < 0x0010) Serial.print('0');
+  Serial.print(value, HEX);
+}
+
+void print_hex8_2(uint8_t value) {
+  if (value < 0x10) Serial.print('0');
+  Serial.print(value, HEX);
+}
+
+void list_addr_watches() {
+  Serial.println("Address watches:");
+  for (int i = 0; i < MAX_ADDR_WATCHES; i++) {
+    if ((addr_watches[i].flags & WATCH_ENABLE) == 0) continue;
+    Serial.print("  ");
+    Serial.print(i);
+    Serial.print(": ");
+    print_hex16_4(addr_watches[i].start);
+    Serial.print("-");
+    print_hex16_4(addr_watches[i].end);
+    Serial.print(" ");
+    if (addr_watches[i].flags & WATCH_READ)  Serial.print("R");
+    if (addr_watches[i].flags & WATCH_WRITE) Serial.print("W");
+    if (addr_watches[i].flags & WATCH_FETCH) Serial.print("X");
+    Serial.println();
+  }
+}
+
+void notify_address_access(const char* kind, uint16_t pc, uint16_t addr, uint8_t data) {
+  Serial.print("[NOTIFY] ");
+  Serial.print(kind);
+  Serial.print(" PC=");
+  print_hex16_4(pc);
+  Serial.print(" ADDR=");
+  print_hex16_4(addr);
+  Serial.print(" DATA=");
+  print_hex8_2(data);
+  Serial.println();
+}
+
+bool parse_hex16(const char* s, uint16_t &value) {
+  if (s == nullptr || *s == '\0') return false;
+  char* endptr;
+  unsigned long v = strtoul(s, &endptr, 16);
+  if (*endptr != '\0' || v > 0xFFFFUL) return false;
+  value = (uint16_t)v;
+  return true;
+}
+
+uint8_t parse_watch_flags(const char* s) {
+  uint8_t flags = 0;
+  while (*s) {
+    if (*s == 'R') flags |= WATCH_READ;
+    else if (*s == 'W') flags |= WATCH_WRITE;
+    else if (*s == 'X') flags |= WATCH_FETCH;
+    s++;
+  }
+  return flags;
+}
+
+bool parse_address_or_range(const char* token, uint16_t &start, uint16_t &end) {
+  const char* dash = strchr(token, '-');
+  if (!dash) {
+    if (!parse_hex16(token, start)) return false;
+    end = start;
+    return true;
+  }
+
+  char left[10];
+  char right[10];
+  size_t left_len = (size_t)(dash - token);
+  if (left_len >= sizeof(left)) return false;
+
+  strncpy(left, token, left_len);
+  left[left_len] = '\0';
+  strncpy(right, dash + 1, sizeof(right) - 1);
+  right[sizeof(right) - 1] = '\0';
+
+  if (!parse_hex16(left, start)) return false;
+  if (!parse_hex16(right, end)) return false;
+  if (end < start) return false;
+  return true;
+}
+
+bool handle_watch_command(char* line) {
+  if (line == nullptr || *line == '\0') return false;
+  while (*line == ' ') line++;
+  if (*line == '\0') return false;
+
+  if (strcmp(line, "WL") == 0) {
+    list_addr_watches();
+    return true;
+  }
+
+  if (strcmp(line, "WC") == 0) {
+    clear_addr_watches();
+    Serial.println("All watches cleared.");
+    return true;
+  }
+
+  if (line[0] == 'W' && line[1] == 'D') {
+    int idx = atoi(&line[2]);
+    if (delete_addr_watch((uint8_t)idx)) {
+      Serial.print("Deleted watch slot ");
+      Serial.println(idx);
+    } else {
+      Serial.println("Invalid watch slot.");
+    }
+    return true;
+  }
+
+  char cmd = line[0];
+  if (cmd != 'N' && cmd != 'O') return false;
+
+  char* rest = line + 1;
+  while (*rest == ' ') rest++;
+
+  char* token1 = strtok(rest, " ");
+  char* token2 = strtok(nullptr, " ");
+
+  if (!token1 || !token2) {
+    Serial.println("Syntax: NA080 RW   or   OA000-AFFF RW");
+    return true;
+  }
+
+  uint16_t start, end;
+  if (!parse_address_or_range(token1, start, end)) {
+    Serial.println("Invalid address or range.");
+    return true;
+  }
+
+  uint8_t flags = parse_watch_flags(token2);
+  if (flags == 0) {
+    Serial.println("Invalid mode. Use R, W, RW, X, or combinations.");
+    return true;
+  }
+
+  if (add_addr_watch(start, end, flags)) {
+    Serial.print("Watch added: ");
+    print_hex16_4(start);
+    Serial.print("-");
+    print_hex16_4(end);
+    Serial.print(" ");
+    Serial.println(token2);
+  } else {
+    Serial.println("No free watch slots.");
+  }
+  return true;
+}
+
+void notify_watch_fetch(uint16_t pc, uint8_t opcode_byte) {
+  if (address_matches_watch(pc, WATCH_FETCH)) notify_address_access("FETCH", pc, pc, opcode_byte);
+}
+
+void notify_watch_mem_read(uint16_t pc, uint16_t addr, uint8_t data) {
+  if (address_matches_watch(addr, WATCH_READ)) notify_address_access("READ ", pc, addr, data);
+}
+
+void notify_watch_mem_write(uint16_t pc, uint16_t addr, uint8_t data) {
+  if (address_matches_watch(addr, WATCH_WRITE)) notify_address_access("WRITE", pc, addr, data);
+}
+
+bool process_runtime_command(const char* line_in) {
+  if (line_in == nullptr) return false;
+  char local_line[WATCH_CMD_BUF_SIZE];
+  strncpy(local_line, line_in, sizeof(local_line) - 1);
+  local_line[sizeof(local_line) - 1] = '\0';
+
+  for (size_t i = 0; local_line[i] != '\0'; i++) {
+    local_line[i] = (char)toupper((unsigned char)local_line[i]);
+  }
+
+  if (handle_watch_command(local_line)) return true;
+
+  if (strcmp(local_line, "0") == 0) { mode=0; Serial.println("M0"); return true; }
+  if (strcmp(local_line, "1") == 0) { mode=1; Serial.println("M1"); return true; }
+  if (strcmp(local_line, "2") == 0) { mode=2; Serial.println("M2"); return true; }
+  if (strcmp(local_line, "3") == 0) { mode=3; Serial.println("M3"); return true; }
+  if (strcmp(local_line, "D") == 0) { print_cpu_statuses(); return true; }
+
+  return false;
+}
+
+void poll_runtime_serial_commands() {
+  while (Serial.available()) {
+    char c = Serial.read();
+    if (c == '\r' || c == '\n') {
+      if (watch_cmd_pos > 0) {
+        watch_cmd_buf[watch_cmd_pos] = '\0';
+        process_runtime_command(watch_cmd_buf);
+        watch_cmd_pos = 0;
+      }
+    } else if (watch_cmd_pos < (WATCH_CMD_BUF_SIZE - 1)) {
+      watch_cmd_buf[watch_cmd_pos++] = c;
+    }
+  }
+}
+
 
 
 
@@ -333,6 +603,7 @@ void setup() {
   cpu_status_ctr = 0;
 
   Serial.begin(9600);
+  init_addr_watches();
   Serial.println("Setup complete");
 }
   
@@ -428,8 +699,16 @@ inline uint8_t BIU_Bus_Cycle(uint8_t biu_operation, uint16_t local_address , uin
     if ( (biu_operation==OPCODE_READ_M1) || ( biu_operation==INTERRUPT_ACK) )      m1_cycle=0; else m1_cycle=2;  
     
     
-    if (local_mode>1 && ((biu_operation==OPCODE_READ_M1)||(biu_operation==MEM_READ_BYTE)) ) return internal_RAM[local_address];                     // Mode 2, 3 Reads
-    if (local_mode>2 && local_address>=0x4000 && biu_operation==MEM_WRITE_BYTE )  {internal_RAM[local_address] = local_data;  return 0xEE;  }       // Mode 3 Writes
+    if (local_mode>1 && ((biu_operation==OPCODE_READ_M1)||(biu_operation==MEM_READ_BYTE)) ) {
+        read_data = internal_RAM[local_address];
+        if (biu_operation == MEM_READ_BYTE) notify_watch_mem_read(register_pc, local_address, read_data);
+        return read_data;
+    }                     // Mode 2, 3 Reads
+    if (local_mode>2 && local_address>=0x4000 && biu_operation==MEM_WRITE_BYTE )  {
+        internal_RAM[local_address] = local_data;
+        notify_watch_mem_write(register_pc, local_address, local_data);
+        return 0xEE;
+    }       // Mode 3 Writes
         
 
 
@@ -505,6 +784,7 @@ inline uint8_t BIU_Bus_Cycle(uint8_t biu_operation, uint16_t local_address , uin
         interrupts(); 
         
         if (local_mode>0)  read_data = internal_RAM[local_address]; // Mode 1 Reads
+        notify_watch_mem_read(register_pc, local_address, read_data);
         
         return read_data;
     }
@@ -540,6 +820,8 @@ inline uint8_t BIU_Bus_Cycle(uint8_t biu_operation, uint16_t local_address , uin
         
         if ( (local_address>=0x4000) && read_cycle==0)  internal_RAM[local_address] = local_data;               // Mode 1 Writes -- Always write to internal RAM
         if (local_mode>0)                   read_data = internal_RAM[local_address];                            // Mode 1 Reads
+        if (read_cycle) notify_watch_mem_read(register_pc, local_address, read_data);
+        else            notify_watch_mem_write(register_pc, local_address, local_data);
 
         return read_data;
     }
@@ -683,6 +965,8 @@ uint8_t Fetch_opcode()  {
     
     if (assert_iack_type0==1)  local_byte = BIU_Bus_Cycle(INTERRUPT_ACK  , 0x0000      , 0x00 ); 
     else                       local_byte = BIU_Bus_Cycle(OPCODE_READ_M1 , register_pc , 0x00 );
+    
+    notify_watch_fetch(register_pc, local_byte);
     
     assert_iack_type0=0;
     register_pc++;
@@ -3405,6 +3689,7 @@ int isHex(char* stc) {
     return 1;
 }
 
+/* 
 void dumpMemory(const char* stc) {
    char from[5];
    char to[5];
@@ -3454,6 +3739,66 @@ void dumpMemory(const char* stc) {
 
    Serial.printf("\n");
 }
+*/
+
+void dumpMemory(const char* stc) {
+   char from[5];
+   char to[5];
+   uint i_from;
+   uint i_to;
+   uint8_t byt;
+   uint32_t chksum = 0;
+
+   from[0] = 0x00; from[1] = 0x00; from[2] = 0x00; from[3] = 0x00; from[4] = 0x00;
+   to[0]   = 0x00; to[1]   = 0x00; to[2]   = 0x00; to[3]   = 0x00; to[4]   = 0x00;
+
+   for (int i = 1; i < 5; i++)
+       from[i - 1] = *(stc + i);
+
+   for (int i = 6; i < 10; i++)
+       to[i - 6] = *(stc + i);
+
+   if (isHex(from)) {
+       i_from = (uint)strtol(from, 0, 16);
+
+       if (isHex(to))
+           i_to = (uint)strtol(to, 0, 16);
+       else
+           i_to = i_from;
+
+       int wrapper = 0;
+
+       for (uint i = i_from; i <= i_to; i++) {
+           byt = BIU_Bus_Cycle(MEM_READ_BYTE, i, 0x00);
+           chksum += byt;
+
+           if (byt < 0x10)
+               Serial.print("0");
+
+           Serial.print(byt, HEX);
+           Serial.print(" ");
+
+           wrapper++;
+           if (wrapper >= 32) {
+               Serial.print("\n");
+               wrapper = 0;
+           }
+
+           // Prevent possible wraparound if uint is 16-bit and i_to == 0xFFFF
+           if (i == 0xFFFF)
+               break;
+       }
+
+       Serial.print("\nChecksum:\n");
+       Serial.print(chksum, HEX);
+   }
+   else {
+       Serial.print("Malformed command.\n");
+   }
+
+   Serial.printf("\n");
+}
+
 
 void writeByteToMemory(const char* stc) {
    char from[5];
@@ -3606,13 +3951,188 @@ void writeByteToMemoryBlockWithVerify(const char* stc) {
 void showOptions() {
   Serial.printf("  G - Go\n");
   Serial.printf("  H - Help\n");
+  Serial.printf("  Cnnnn-mmmm    - destructive March C- RAM test over address range      \n");
   Serial.printf("  Rnnnn-mmmm    - read memory from nnnn to mmmm and display it          \n");
+  Serial.printf("  Mnnnn-mmmm    - destructive 00-FF write/read verify test over address range\n");
   Serial.printf("  Wnnnn mm      - write mm into memory address nnnn without verification\n");
   Serial.printf("  Vnnnn mm      - write mm into memory address nnnn and verify it       \n");
   Serial.printf("  Ynnnn-mmmm pp - write pp into address range nnnn to mmmm              \n");
-  Serial.printf("  Znnnn-mmmm pp - write pp into address range nnnn to mmmm and verify it\n\n");
+  Serial.printf("  Znnnn-mmmm pp - write pp into address range nnnn to mmmm and verify it\n");
+  Serial.printf("  Nxxxx [R|W|RW|X]      - notify on single address access (example: NA080 W)\n");
+  Serial.printf("  Oxxxx-yyyy [R|W|RW|X] - notify on range access (example: OA000-AFFF RW)\n");
+  Serial.printf("  WL / WC / WDn         - list / clear / delete watch n\n\n");
 }
 
+
+void marchTestMemory(const char* stc) {
+   char from[5];
+   char to[5];
+   uint32_t i_from;
+   uint32_t i_to;
+   uint32_t total_errors = 0;
+   uint32_t total_writes = 0;
+   uint32_t total_reads = 0;
+
+   from[0] = 0x00; from[1] = 0x00; from[2] = 0x00; from[3] = 0x00; from[4] = 0x00;
+   to[0]   = 0x00; to[1]   = 0x00; to[2]   = 0x00; to[3]   = 0x00; to[4]   = 0x00;
+
+   // Expected syntax: Mnnnn-mmmm
+   for (int i = 1; i < 5; i++)
+       from[i - 1] = *(stc + i);
+
+   for (int i = 6; i < 10; i++)
+       to[i - 6] = *(stc + i);
+
+   if (!isHex(from) || !isHex(to)) {
+       Serial.print("Malformed command.\n");
+       return;
+   }
+
+   i_from = (uint32_t)strtol(from, 0, 16);
+   i_to   = (uint32_t)strtol(to,   0, 16);
+
+   if (i_to < i_from) {
+       Serial.print("Malformed range.\n");
+       return;
+   }
+
+   Serial.printf("Starting exhaustive 00-FF RAM test on %04lX-%04lX\n", i_from, i_to);
+   Serial.printf("WARNING: this test is destructive.\n");
+
+   for (uint32_t pattern = 0; pattern <= 0xFF; pattern++) {
+
+       // Write entire range with current pattern
+       for (uint32_t addr = i_from; addr <= i_to; addr++) {
+           BIU_Bus_Cycle(MEM_WRITE_BYTE, (uint16_t)addr, (uint8_t)pattern);
+           total_writes++;
+       }
+
+       // Read back and verify
+       for (uint32_t addr = i_from; addr <= i_to; addr++) {
+           uint8_t observed = BIU_Bus_Cycle(MEM_READ_BYTE, (uint16_t)addr, 0x00);
+           total_reads++;
+
+           if (observed != (uint8_t)pattern) {
+               Serial.printf("FAIL P=%02lX ADDR=%04lX EXP=%02lX GOT=%02X\n",
+                             pattern, addr, pattern, observed);
+               total_errors++;
+           }
+       }
+
+       if ((pattern & 0x0F) == 0x0F) {
+           Serial.printf("Completed pattern %02lX, errors so far: %lu\n", pattern, total_errors);
+       }
+   }
+
+   Serial.printf("RAM test complete.\n");
+   Serial.printf("Range        : %04lX-%04lX\n", i_from, i_to);
+   Serial.printf("Writes       : %lu\n", total_writes);
+   Serial.printf("Reads        : %lu\n", total_reads);
+   Serial.printf("Total errors : %lu\n", total_errors);
+}
+
+void marchCTestMemory(const char* stc) {
+   char from[5];
+   char to[5];
+   uint32_t i_from;
+   uint32_t i_to;
+   uint32_t total_errors = 0;
+   uint32_t total_reads = 0;
+   uint32_t total_writes = 0;
+
+   from[0] = 0x00; from[1] = 0x00; from[2] = 0x00; from[3] = 0x00; from[4] = 0x00;
+   to[0]   = 0x00; to[1]   = 0x00; to[2]   = 0x00; to[3]   = 0x00; to[4]   = 0x00;
+
+   // Expected syntax: Cnnnn-mmmm
+   for (int i = 1; i < 5; i++)
+       from[i - 1] = *(stc + i);
+
+   for (int i = 6; i < 10; i++)
+       to[i - 6] = *(stc + i);
+
+   if (!isHex(from) || !isHex(to)) {
+       Serial.print("Malformed command.\n");
+       return;
+   }
+
+   i_from = (uint32_t)strtol(from, 0, 16);
+   i_to   = (uint32_t)strtol(to,   0, 16);
+
+   if (i_to < i_from) {
+       Serial.print("Malformed range.\n");
+       return;
+   }
+
+   Serial.printf("Starting March C- RAM test on %04lX-%04lX\n", i_from, i_to);
+   Serial.printf("WARNING: this test is destructive.\n");
+
+   auto read_check = [&](uint32_t addr, uint8_t expected, const char* phase) {
+       uint8_t observed = BIU_Bus_Cycle(MEM_READ_BYTE, (uint16_t)addr, 0x00);
+       total_reads++;
+       if (observed != expected) {
+           Serial.printf("FAIL %s ADDR=%04lX EXP=%02X GOT=%02X\n",
+                         phase, addr, expected, observed);
+           total_errors++;
+       }
+   };
+
+   auto write_pat = [&](uint32_t addr, uint8_t pattern) {
+       BIU_Bus_Cycle(MEM_WRITE_BYTE, (uint16_t)addr, pattern);
+       total_writes++;
+   };
+
+   // -------------------------------------------------------------------------
+   // Phase 1: ↑ write 00 to all
+   // -------------------------------------------------------------------------
+   for (uint32_t addr = i_from; addr <= i_to; addr++) {
+       write_pat(addr, 0x00);
+   }
+
+   // -------------------------------------------------------------------------
+   // Phase 2: ↑ read 00, write FF
+   // -------------------------------------------------------------------------
+   for (uint32_t addr = i_from; addr <= i_to; addr++) {
+       read_check(addr, 0x00, "P2");
+       write_pat(addr, 0xFF);
+   }
+
+   // -------------------------------------------------------------------------
+   // Phase 3: ↑ read FF, write 00
+   // -------------------------------------------------------------------------
+   for (uint32_t addr = i_from; addr <= i_to; addr++) {
+       read_check(addr, 0xFF, "P3");
+       write_pat(addr, 0x00);
+   }
+
+   // -------------------------------------------------------------------------
+   // Phase 4: ↓ read 00, write FF
+   // -------------------------------------------------------------------------
+   for (uint32_t addr = i_to + 1; addr-- > i_from; ) {
+       read_check(addr, 0x00, "P4");
+       write_pat(addr, 0xFF);
+   }
+
+   // -------------------------------------------------------------------------
+   // Phase 5: ↓ read FF, write 00
+   // -------------------------------------------------------------------------
+   for (uint32_t addr = i_to + 1; addr-- > i_from; ) {
+       read_check(addr, 0xFF, "P5");
+       write_pat(addr, 0x00);
+   }
+
+   // -------------------------------------------------------------------------
+   // Phase 6: ↓ read 00
+   // -------------------------------------------------------------------------
+   for (uint32_t addr = i_to + 1; addr-- > i_from; ) {
+       read_check(addr, 0x00, "P6");
+   }
+
+   Serial.printf("March C- RAM test complete.\n");
+   Serial.printf("Range        : %04lX-%04lX\n", i_from, i_to);
+   Serial.printf("Writes       : %lu\n", total_writes);
+   Serial.printf("Reads        : %lu\n", total_reads);
+   Serial.printf("Total errors : %lu\n", total_errors);
+}
 
 // -------------------------------------------------
 //
@@ -3651,23 +4171,37 @@ void showOptions() {
            const char* stc = st.c_str();
            Serial.print(st);
            Serial.print("\n");
-           if(stc[0] == 'G' || stc[0] == 'g') {
+           char cmdline[WATCH_CMD_BUF_SIZE];
+           strncpy(cmdline, stc, sizeof(cmdline) - 1);
+           cmdline[sizeof(cmdline) - 1] = '\0';
+           for (size_t i = 0; cmdline[i] != '\0'; i++) cmdline[i] = (char)toupper((unsigned char)cmdline[i]);
+
+           if(handle_watch_command(cmdline)) {
+               ;
+           }
+           else if(stc[0] == 'G' || stc[0] == 'g') {
                EmulatorMode = 1;
            }
            else if(stc[0] == 'R' || stc[0] == 'r') {
                 dumpMemory(stc);
            }
-           else if(stc[0] == 'W' || stc[0] == 'w') {
+           else if((stc[0] == 'W' || stc[0] == 'w') && !(stc[1] == 'L' || stc[1] == 'l' || stc[1] == 'C' || stc[1] == 'c' || stc[1] == 'D' || stc[1] == 'd')) {
                 writeByteToMemory(stc);
            }
            else if(stc[0] == 'V' || stc[0] == 'v') {
                 writeByteToMemoryWithVerify(stc);
+           }
+           else if(stc[0] == 'C' || stc[0] == 'c') {
+                marchCTestMemory(stc);
            }
            else if(stc[0] == 'Y' || stc[0] == 'y') {
                 writeByteToMemoryBlock(stc);
            }
            else if(stc[0] == 'Z' || stc[0] == 'z') {
                 writeByteToMemoryBlockWithVerify(stc);
+           }
+           else if(stc[0] == 'M' || stc[0] == 'm') {
+                marchTestMemory(stc);
            }
            else if(stc[0] == 'h' || stc[0] == 'H') {
                 showOptions();
@@ -3691,17 +4225,8 @@ void showOptions() {
       //
       local_counter++;
       if (local_counter==8000){
-        if (Serial.available() ) { 
-          incomingByte = Serial.read();   
-          switch (incomingByte){
-            case 48: mode=0;  Serial.println("M0"); break;
-            case 49: mode=1;  Serial.println("M1"); break;
-            case 50: mode=2;  Serial.println("M2"); break;
-            case 51: mode=3;  Serial.println("M3"); break;
-            case 68: print_cpu_statuses(); break;   // D  - dump... seems to cause the Teensy to reboot... not sure why
-            case 100: print_cpu_statuses(); break;  // d  - dump
-          }
-        }
+        poll_runtime_serial_commands();
+        local_counter = 0;
       }
       
       
