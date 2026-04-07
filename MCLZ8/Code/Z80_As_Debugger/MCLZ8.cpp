@@ -43,8 +43,9 @@
 //
 //------------------------------------------------------------------------
                                                   
+#include <Arduino.h>
 
-
+#include <stddef.h>
 #include <stdint.h>
 
                                                     
@@ -54,7 +55,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define CONSOLE_LINE_SIZE 80
 
+char console_line[CONSOLE_LINE_SIZE];
+uint8_t console_pos = 0;
+bool console_line_ready = false;
 
 // Teensy 4.1 pin assignments
 //
@@ -210,7 +215,6 @@ char opcodebuf[24];
 
 // Generic address/range notify watch support
 #define MAX_ADDR_WATCHES 8
-#define WATCH_CMD_BUF_SIZE 64
 
 enum WatchFlags : uint8_t {
   WATCH_READ   = 0x01,
@@ -226,8 +230,6 @@ typedef struct {
 } AddrWatch;
 
 AddrWatch addr_watches[MAX_ADDR_WATCHES];
-char watch_cmd_buf[WATCH_CMD_BUF_SIZE];
-uint8_t watch_cmd_pos = 0;
 
 void init_addr_watches() {
   for (int i = 0; i < MAX_ADDR_WATCHES; i++) {
@@ -235,8 +237,6 @@ void init_addr_watches() {
     addr_watches[i].end = 0;
     addr_watches[i].flags = 0;
   }
-  watch_cmd_pos = 0;
-  watch_cmd_buf[0] = '\0';
 }
 
 void clear_addr_watches() {
@@ -436,41 +436,7 @@ void notify_watch_mem_write(uint16_t pc, uint16_t addr, uint8_t data) {
   if (address_matches_watch(addr, WATCH_WRITE)) notify_address_access("WRITE", pc, addr, data);
 }
 
-bool process_runtime_command(const char* line_in) {
-  if (line_in == nullptr) return false;
-  char local_line[WATCH_CMD_BUF_SIZE];
-  strncpy(local_line, line_in, sizeof(local_line) - 1);
-  local_line[sizeof(local_line) - 1] = '\0';
 
-  for (size_t i = 0; local_line[i] != '\0'; i++) {
-    local_line[i] = (char)toupper((unsigned char)local_line[i]);
-  }
-
-  if (handle_watch_command(local_line)) return true;
-
-  if (strcmp(local_line, "0") == 0) { mode=0; Serial.println("M0"); return true; }
-  if (strcmp(local_line, "1") == 0) { mode=1; Serial.println("M1"); return true; }
-  if (strcmp(local_line, "2") == 0) { mode=2; Serial.println("M2"); return true; }
-  if (strcmp(local_line, "3") == 0) { mode=3; Serial.println("M3"); return true; }
-  if (strcmp(local_line, "D") == 0) { print_cpu_statuses(); return true; }
-
-  return false;
-}
-
-void poll_runtime_serial_commands() {
-  while (Serial.available()) {
-    char c = Serial.read();
-    if (c == '\r' || c == '\n') {
-      if (watch_cmd_pos > 0) {
-        watch_cmd_buf[watch_cmd_pos] = '\0';
-        process_runtime_command(watch_cmd_buf);
-        watch_cmd_pos = 0;
-      }
-    } else if (watch_cmd_pos < (WATCH_CMD_BUF_SIZE - 1)) {
-      watch_cmd_buf[watch_cmd_pos++] = c;
-    }
-  }
-}
 
 
 
@@ -545,7 +511,7 @@ cpu_status stat_buf[STAT_BUF_SIZE];
 
 // Setup Teensy 4.1 IO's
 //
-void setup() {
+void emulator_setup() {
     
   pinMode(PIN_RESET,         INPUT);  
   pinMode(PIN_CLK,           INPUT);  
@@ -3689,57 +3655,176 @@ int isHex(char* stc) {
     return 1;
 }
 
-/* 
-void dumpMemory(const char* stc) {
-   char from[5];
-   char to[5];
-   uint i_from;
-   uint i_to;
-   uint8_t byt;
-   const char* prstr;
-   uint32_t chksum = 0;
+// -------------------------------------------------
+// CRC32 / SHA1 helpers for ROM-range verification
+// Produces values compatible with MAME ROM_LOAD CRC(...) SHA1(...)
+// when run over the exact same byte range in the same order.
+// -------------------------------------------------
 
-   from[0] = 0x00; from[1] = 0x00; from[2] = 0x00; from[3] = 0x00; from[4] = 0x00;
-   to[0] = 0x00; to[1] = 0x00; to[2] = 0x00; to[3] = 0x00; to[4] = 0x00;
+struct Sha1Context {
+    uint32_t h[5];
+    uint64_t total_len;
+    uint8_t  block[64];
+    size_t   block_len;
+};
 
-   for(int i=1;i<5;i++)
-       from[i-1] = *(stc+i);
-
-   for(int i=6;i<10;i++)
-       to[i-6] = *(stc+i);
-
-   if(isHex(from)) {
-       i_from = (int) strtol(from, 0, 16);
-       if(isHex(to)) 
-           i_to = (int) strtol(to, 0, 16);
-       else
-           i_to = i_from;
-
-       int wrapper = 0;
-       for(uint i=i_from; i<=i_to;i++) {
-           byt = BIU_Bus_Cycle(MEM_READ_BYTE, i, 0x00);
-           chksum += byt;
-           prstr = String(byt, HEX).c_str();
-           if(strlen(prstr) == 1)
-               Serial.print("0");
-           Serial.print(prstr);
-           Serial.print(" ");
-           wrapper++;
-           if(wrapper > 32) {
-               Serial.print("\n");
-               wrapper = 0;
-           }
-       }
-       Serial.print("\nChecksum:\n");
-       Serial.print(chksum, HEX);
-   }
-   else {
-       Serial.print("Malformed command.\n");
-   }
-
-   Serial.printf("\n");
+static inline uint32_t rol32(uint32_t v, uint8_t n) {
+    return (v << n) | (v >> (32 - n));
 }
-*/
+
+void sha1_init(Sha1Context &ctx) {
+    ctx.h[0] = 0x67452301UL;
+    ctx.h[1] = 0xEFCDAB89UL;
+    ctx.h[2] = 0x98BADCFEUL;
+    ctx.h[3] = 0x10325476UL;
+    ctx.h[4] = 0xC3D2E1F0UL;
+    ctx.total_len = 0;
+    ctx.block_len = 0;
+}
+
+void sha1_process_block(Sha1Context &ctx, const uint8_t block[64]) {
+    uint32_t w[80];
+
+    for (int i = 0; i < 16; i++) {
+        w[i] =
+            ((uint32_t)block[i * 4 + 0] << 24) |
+            ((uint32_t)block[i * 4 + 1] << 16) |
+            ((uint32_t)block[i * 4 + 2] <<  8) |
+            ((uint32_t)block[i * 4 + 3] <<  0);
+    }
+
+    for (int i = 16; i < 80; i++) {
+        w[i] = rol32(w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16], 1);
+    }
+
+    uint32_t a = ctx.h[0];
+    uint32_t b = ctx.h[1];
+    uint32_t c = ctx.h[2];
+    uint32_t d = ctx.h[3];
+    uint32_t e = ctx.h[4];
+
+    for (int i = 0; i < 80; i++) {
+        uint32_t f, k;
+
+        if (i < 20) {
+            f = (b & c) | ((~b) & d);
+            k = 0x5A827999UL;
+        } else if (i < 40) {
+            f = b ^ c ^ d;
+            k = 0x6ED9EBA1UL;
+        } else if (i < 60) {
+            f = (b & c) | (b & d) | (c & d);
+            k = 0x8F1BBCDCUL;
+        } else {
+            f = b ^ c ^ d;
+            k = 0xCA62C1D6UL;
+        }
+
+        uint32_t temp = rol32(a, 5) + f + e + k + w[i];
+        e = d;
+        d = c;
+        c = rol32(b, 30);
+        b = a;
+        a = temp;
+    }
+
+    ctx.h[0] += a;
+    ctx.h[1] += b;
+    ctx.h[2] += c;
+    ctx.h[3] += d;
+    ctx.h[4] += e;
+}
+
+void sha1_update(Sha1Context &ctx, const uint8_t *data, size_t len) {
+    ctx.total_len += len;
+
+    while (len > 0) {
+        size_t take = 64 - ctx.block_len;
+        if (take > len) take = len;
+
+        memcpy(&ctx.block[ctx.block_len], data, take);
+        ctx.block_len += take;
+        data += take;
+        len -= take;
+
+        if (ctx.block_len == 64) {
+            sha1_process_block(ctx, ctx.block);
+            ctx.block_len = 0;
+        }
+    }
+}
+
+void sha1_final(Sha1Context &ctx, uint8_t out[20]) {
+    uint64_t total_bits = ctx.total_len * 8ULL;
+
+    ctx.block[ctx.block_len++] = 0x80;
+
+    if (ctx.block_len > 56) {
+        while (ctx.block_len < 64) ctx.block[ctx.block_len++] = 0x00;
+        sha1_process_block(ctx, ctx.block);
+        ctx.block_len = 0;
+    }
+
+    while (ctx.block_len < 56) ctx.block[ctx.block_len++] = 0x00;
+
+    for (int i = 7; i >= 0; i--) {
+        ctx.block[ctx.block_len++] = (uint8_t)((total_bits >> (i * 8)) & 0xFF);
+    }
+
+    sha1_process_block(ctx, ctx.block);
+    ctx.block_len = 0;
+
+    for (int i = 0; i < 5; i++) {
+        out[i * 4 + 0] = (uint8_t)((ctx.h[i] >> 24) & 0xFF);
+        out[i * 4 + 1] = (uint8_t)((ctx.h[i] >> 16) & 0xFF);
+        out[i * 4 + 2] = (uint8_t)((ctx.h[i] >>  8) & 0xFF);
+        out[i * 4 + 3] = (uint8_t)((ctx.h[i] >>  0) & 0xFF);
+    }
+}
+
+uint32_t crc32_update_byte(uint32_t crc, uint8_t data) {
+    crc ^= data;
+    for (int i = 0; i < 8; i++) {
+        if (crc & 1U) crc = (crc >> 1) ^ 0xEDB88320UL;
+        else          crc = (crc >> 1);
+    }
+    return crc;
+}
+
+void print_sha1_hex(const uint8_t sha1[20]) {
+    for (int i = 0; i < 20; i++) {
+        if (sha1[i] < 0x10) Serial.print('0');
+        Serial.print(sha1[i], HEX);
+    }
+}
+
+void print_range_crc_sha1(uint16_t start_addr, uint16_t end_addr) {
+    uint32_t crc = 0xFFFFFFFFUL;
+    Sha1Context sha1;
+    sha1_init(sha1);
+
+    for (uint32_t addr = start_addr; addr <= end_addr; addr++) {
+        uint8_t b = BIU_Bus_Cycle(MEM_READ_BYTE, (uint16_t)addr, 0x00);
+        crc = crc32_update_byte(crc, b);
+        sha1_update(sha1, &b, 1);
+    }
+
+    crc ^= 0xFFFFFFFFUL;
+
+    uint8_t sha1_out[20];
+    sha1_final(sha1, sha1_out);
+
+    Serial.print("CRC(");
+    for (int shift = 28; shift >= 0; shift -= 4) {
+        uint8_t nib = (uint8_t)((crc >> shift) & 0x0F);
+        Serial.print((char)(nib < 10 ? ('0' + nib) : ('a' + nib - 10)));
+    }
+    Serial.print(") ");
+
+    Serial.print("SHA1(");
+    print_sha1_hex(sha1_out);
+    Serial.println(")");
+}
 
 void dumpMemory(const char* stc) {
    char from[5];
@@ -3766,6 +3851,10 @@ void dumpMemory(const char* stc) {
        else
            i_to = i_from;
 
+
+       Serial.printf("Hashing range %04X-%04X, bytes=%lu\n",
+              i_from, i_to, (unsigned long)(i_to - i_from + 1));
+
        int wrapper = 0;
 
        for (uint i = i_from; i <= i_to; i++) {
@@ -3791,7 +3880,9 @@ void dumpMemory(const char* stc) {
 
        Serial.print("\nChecksum:\n");
        Serial.print(chksum, HEX);
-   }
+       Serial.print("\n");
+       print_range_crc_sha1(i_from, i_to);
+   } 
    else {
        Serial.print("Malformed command.\n");
    }
@@ -4134,13 +4225,155 @@ void marchCTestMemory(const char* stc) {
    Serial.printf("Total errors : %lu\n", total_errors);
 }
 
+void service_console_rx() {
+    while (Serial.available()) {
+        char c = (char)Serial.read();
+
+        if (c == '\r') {
+            continue;
+        }
+
+        if (c == '\n') {
+            if (console_pos > 0) {
+                console_line[console_pos] = '\0';
+                console_line_ready = true;
+                console_pos = 0;
+            }
+            continue;
+        }
+
+        if (console_pos < (CONSOLE_LINE_SIZE - 1)) {
+            console_line[console_pos++] = c;
+        }
+    }
+}
+
+bool process_console_command(char *cmdline, bool running, uint8_t *pEmulatorMode) {
+    if (cmdline == nullptr || cmdline[0] == '\0') {
+        return false;
+    }
+
+    for (size_t i = 0; cmdline[i] != '\0'; i++) {
+        cmdline[i] = (char)toupper((unsigned char)cmdline[i]);
+    }
+
+    Serial.print(cmdline);
+    Serial.print("\n");
+
+    if (handle_watch_command(cmdline)) {
+        return true;
+    }
+
+    // Commands allowed while running
+    if (strcmp(cmdline, "0") == 0) {
+        mode = 0;
+        Serial.println("M0");
+        return true;
+    }
+    else if (strcmp(cmdline, "1") == 0) {
+        mode = 1;
+        Serial.println("M1");
+        return true;
+    }
+    else if (strcmp(cmdline, "2") == 0) {
+        mode = 2;
+        Serial.println("M2");
+        return true;
+    }
+    else if (strcmp(cmdline, "3") == 0) {
+        mode = 3;
+        Serial.println("M3");
+        return true;
+    }
+    else if (strcmp(cmdline, "D") == 0) {
+        print_cpu_statuses();
+        return true;
+    }
+
+    // Startup-only commands
+    if (!running) {
+        if (cmdline[0] == 'G') {
+            *pEmulatorMode = 1;
+            return true;
+        }
+        else if (cmdline[0] == 'R') {
+            dumpMemory(cmdline);
+            return true;
+        }
+        else if (cmdline[0] == 'W' && !(cmdline[1] == 'L' || cmdline[1] == 'C' || cmdline[1] == 'D')) {
+            writeByteToMemory(cmdline);
+            return true;
+        }
+        else if (cmdline[0] == 'V') {
+            writeByteToMemoryWithVerify(cmdline);
+            return true;
+        }
+        else if (cmdline[0] == 'C') {
+            marchCTestMemory(cmdline);
+            return true;
+        }
+        else if (cmdline[0] == 'Y') {
+            writeByteToMemoryBlock(cmdline);
+            return true;
+        }
+        else if (cmdline[0] == 'Z') {
+            writeByteToMemoryBlockWithVerify(cmdline);
+            return true;
+        }
+        else if (cmdline[0] == 'M') {
+            marchTestMemory(cmdline);
+            return true;
+        }
+        else if (cmdline[0] == 'H') {
+            showOptions();
+            return true;
+        }
+    }
+
+    Serial.printf("Invalid command.\n");
+    return false;
+}
+
+
+void run_one_instruction_slice() {
+    // Poll for interrupts between instructions,
+    // but not when immediately after instruction enabling interrupts,
+    // or if the last opcode was a prefix.
+    //
+    if (last_instruction_set_a_prefix==0 && pause_interrupts==0)  {
+        if (nmi_latched==1) {
+            NMI_Handler();
+        }
+        else if (direct_intr==0 && register_iff1==1) {
+            INTR_Handler();
+        }
+    }
+    pause_interrupts=0;                // debounce
+    last_instruction_set_a_prefix=0;
+
+    // Process new instruction
+    //
+    execute_instruction();
+
+    if (last_instruction_set_a_prefix==0) {
+        prefix_dd = 0;
+        prefix_fd = 0;
+        prefix_cb = 0;
+    }
+
+    if (mode<3 && clock_counter > 0) {
+        wait_for_CLK_falling_edge();
+        clock_counter--;
+        return;
+    }
+}
+
 // -------------------------------------------------
 //
 // Main loop
 //
 // -------------------------------------------------
- void loop() {
-  uint16_t local_counter=0;
+ void emulator_loop() {
   uint8_t EmulatorMode = 0;
   
 
@@ -4164,104 +4397,32 @@ void marchCTestMemory(const char* stc) {
   // blocks of memory.  The checksum behavior (which happens when you read a block of memory) is particularly 
   // useful when comparing your EEProms to a MAME rom file for example).
 
-  while(EmulatorMode == 0) {
-       if(Serial.available()) {
-           String st = Serial.readString();
-           st.trim();
-           const char* stc = st.c_str();
-           Serial.print(st);
-           Serial.print("\n");
-           char cmdline[WATCH_CMD_BUF_SIZE];
-           strncpy(cmdline, stc, sizeof(cmdline) - 1);
-           cmdline[sizeof(cmdline) - 1] = '\0';
-           for (size_t i = 0; cmdline[i] != '\0'; i++) cmdline[i] = (char)toupper((unsigned char)cmdline[i]);
+  while (EmulatorMode == 0) {
+        service_console_rx();
 
-           if(handle_watch_command(cmdline)) {
-               ;
-           }
-           else if(stc[0] == 'G' || stc[0] == 'g') {
-               EmulatorMode = 1;
-           }
-           else if(stc[0] == 'R' || stc[0] == 'r') {
-                dumpMemory(stc);
-           }
-           else if((stc[0] == 'W' || stc[0] == 'w') && !(stc[1] == 'L' || stc[1] == 'l' || stc[1] == 'C' || stc[1] == 'c' || stc[1] == 'D' || stc[1] == 'd')) {
-                writeByteToMemory(stc);
-           }
-           else if(stc[0] == 'V' || stc[0] == 'v') {
-                writeByteToMemoryWithVerify(stc);
-           }
-           else if(stc[0] == 'C' || stc[0] == 'c') {
-                marchCTestMemory(stc);
-           }
-           else if(stc[0] == 'Y' || stc[0] == 'y') {
-                writeByteToMemoryBlock(stc);
-           }
-           else if(stc[0] == 'Z' || stc[0] == 'z') {
-                writeByteToMemoryBlockWithVerify(stc);
-           }
-           else if(stc[0] == 'M' || stc[0] == 'm') {
-                marchTestMemory(stc);
-           }
-           else if(stc[0] == 'h' || stc[0] == 'H') {
-                showOptions();
-           }
-           else {
-               Serial.printf("Invalid command.\n");
-           }
-       }
-       else
-            delay(1);
+        if (console_line_ready) {
+            console_line_ready = false;
+            process_console_command(console_line, false, &EmulatorMode);
+        }
   }
-
-  local_counter=0;
+  
   while (1) {
                 
       if (direct_reset==0) reset_sequence();
 
-      // Set Acceleration using UART receive characters
-      // Send the numbers 0,1,2,3 from the host through a serial terminal to the MCL65+
-      // for acceleration modes 0,1,2,3
-      //
-      local_counter++;
-      if (local_counter==8000){
-        poll_runtime_serial_commands();
-        local_counter = 0;
-      }
-      
-      
-      // Poll for interrupts between instructions, 
-      // but not when immediately after instruction enabling interrupts,
-      // or if the last opcode was a prefix.
-      //
-      if (last_instruction_set_a_prefix==0 && pause_interrupts==0)  {
-        if (nmi_latched==1) { 
-           NMI_Handler();  
-        }           
-        else if (direct_intr==0 && register_iff1==1) { 
-           INTR_Handler(); 
-        }
-      }
-      pause_interrupts=0;                // debounce
-      last_instruction_set_a_prefix=0;
+      service_console_rx();
 
+      if (console_line_ready) {
+            console_line_ready = false;
 
-      // Process new instruction
-      //
-      execute_instruction();   
-      
-      if (last_instruction_set_a_prefix==0) {
-          prefix_dd = 0;
-          prefix_fd = 0;
-          prefix_cb = 0;
+            // Only allow lightweight commands while running
+            process_console_command(console_line, true, &EmulatorMode);
       }
 
-      // Wait for cycle counter to reach zero before processing interrupts or the next instruction
-      //
-      if (mode<3) while (clock_counter>0)  {  wait_for_CLK_falling_edge();   }
+      run_one_instruction_slice();
 
-          
+
 // ** End main loop
 
   }      
- } 
+} 
