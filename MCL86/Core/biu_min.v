@@ -521,11 +521,19 @@ else
                                 biu_state <= 8'h01;
                               end
                                                 
-                      // Halt Request 
+                      // Halt Request: acknowledge immediately without
+                      // running a real bus cycle. A real 8088 HALT is just
+                      // T1 (ALE pulse + S2:S0=011 status) and does NOT wait
+                      // for READY. There's no architectural reason for a
+                      // host platform to drive READY in response to a HALT
+                      // cycle, so running through states 0x02..0x0A risks
+                      // stalling at the READY-wait in state 0x07
+                      // indefinitely on any board that doesn't happen to
+                      // assert READY anyway.
                       8'h18 : begin
-                                addr_out_temp <= { biu_register_cs[15:0] , 4'h0 } + pfq_addr_out[15:0] ;
                                 s_bits <= 3'b011;
-                                biu_state <= 8'h01;
+                                biu_done_int <= 1'b1;
+                                biu_state <= 8'h0B;
                               end
                                             
                       // Memory Byte Read 
