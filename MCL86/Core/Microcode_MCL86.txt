@@ -29,6 +29,13 @@
 // Revision 4.0 12/2/2022
 // Assigned values to unused flags[1,3,5] for opcode LAHF
 //
+// Revision 5.0 5/5/2026
+// STORE/RESTORE_SEG_PREFIX use r2 scratch instead of stashing the
+// segment-override prefix bit in eu_flags bit 4 (AF). The original
+// procedure corrupted architectural AF on every string-op call site
+// (8086 spec says string ops preserve flags). r2 is dead during string
+// ops since the INC16/DEC16 flag-processing path that uses r2 isn't
+// called between STORE and RESTORE.
 //
 //------------------------------------------------------------------------
 //
@@ -8234,7 +8241,16 @@ p 01 00000 00001 0011
 #
 # PROCEDURE - STORE_SEG_PREFIX
 #
-# Store the Segment Override Prefix bit in the AF Flag temporarily
+# Stash the Segment Override Prefix bit in scratch register r2 across a
+# BIU operation that needs the override cleared (e.g. MOVS dest write
+# after a DS-overridden source read). Originally this used eu_flags
+# bit 4 (AF) as the stash, but that corrupts the architectural AF flag
+# on every string-op call site (8086 says string ops preserve flags).
+# Cannot use r0/r1 as scratch — CMPSB/CMPSW load r0 with the source
+# byte at 0x0645 and r1 with the dest byte at 0x064B, with the
+# STORE_SEG_PREFIX call sandwiched at 0x0646. r3 is the BIU address
+# register (set to SI then DI between calls), also unsafe. r2 is dead
+# across all string-op STORE/RESTORE windows.
 #
 # --------------------------------------------------------------------
 #
@@ -8248,10 +8264,10 @@ p 00 00000 00001 0751
 p 01 00000 00001 1002
 p 01 00000 00001 0755
 #
-# Set eu_alu_a flag to 1
+# r2 = 1 (scratch: segment override was set)
 p 00 00000 00001 0752
-p 01 00000 00001 588F
-p 01 00000 00001 0010
+p 01 00000 00001 5BFF
+p 01 00000 00001 0001
 #
 # Set segment_override prefix bit to 0
 p 00 00000 00001 0753
@@ -8263,10 +8279,10 @@ p 00 00000 00001 0754
 p 01 00000 00001 1030
 p 01 00000 00001 4000
 #
-# B: Set eu_alu_a flag to 0
+# B: r2 = 0 (scratch: segment override was clear)
 p 00 00000 00001 0755
-p 01 00000 00001 488F
-p 01 00000 00001 FFEF
+p 01 00000 00001 5BFF
+p 01 00000 00001 0000
 #
 # Set segment_override prefix bit to 0
 p 00 00000 00001 0756
@@ -8282,15 +8298,16 @@ p 01 00000 00001 4000
 #
 # PROCEDURE - RESTORE_SEG_PREFIX
 #
-# Retore the Segment Override Prefix bit from the AF Flag
-# The override prefix is assumed to be 0 before entering this procedure.
+# Restore the Segment Override Prefix bit from scratch register r2
+# (saved by STORE_SEG_PREFIX). The override prefix is assumed to be 0
+# before entering this procedure.
 #
 # --------------------------------------------------------------------
 #
-# Isolate eu_alu_a flag into Dummy
+# Isolate r2 bit 0 (saved segment-override bit) into Dummy
 p 00 00000 00001 075A
-p 01 00000 00001 4E8F
-p 01 00000 00001 0010
+p 01 00000 00001 4EBF
+p 01 00000 00001 0001
 #
 # Return to calling code if last ALU=0
 p 00 00000 00001 075B
