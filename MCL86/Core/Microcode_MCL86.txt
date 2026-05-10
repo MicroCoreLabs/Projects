@@ -37,6 +37,29 @@
 // ops since the INC16/DEC16 flag-processing path that uses r2 isn't
 // called between STORE and RESTORE.
 //
+// Revision 6.0 5/6/2026
+// Segment-load interrupt-poll fix. Real 8086 only delays interrupts by
+// one instruction after MOV/POP to SS (atomic stack reload), not after
+// other segment-register loads. Previously, all POP_SEGREG (POP ES/CS/
+// SS/DS at 0x07/0x0F/0x17/0x1F) and all MOV Sreg (the 0x8E group)
+// converged on the legacy 0x0470-0x0478 ending whose final jump skips
+// the interrupt-poll section of the main fetch loop (jumps to 0x0011
+// instead of 0x0006). That caused the worker to miss hardware
+// interrupts taken by MartyPC after POP DS / POP ES / MOV ES / MOV DS,
+// because the worker's microcode bypassed the 0x0008 intr_asserted
+// test in the fetch loop following these instructions.
+//
+// Fix: split the common ending into two:
+//   * 0x0470-0x0478 (legacy): final jump to 0x0011, used by POP SS and
+//     MOV SS to preserve the architecturally-mandated 1-instruction
+//     interrupt delay for atomic stack reload.
+//   * 0x0FC7-0x0FCF (new): mirror of 0x0470-0x0478 with final jump to
+//     0x0006 (with INT poll), used by POP ES/CS/DS and MOV ES/CS/DS.
+// MOV ES/CS/DS reach the new tail via 0x0D63 redirected from 0x0474 to
+// 0x0FCB (the PFQ-wait entry of the new tail). MOV SS bypasses 0x0D62
+// /0x0D63 entirely by jumping from 0x0D6B to a new SS-specific
+// debounce + skip-INT path at 0x0FD0-0x0FD1.
+//
 //------------------------------------------------------------------------
 //
 // Copyright (c) 2020 Ted Fried
@@ -4653,10 +4676,13 @@ p 00 00000 00001 045A
 p 01 00000 00001 4DDF
 p 01 00000 00001 CFF3
 #
-# Jump unconditional to POP_SEGREG ending
+# Jump unconditional to POP_SEGREG_WITH_INT ending (0xFC7) — POP ES
+# polls INT on completion, real-8086 behavior. POP SS keeps the legacy
+# skip-INT ending at 0x0470 (1-instruction interrupt delay for atomic
+# stack reload).
 p 00 00000 00001 045B
 p 01 00000 00001 1000
-p 01 00000 00001 0470
+p 01 00000 00001 0FC7
 #
 #
 # -----------------------------------------------------
@@ -4685,10 +4711,12 @@ p 00 00000 00001 045F
 p 01 00000 00001 4DDF
 p 01 00000 00001 CFD3
 #
-# Jump unconditional to POP_SEGREG ending
+# Jump unconditional to POP_SEGREG_WITH_INT ending (0xFC7) — POP CS
+# polls INT on completion (POP CS isn't a real 8086 opcode in modern
+# decode, but the handler exists; same fix as POP ES/DS).
 p 00 00000 00001 0460
 p 01 00000 00001 1000
-p 01 00000 00001 0470
+p 01 00000 00001 0FC7
 #
 #
 # -----------------------------------------------------
@@ -4749,10 +4777,11 @@ p 00 00000 00001 0469
 p 01 00000 00001 4DDF
 p 01 00000 00001 CFC3
 #
-# Jump unconditional to POP_SEGREG ending
+# Jump unconditional to POP_SEGREG_WITH_INT ending (0xFC7) — POP DS
+# polls INT on completion, real-8086 behavior.
 p 00 00000 00001 046A
 p 01 00000 00001 1000
-p 01 00000 00001 0470
+p 01 00000 00001 0FC7
 #
 # -----------------------------------------------------
 #
@@ -16064,10 +16093,13 @@ p 00 00000 00001 0D62
 p 01 00000 00001 4DDF
 p 01 00000 00001 0000
 #
-# Jump unconditional to common code that waits for prefetch queue, then returns to main loop skipping polling all interrupts
+# Jump unconditional to PFQ-wait entry of POP_SEGREG_WITH_INT ending
+# (0xFCB). MOV ES/CS/DS now poll INT on completion, real-8086 behavior.
+# MOV SS bypasses this by going through 0xFD0 (SS-specific debounce
+# that jumps to legacy skip-INT 0x0474).
 p 00 00000 00001 0D63
 p 01 00000 00001 1000
-p 01 00000 00001 0474
+p 01 00000 00001 0FCB
 #
 # Update the CS Segment Register
 # ------------------------------
@@ -16102,10 +16134,12 @@ p 00 00000 00001 0D6A
 p 01 00000 00001 5DFF
 p 01 00000 00001 3010
 #
-# Jump unconditional to common code
+# Jump unconditional to SS-specific debounce + skip-INT (0xFD0) so MOV
+# SS keeps the 1-instruction interrupt delay for atomic stack reload.
+# MOV ES/CS/DS continue through 0x0D62 → 0x0D63 → 0xFCB (with INT).
 p 00 00000 00001 0D6B
 p 01 00000 00001 1000
-p 01 00000 00001 0D62
+p 01 00000 00001 0FD0
 #
 # Update the DS Segment Register
 # ------------------------------
@@ -18706,6 +18740,84 @@ p 01 00000 00001 1000
 p 01 00000 00001 00C6
 #
 #
+#
+# -----------------------------------------------------
+# POP/MOV ES/CS/DS "with INT poll" common ending. Mirror of legacy
+# 0x0470-0x0478 ending, but final jump returns to 0x0006 (with INT)
+# instead of 0x0011 (skip INT). Real 8086 only delays interrupts after
+# segment-register loads to SS (POP SS / MOV SS / LSS); ES/CS/DS loads
+# do not delay. POP/MOV SS keep their existing 0x0470-based path.
+#
+# POP ES/CS/DS handlers jump to 0xFC7 (start). MOV ES/CS/DS reach
+# 0xFCB (PFQ-wait entry) via 0x0D63's redirected jump.
+# -----------------------------------------------------
+#
+# Write 12 clocks to clock counter (== 0x0470)
+p 00 00000 00001 0FC7
+p 01 00000 00001 5FFF
+p 01 00000 00001 C02B
+#
+# CALL WAIT_CLOCKS (== 0x0471)
+p 00 00000 00001 0FC8
+p 01 00000 00001 1100
+p 01 00000 00001 03F2
+#
+# Strobe BIU - Fetch Opcode (== 0x0472)
+p 00 00000 00001 0FC9
+p 01 00000 00001 5DDF
+p 01 00000 00001 1004
+#
+# Debounce BIU Strobe (== 0x0473)
+p 00 00000 00001 0FCA
+p 01 00000 00001 4DDF
+p 01 00000 00001 0000
+#
+# AND with PFQ_EMPTY mask (== 0x0474; MOV ES/CS/DS enter here)
+p 00 00000 00001 0FCB
+p 01 00000 00001 4EEF
+p 01 00000 00001 0080
+#
+# Jump back to 0xFCB if PFQ empty (== 0x0475)
+p 00 00000 00001 0FCC
+p 01 00000 00001 1002
+p 01 00000 00001 0FCB
+#
+# Clear prefix flags (== 0x0476)
+p 00 00000 00001 0FCD
+p 01 00000 00001 488F
+p 01 00000 00001 0FD5
+#
+# Clear BIU command (== 0x0477)
+p 00 00000 00001 0FCE
+p 01 00000 00001 4DDF
+p 01 00000 00001 0000
+#
+# Jump to main loop start at 0x0006 (with INT poll). This is the only
+# difference from 0x0478, which jumps to 0x0011 (skip INT).
+p 00 00000 00001 0FCF
+p 01 00000 00001 1000
+p 01 00000 00001 0006
+#
+
+#
+# -----------------------------------------------------
+# MOV SS-specific debounce + skip-INT jump. MOV SS at 0x0D6B redirects
+# here so it bypasses the 0x0D63 path (which now points at the with-INT
+# tail) and lands on the legacy skip-INT 0x0474 ending.
+# -----------------------------------------------------
+#
+# Debounce BIU Strobe (mirror of 0x0D62)
+p 00 00000 00001 0FD0
+p 01 00000 00001 4DDF
+p 01 00000 00001 0000
+#
+# Jump to legacy skip-INT PFQ-wait (== old 0x0D63 → 0x0474)
+p 00 00000 00001 0FD1
+p 01 00000 00001 1000
+p 01 00000 00001 0474
+#
+
+
 
 # DONE 
 
