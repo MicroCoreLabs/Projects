@@ -115,6 +115,19 @@ reg   clk_d3;
 reg   clk_d4;
 reg   eu_biu_req_caught;
 reg   eu_biu_req_d1;
+// Stage a pending CS-register update so the visible biu_register_cs only
+// changes when the matching JMP/CALL/RET request (eu_biu_req_code 5'h19)
+// lands -- atomic with pfq_addr_in. Real 8088 microcode treats CS+IP as a
+// single update from the BIU's point of view; MCL86jr's microcode strobes
+// them separately, and without staging the BIU briefly sees new CS + old
+// pfq_addr_in. Two visible bus-level symptoms get fixed by staging:
+//   * No phantom fetch at (new_CS << 4) + old_pfq_addr_in (e.g. F000:0005
+//     out of the reset vector instead of FFFF:0005).
+//   * The prefetch in the gap between CS strobe and JMP request still uses
+//     the OLD CS, producing the real-8088 prefetch overshoot
+//     (e.g. FFFF:0005) that's discarded after the queue flush.
+reg [15:0] biu_register_cs_staged;
+reg        cs_update_staged;
 reg   eu_prefix_lock_d1;
 reg   eu_prefix_lock_d2;
 reg   intr_d1;
@@ -305,6 +318,8 @@ begin : BIU_STATE_MACHINE
       biu_state <= 8'hD0;
       pfq_write <= 'h0;
       pfq_addr_in <= 'h0;
+      biu_register_cs_staged <= 16'hFFFF;
+      cs_update_staged <= 1'b0;
       biu_return_data_int <= 'h0;
       biu_done_int <= 'h0;
       ready_d1 <= 'h0;
@@ -453,19 +468,24 @@ else
       end
                     
     
-    // Strobe from EU to update the segment and addressing registers
+    // Strobe from EU to update the segment and addressing registers.
+    // CS is staged rather than committed so the BIU keeps prefetching
+    // from the OLD CS until the matching JMP request lands.
     if (eu_biu_strobe==2'b11)
       begin
         case (eu_biu_req_code[2:0])  // synthesis parallel_case
           3'h0 : biu_register_es      <= EU_BIU_DATAOUT[15:0];
           3'h1 : biu_register_ss      <= EU_BIU_DATAOUT[15:0];
-          3'h2 : biu_register_cs      <= EU_BIU_DATAOUT[15:0];
+          3'h2 : begin
+                   biu_register_cs_staged <= EU_BIU_DATAOUT[15:0];
+                   cs_update_staged       <= 1'b1;
+                 end
           3'h3 : biu_register_ds      <= EU_BIU_DATAOUT[15:0];
           3'h4 : biu_register_rm      <= EU_BIU_DATAOUT[15:0];
           3'h5 : biu_register_reg     <= EU_BIU_DATAOUT[15:0];
           default :  ;
         endcase
-      end   
+      end
 
     // Strobe from EU to set the 8088 clock cycle counter
     if (eu_biu_strobe==2'b10)
@@ -494,14 +514,21 @@ else
       end                         
         
         
-    if (eu_biu_req_caught==1'b1 && eu_biu_req_code==5'h19) 
+    if (eu_biu_req_caught==1'b1 && eu_biu_req_code==5'h19)
       begin
         pfq_addr_in <= eu_register_r3_d; // Update the prefetch queue to the new address.
-      end    
+        // Atomically commit the staged CS (if any) at the same edge so
+        // prefetches from this point onward see (new CS, new pfq_addr_in).
+        if (cs_update_staged)
+          begin
+            biu_register_cs    <= biu_register_cs_staged;
+            cs_update_staged   <= 1'b0;
+          end
+      end
     else if (pfq_write==1'b1)
-      begin  
+      begin
         pfq_addr_in <= pfq_addr_in + 1;
-      end                         
+      end
         
       
     // Write to the selected prefetch queue entry.
