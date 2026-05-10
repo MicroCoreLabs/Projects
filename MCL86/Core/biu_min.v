@@ -135,6 +135,12 @@ wire  eu_prefix_seg;
 wire  pfq_empty;
 reg  [7:0]  ad_in_int;
 reg  [19:0] addr_out_temp;
+// Latched byte-1 offset for word reads, used to compute byte 2 with
+// proper 8086-style offset wrap (byte_2_offset = (byte_1_offset+1)&0xFFFF).
+// Avoids both a 16-bit-only linear increment (which gives wrong addresses
+// at 0x?FFFF for non-paragraph-aligned segments) and a naive 20-bit
+// linear increment (which is wrong for offset=0xFFFF wrap).
+reg  [15:0] biu_byte1_offset;
 reg  [7:0]  biu_state;
 reg  [15:0] biu_register_cs;
 reg  [15:0] biu_register_es;
@@ -291,6 +297,7 @@ begin : BIU_STATE_MACHINE
       eu_biu_req_d1 <= 'h0;
       latched_data_in <= 'h0;
       addr_out_temp <= 'h0;
+      biu_byte1_offset <= 'h0;
       s_bits <= 3'b111;
       AD_OUT <= 'h0;
       word_cycle <= 1'b0;
@@ -505,6 +512,7 @@ else
                       // Interrupt ACK Cycle 
                       8'h16 : begin                   
                                 addr_out_temp <= { 4'h0 , eu_register_r3_d[15:0] };
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 //AD_OE <= 'h0;                   
                                 word_cycle <= 1'b1;
                                 s_bits <= 3'b000;
@@ -514,6 +522,7 @@ else
                       // IO Byte Read 
                       8'h08 : begin
                                 addr_out_temp <= { 4'h0 , eu_register_r3_d[15:0] };
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 s_bits <= 3'b001;
                                 biu_state <= 8'h01;
                               end
@@ -521,6 +530,7 @@ else
                       // IO Word Read 
                       8'h1A : begin
                                 addr_out_temp <= { 4'h0 , eu_register_r3_d[15:0] };
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 word_cycle <= 1'b1; 
                                 s_bits <= 3'b001;
                                 biu_state <= 8'h01;
@@ -529,6 +539,7 @@ else
                       // IO Byte Write 
                       8'h0A : begin
                                 addr_out_temp <= { 4'h0 , eu_register_r3_d[15:0] };
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 s_bits <= 3'b010;
                                 biu_state <= 8'h01;
                               end
@@ -536,6 +547,7 @@ else
                       // IO Word Write 
                       8'h1C : begin
                                 addr_out_temp <= { 4'h0 , eu_register_r3_d[15:0] };
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 word_cycle <= 1'b1; 
                                 s_bits <= 3'b010;
                                 biu_state <= 8'h01;
@@ -559,6 +571,7 @@ else
                       // Memory Byte Read 
                       8'h0C : begin
                                 addr_out_temp <= { biu_muxed_segment[15:0] , 4'h0 } + eu_register_r3_d[15:0];
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 s_bits <= 3'b101;
                                 biu_state <= 8'h01;
                               end
@@ -566,6 +579,7 @@ else
                       // Memory Word Read 
                       8'h10 : begin
                                 addr_out_temp <= { biu_muxed_segment[15:0] , 4'h0 } + eu_register_r3_d[15:0];
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 word_cycle <= 1'b1; 
                                 s_bits <= 3'b101;
                                 biu_state <= 8'h01;
@@ -574,6 +588,7 @@ else
                       // Memory Word Read from Stack Segment
                       8'h11 : begin
                                 addr_out_temp <= { biu_register_ss[15:0] , 4'h0 } + eu_register_r3_d[15:0];
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 word_cycle <= 1'b1; 
                                 s_bits <= 3'b101;
                                 biu_state <= 8'h01;
@@ -582,6 +597,7 @@ else
                       // Memory Word Read from Segment 0x0000 - Used for interrupt vector fetches
                       8'h12 : begin
                                 addr_out_temp <= { 4'h0 , eu_register_r3_d[15:0] };
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 word_cycle <= 1'b1; 
                                 s_bits <= 3'b101;
                                 biu_state <= 8'h01;
@@ -590,6 +606,7 @@ else
                       // Memory Byte Write 
                       8'h0E : begin
                                 addr_out_temp <= { biu_muxed_segment[15:0] , 4'h0 } + eu_register_r3_d[15:0];
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 s_bits <= 3'b110;
                                 biu_state <= 8'h01;
                               end
@@ -597,6 +614,7 @@ else
                       // Memory Word Write 
                       8'h13 : begin
                                 addr_out_temp <= { biu_muxed_segment[15:0] , 4'h0 } + eu_register_r3_d[15:0];
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 word_cycle <= 1'b1; 
                                 s_bits <= 3'b110;
                                 biu_state <= 8'h01;
@@ -605,6 +623,7 @@ else
                       // Memory Word Write to Stack Segment
                       8'h14 : begin
                                 addr_out_temp <= { biu_register_ss[15:0] , 4'h0 } + eu_register_r3_d[15:0];
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 word_cycle <= 1'b1; 
                                 s_bits <= 3'b110;
                                 biu_state <= 8'h01;
@@ -760,7 +779,19 @@ else
                 INTA_n <= 1'b1;
 
                 
-                 addr_out_temp[15:0] <=  addr_out_temp[15:0] + 1;
+                 // Byte-2 of word access: 8086 wraps the OFFSET within
+                 // the segment (byte_2_offset = (byte_1_offset+1)&0xFFFF).
+                 // For offset != 0xFFFF this is just linear+1 (full
+                 // 20-bit so the carry past bit 15 propagates, fixing
+                 // word reads that cross 64KB linear boundaries with
+                 // non-paragraph-aligned segments).
+                 // For offset == 0xFFFF the offset wraps to 0 and
+                 // byte_2_linear = seg*16 = byte_1_linear - 0xFFFF.
+                 if (biu_byte1_offset == 16'hFFFF)
+                   addr_out_temp[19:0] <= addr_out_temp[19:0] - 20'h0FFFF;
+                 else
+                   addr_out_temp[19:0] <= addr_out_temp[19:0] + 1;
+
                  if (word_cycle==1'b1 && byte_num==1'b0)
                    begin        
                      byte_num <= 1'b1;                   
