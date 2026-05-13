@@ -405,7 +405,22 @@ else
   
     // Delay the INTR enable flag until after the next instruction begins.
     // No delay when it is disabled.
-    if (eu_flag_i==1'b0)
+    // Exception: when the microcode is executing IRET's "OR r0 into
+    // FLAGS" step, update intr_enable_delayed in the same cycle
+    // directly from bit 9 of the ALU output (= the new popped IF).
+    // The microcode word is at ROM address 0x0532; ROM has 1-cycle
+    // synchronous read, so eu_rom_data shows that word when
+    // eu_rom_address has advanced to 0x0533. Must come BEFORE the
+    // eu_flag_i==0 short-circuit because eu_flag_i is still the OLD
+    // value at this point (typically 0 — we're returning from an ISR
+    // that ran with CLI). Real 8086 only delays interrupt recognition
+    // after STI / MOV SS / POP SS — not after IRET.
+    if (eu_stall_pipeline==1'b0 && eu_opcode_type!=3'h0 && eu_opcode_type!=3'h1
+        && eu_rom_address==13'h0533)
+      begin
+        intr_enable_delayed <= eu_alu_out[9];
+      end
+    else if (eu_flag_i==1'b0)
       begin
         intr_enable_delayed <= 1'b0;
       end
@@ -623,7 +638,7 @@ else
           4'hB : eu_register_r2   <= eu_alu_out[15:0];
           4'hC : eu_register_r3   <= eu_alu_out[15:0];
           4'hD : eu_biu_command   <= eu_alu_out[15:0];
-          //4'hE : ;             
+          //4'hE : ;
           4'hF : eu_biu_dataout   <= eu_alu_out[15:0];
           default :  ;
         endcase

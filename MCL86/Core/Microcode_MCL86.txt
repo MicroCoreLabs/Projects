@@ -60,6 +60,23 @@
 // /0x0D63 entirely by jumping from 0x0D6B to a new SS-specific
 // debounce + skip-INT path at 0x0FD0-0x0FD1.
 //
+// Revision 7.0 5/11/2026
+// IRET (0xCF) interrupt-recognition fix. Real 8086 only delays
+// interrupt recognition after STI / MOV SS / POP SS; IRET does not.
+// MCL86jr's microcode and EU both deferred INT after IRET for two
+// reasons, both fixed here:
+//   1. IRET's ending jumped to the legacy 0x0470-0x0478 skip-INT
+//      path. Switched to the V6 with-INT-poll path (0x0FCB).
+//   2. Even with the with-INT-poll path, the EU's intr_enable_delayed
+//      register only updates on new_instruction edges, so the IRET
+//      microcode's post-FLAGS-load intr poll would still see IF=0.
+//      eu.v now also bypasses that delay when the microcode is at
+//      IRET's "OR r0 into FLAGS" step (eu_rom_address == 0x0532),
+//      syncing intr_enable_delayed from the ALU output's bit 9 in
+//      the same cycle.
+// Caught running King's Quest I on PCjr: BIOS timer ISR's IRET to
+// user code races the next 18.2Hz tick.
+//
 //------------------------------------------------------------------------
 //
 // Copyright (c) 2020 Ted Fried
@@ -5676,7 +5693,13 @@ p 00 00000 00001 0531
 p 01 00000 00001 488F
 p 01 00000 00001 0000
 #
-# OR r0 into Flags register
+# OR r0 into Flags register. eu.v detects this microcode step (when
+# eu_rom_data delivers this word, which is when eu_rom_address has
+# already advanced to 0x0533 due to the 1-cycle synchronous BRAM
+# read) and immediately syncs intr_enable_delayed from bit 9 of the
+# ALU output, so the post-load intr poll sees IF=1 without waiting
+# for the next new_instruction edge. Real 8086 takes pending
+# interrupts right after IRET.
 p 00 00000 00001 0532
 p 01 00000 00001 5889
 p 01 00000 00001 0000
@@ -5711,10 +5734,14 @@ p 00 00000 00001 0538
 p 01 00000 00001 4DDF
 p 01 00000 00001 0000
 #
-# Jump unconditional to common code that waits for prefetch queue, then returns to main loop skipping all interrupts.
+# Jump to PFQ-wait entry of the with-INT-poll ending (0xFCB). Real
+# 8086 only delays interrupt recognition after STI / MOV SS / POP SS;
+# IRET should NOT defer — the BIOS timer ISR returns via IRET and
+# expects the NEXT 18.2Hz tick to be taken immediately if it lands
+# during IRET. Was 0x0474 (legacy skip-INT path used by POP/MOV SS).
 p 00 00000 00001 0539
 p 01 00000 00001 1000
-p 01 00000 00001 0474
+p 01 00000 00001 0FCB
 #
 # -----------------------------------------------------
 #
