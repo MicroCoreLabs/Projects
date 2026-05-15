@@ -2498,15 +2498,21 @@ p 00 00000 00001 02BE
 p 01 00000 00001 5FFF
 p 01 00000 00001 C492
 #
-# Dummy = AX OR 0x0000 to populate last_alu for flags processing
+# Dummy = AL only (AX AND 0x00FF) to populate last_alu for flags
+# processing. AAD's flags (SF, ZF, PF) are defined on AL per Intel
+# spec, not on the full AX word. AAD always zeroes AH in the body
+# (0x02BB/0x02BD), so for AAD specifically AX AND 0xFF == AX, but
+# calling CALCULATE_FLAGS_BYTE makes the byte-domain explicit and
+# keeps the SF check on AL bit 7 (not AX bit 15).
 p 00 00000 00001 02BF
-p 01 00000 00001 5E0F
-p 01 00000 00001 0000
+p 01 00000 00001 4E0F
+p 01 00000 00001 00FF
 #
-# Call All_Flags_WORD
+# Call CALCULATE_FLAGS_BYTE (byte-domain SF/ZF/PF for AL result).
+# Was: CALL All_Flags_WORD (0x03D3) — wrong domain for AAM/AAD.
 p 00 00000 00001 02C0
 p 01 00000 00001 1100
-p 01 00000 00001 03D3
+p 01 00000 00001 0990
 #
 # Jump unconditional to Multibyte ending
 p 00 00000 00001 02C1
@@ -2601,15 +2607,23 @@ p 00 00000 00001 02D6
 p 01 00000 00001 5FFF
 p 01 00000 00001 C675
 #
-# Dummy = AX OR 0x0000 to populate last_alu for flags processing
+# Dummy = AL only (AX AND 0x00FF) to populate last_alu for flags
+# processing. AAM's flags (SF, ZF, PF) are defined on AL per Intel
+# spec, NOT on the full AX word. Original code populated alu_last
+# with AX, then All_Flags_WORD's bit-15 SF check and 16-bit ZF check
+# tripped on the AH=quotient byte — e.g. AL_pre=0x50, AAM 10 →
+# AX=0x0800, AL=0 (so ZF should be 1), but All_Flags_WORD saw
+# alu_last=0x0800 ≠ 0 and left ZF=0. Caught by Lotus 1-2-3 cosim
+# at op 4901806 in CS:IP F000:19CB-area.
 p 00 00000 00001 02D7
-p 01 00000 00001 5E0F
-p 01 00000 00001 0000
+p 01 00000 00001 4E0F
+p 01 00000 00001 00FF
 #
-# Call All_Flags_WORD
+# Call CALCULATE_FLAGS_BYTE (byte-domain SF/ZF/PF for AL result).
+# Was: CALL All_Flags_WORD (0x03D3) — wrong domain; checked AX.
 p 00 00000 00001 02D8
 p 01 00000 00001 1100
-p 01 00000 00001 03D3
+p 01 00000 00001 0990
 #
 # Jump unconditional to Multibyte ending
 p 00 00000 00001 02D9
