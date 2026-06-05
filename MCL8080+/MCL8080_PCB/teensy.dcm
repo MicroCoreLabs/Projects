@@ -1,0 +1,7 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP Teensy3.5_All_Pins
+F https://www.pjrc.com/teensy/card8a_rev2.pdf
+$ENDCMP
+#
+#End Doc Library
