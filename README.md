@@ -15,6 +15,7 @@ Boards:
     MCL64       -  MOS 6510 emulator which runs on a Teensy 4.1 and can be used as a drop-in replacment in the Commodore 64
     MCL68+      -  Motorola 68000 emulator which runs on a Teensy 4.1 and can be used as a drop-in replacment 
     MCLV20_Max  -  NEC V20 drop-in replacment CPU which uses the MCL86+ board
+	MCL8080+    -  Intel 8080 emulator which runs on an ATTiny85 and has a SPI interface as the local bus
 
     
 Emulated Processors:
