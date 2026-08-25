@@ -86,6 +86,8 @@ entry:
     cli
 %endif
 
+    mov ax, newline
+    call print_string
     mov ax, welcome_msg
     call print_string
 

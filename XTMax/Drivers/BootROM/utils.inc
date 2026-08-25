@@ -11,13 +11,13 @@ print_string:
     mov si, ax
     mov ax, cs
     mov ds, ax
-    mov ah, 0xe
     xor bx, bx
     cld
 .loop:
     lodsb
     or al, al
     jz .done
+    mov ah, 0xe
     int 0x10
     jmp .loop
 .done:
