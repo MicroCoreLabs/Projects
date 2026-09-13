@@ -108,6 +108,14 @@ reg   clk_d3;
 reg   clk_d4;
 reg   eu_biu_req_caught;
 reg   eu_biu_req_d1;
+// Stage a pending CS-register update so the visible biu_register_cs only
+// changes when the matching JMP/CALL/RET request (eu_biu_req_code 5'h19)
+// lands -- atomic with pfq_addr_in. Real 8088 microcode treats CS+IP as a
+// single update from the BIU's point of view; without staging the BIU
+// briefly sees new CS + old pfq_addr_in, and any prefetch dispatched in
+// that window forms a phantom (new_CS << 4) + old_pfq_addr_in address.
+reg [15:0] biu_register_cs_staged;
+reg        cs_update_staged;
 reg   eu_prefix_lock_d1;
 reg   eu_prefix_lock_d2;
 reg   intr_d1;
@@ -127,6 +135,12 @@ wire  eu_prefix_seg;
 wire  pfq_empty;
 reg  [7:0]  ad_in_int;
 reg  [19:0] addr_out_temp;
+// Latched byte-1 offset for word reads, used to compute byte 2 with
+// proper 8086-style offset wrap (byte_2_offset = (byte_1_offset+1)&0xFFFF).
+// Avoids both a 16-bit-only linear increment (which gives wrong addresses
+// at 0x?FFFF for non-paragraph-aligned segments) and a naive 20-bit
+// linear increment (which is wrong for offset=0xFFFF wrap).
+reg  [15:0] biu_byte1_offset;
 reg  [7:0]  biu_state;
 reg  [15:0] biu_register_cs;
 reg  [15:0] biu_register_es;
@@ -259,6 +273,8 @@ begin : BIU_STATE_MACHINE
       eu_register_r3_d <= 'h0;
       eu_biu_req_caught <= 'h0;
       biu_register_cs <= 16'hFFFF;
+      biu_register_cs_staged <= 16'hFFFF;
+      cs_update_staged <= 1'b0;
       biu_register_es <= 'h0;
       biu_register_ss <= 'h0;
       biu_register_ds <= 'h0;
@@ -281,6 +297,7 @@ begin : BIU_STATE_MACHINE
       eu_biu_req_d1 <= 'h0;
       latched_data_in <= 'h0;
       addr_out_temp <= 'h0;
+      biu_byte1_offset <= 'h0;
       s_bits <= 3'b111;
       AD_OUT <= 'h0;
       word_cycle <= 1'b0;
@@ -400,7 +417,10 @@ else
         case (eu_biu_req_code[2:0])  // synthesis parallel_case
           3'h0 : biu_register_es      <= EU_BIU_DATAOUT[15:0];
           3'h1 : biu_register_ss      <= EU_BIU_DATAOUT[15:0];
-          3'h2 : biu_register_cs      <= EU_BIU_DATAOUT[15:0];
+          3'h2 : begin
+                   biu_register_cs_staged <= EU_BIU_DATAOUT[15:0];
+                   cs_update_staged       <= 1'b1;
+                 end
           3'h3 : biu_register_ds      <= EU_BIU_DATAOUT[15:0];
           3'h4 : biu_register_rm      <= EU_BIU_DATAOUT[15:0];
           3'h5 : biu_register_reg     <= EU_BIU_DATAOUT[15:0];
@@ -437,10 +457,17 @@ else
       end                         
         
         
-    if (eu_biu_req_caught==1'b1 && eu_biu_req_code==5'h19) 
+    if (eu_biu_req_caught==1'b1 && eu_biu_req_code==5'h19)
       begin
         pfq_addr_in <= eu_register_r3_d; // Update the prefetch queue to the new address.
-      end    
+        // Atomically commit the staged CS (if any) at the same edge so
+        // prefetches from this point onward see (new CS, new pfq_addr_in).
+        if (cs_update_staged)
+          begin
+            biu_register_cs    <= biu_register_cs_staged;
+            cs_update_staged   <= 1'b0;
+          end
+      end
     else if (pfq_write==1'b1)
       begin  
         pfq_addr_in <= pfq_addr_in + 1;
@@ -485,6 +512,7 @@ else
                       // Interrupt ACK Cycle 
                       8'h16 : begin                   
                                 addr_out_temp <= { 4'h0 , eu_register_r3_d[15:0] };
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 //AD_OE <= 'h0;                   
                                 word_cycle <= 1'b1;
                                 s_bits <= 3'b000;
@@ -494,6 +522,7 @@ else
                       // IO Byte Read 
                       8'h08 : begin
                                 addr_out_temp <= { 4'h0 , eu_register_r3_d[15:0] };
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 s_bits <= 3'b001;
                                 biu_state <= 8'h01;
                               end
@@ -501,6 +530,7 @@ else
                       // IO Word Read 
                       8'h1A : begin
                                 addr_out_temp <= { 4'h0 , eu_register_r3_d[15:0] };
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 word_cycle <= 1'b1; 
                                 s_bits <= 3'b001;
                                 biu_state <= 8'h01;
@@ -509,6 +539,7 @@ else
                       // IO Byte Write 
                       8'h0A : begin
                                 addr_out_temp <= { 4'h0 , eu_register_r3_d[15:0] };
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 s_bits <= 3'b010;
                                 biu_state <= 8'h01;
                               end
@@ -516,21 +547,31 @@ else
                       // IO Word Write 
                       8'h1C : begin
                                 addr_out_temp <= { 4'h0 , eu_register_r3_d[15:0] };
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 word_cycle <= 1'b1; 
                                 s_bits <= 3'b010;
                                 biu_state <= 8'h01;
                               end
                                                 
-                      // Halt Request 
+                      // Halt Request: acknowledge immediately without
+                      // running a real bus cycle. A real 8088 HALT is just
+                      // T1 (ALE pulse + S2:S0=011 status) and does NOT wait
+                      // for READY. There's no architectural reason for a
+                      // host platform to drive READY in response to a HALT
+                      // cycle, so running through states 0x02..0x0A risks
+                      // stalling at the READY-wait in state 0x07
+                      // indefinitely on any board that doesn't happen to
+                      // assert READY anyway.
                       8'h18 : begin
-                                addr_out_temp <= { biu_register_cs[15:0] , 4'h0 } + pfq_addr_out[15:0] ;
                                 s_bits <= 3'b011;
-                                biu_state <= 8'h01;
+                                biu_done_int <= 1'b1;
+                                biu_state <= 8'h0B;
                               end
                                             
                       // Memory Byte Read 
                       8'h0C : begin
                                 addr_out_temp <= { biu_muxed_segment[15:0] , 4'h0 } + eu_register_r3_d[15:0];
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 s_bits <= 3'b101;
                                 biu_state <= 8'h01;
                               end
@@ -538,6 +579,7 @@ else
                       // Memory Word Read 
                       8'h10 : begin
                                 addr_out_temp <= { biu_muxed_segment[15:0] , 4'h0 } + eu_register_r3_d[15:0];
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 word_cycle <= 1'b1; 
                                 s_bits <= 3'b101;
                                 biu_state <= 8'h01;
@@ -546,6 +588,7 @@ else
                       // Memory Word Read from Stack Segment
                       8'h11 : begin
                                 addr_out_temp <= { biu_register_ss[15:0] , 4'h0 } + eu_register_r3_d[15:0];
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 word_cycle <= 1'b1; 
                                 s_bits <= 3'b101;
                                 biu_state <= 8'h01;
@@ -554,6 +597,7 @@ else
                       // Memory Word Read from Segment 0x0000 - Used for interrupt vector fetches
                       8'h12 : begin
                                 addr_out_temp <= { 4'h0 , eu_register_r3_d[15:0] };
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 word_cycle <= 1'b1; 
                                 s_bits <= 3'b101;
                                 biu_state <= 8'h01;
@@ -562,6 +606,7 @@ else
                       // Memory Byte Write 
                       8'h0E : begin
                                 addr_out_temp <= { biu_muxed_segment[15:0] , 4'h0 } + eu_register_r3_d[15:0];
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 s_bits <= 3'b110;
                                 biu_state <= 8'h01;
                               end
@@ -569,6 +614,7 @@ else
                       // Memory Word Write 
                       8'h13 : begin
                                 addr_out_temp <= { biu_muxed_segment[15:0] , 4'h0 } + eu_register_r3_d[15:0];
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 word_cycle <= 1'b1; 
                                 s_bits <= 3'b110;
                                 biu_state <= 8'h01;
@@ -577,6 +623,7 @@ else
                       // Memory Word Write to Stack Segment
                       8'h14 : begin
                                 addr_out_temp <= { biu_register_ss[15:0] , 4'h0 } + eu_register_r3_d[15:0];
+                                biu_byte1_offset <= eu_register_r3_d[15:0];
                                 word_cycle <= 1'b1; 
                                 s_bits <= 3'b110;
                                 biu_state <= 8'h01;
@@ -732,7 +779,19 @@ else
                 INTA_n <= 1'b1;
 
                 
-                 addr_out_temp[15:0] <=  addr_out_temp[15:0] + 1;
+                 // Byte-2 of word access: 8086 wraps the OFFSET within
+                 // the segment (byte_2_offset = (byte_1_offset+1)&0xFFFF).
+                 // For offset != 0xFFFF this is just linear+1 (full
+                 // 20-bit so the carry past bit 15 propagates, fixing
+                 // word reads that cross 64KB linear boundaries with
+                 // non-paragraph-aligned segments).
+                 // For offset == 0xFFFF the offset wraps to 0 and
+                 // byte_2_linear = seg*16 = byte_1_linear - 0xFFFF.
+                 if (biu_byte1_offset == 16'hFFFF)
+                   addr_out_temp[19:0] <= addr_out_temp[19:0] - 20'h0FFFF;
+                 else
+                   addr_out_temp[19:0] <= addr_out_temp[19:0] + 1;
+
                  if (word_cycle==1'b1 && byte_num==1'b0)
                    begin        
                      byte_num <= 1'b1;                   
